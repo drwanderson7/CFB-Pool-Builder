@@ -181,15 +181,29 @@
       font-weight: 800;
     }
 
-    .candidate-list { display: grid; gap: 8px; }
+    .candidate-list { display: grid; gap: 4px; }
+    .candidate-columns {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 95px 95px 106px;
+      gap: 6px;
+      padding: 0 9px 6px;
+      color: var(--muted);
+      font-size: .7rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+    .candidate-columns[hidden] { display: none; }
+    .candidates { min-height: 0; min-width: 0; }
+    .team-row .field-label, .team-row .lock-line { display: none; }
     .team-row {
       display: grid;
-      grid-template-columns: minmax(100px, 1fr) 95px 95px 106px;
+      grid-template-columns: minmax(0, 1fr) 95px 95px 106px;
       gap: 6px;
       align-items: center;
-      padding: 10px;
+      padding: 5px 8px;
       border: 1px solid var(--line);
-      border-radius: 12px;
+      border-radius: 8px;
       background: var(--panel-2);
       transition: border-color .15s ease, background .15s ease, opacity .15s ease;
     }
@@ -312,6 +326,8 @@
     }
 
     @media (max-width: 620px) {
+      .candidate-columns { display: none; }
+      .team-row .field-label { display: block; }
       .team-row { grid-template-columns: 1fr 1fr; align-items: end; }
       .team-name-wrap, .placement-group { grid-column: 1 / -1; }
       .choice-btn { min-width: 36px; }
@@ -335,7 +351,7 @@
   <main class="app">
     <header class="topbar">
       <div>
-        <p class="eyebrow">Standalone tool • Light v4</p>
+        <p class="eyebrow">Standalone tool • Light v5</p>
         <h1>CFB Splash Pool Builder</h1>
         <p class="subtitle">Build two 7-pick entries, control every team's exposure, drag teams between entries to move them, or use Lock both to place a team in both entries.</p>
       </div>
@@ -398,6 +414,7 @@
           </div>
           <span class="badge" id="candidateBadge">0 teams</span>
         </div>
+        <div class="candidate-columns" id="candidateColumns" aria-hidden="true"><span>Team</span><span>Min</span><span>Max</span><span>Place</span></div>
         <div class="candidate-list" id="candidateList"></div>
         <div class="empty-state" id="candidateEmpty"><strong>No teams loaded</strong><span>Paste your 10–15 candidates above to begin.</span></div>
       </div>
