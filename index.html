@@ -184,10 +184,10 @@
     .candidate-list { display: grid; gap: 8px; }
     .team-row {
       display: grid;
-      grid-template-columns: minmax(125px, 1fr) 72px 72px 74px;
-      gap: 8px;
+      grid-template-columns: minmax(145px, 1fr) auto auto auto;
+      gap: 10px;
       align-items: center;
-      padding: 9px;
+      padding: 10px;
       border: 1px solid var(--line);
       border-radius: 12px;
       background: var(--panel-2);
@@ -200,18 +200,25 @@
     .lock-line { min-height: 17px; margin-top: 3px; color: var(--muted); font-size: .71rem; }
     .lock-line.active { color: var(--green); }
     .field-label { display: block; margin-bottom: 4px; color: var(--muted); font-size: .65rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
-    .team-row select { width: 100%; min-height: 36px; padding: 0 7px; }
-    .quick-locks { display: flex; justify-content: flex-end; gap: 5px; }
-    .quick-lock {
-      width: 32px;
+    .setting-group { min-width: 96px; }
+    .segmented, .placement-buttons { display: flex; gap: 4px; }
+    .choice-btn {
+      min-width: 29px;
       height: 32px;
+      padding: 0 7px;
       border: 1px solid var(--line);
       border-radius: 8px;
       background: #ffffff;
       color: var(--muted);
-      font-weight: 850;
+      font-size: .76rem;
+      font-weight: 800;
     }
-    .quick-lock.on { color: #ffffff; background: var(--green); border-color: var(--green); }
+    .choice-btn:hover { border-color: #91aa99; color: var(--text); }
+    .choice-btn.active { color: #ffffff; background: var(--green); border-color: var(--green); }
+    .choice-btn:disabled { opacity: .35; cursor: not-allowed; }
+    .placement-group { min-width: 140px; }
+    .place-btn { min-width: 34px; }
+    .place-btn.both { min-width: 66px; }
 
     .entry { display: flex; flex-direction: column; }
     .entry-head { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-bottom: 11px; }
@@ -288,7 +295,6 @@
     @media (max-width: 1120px) {
       .workspace { grid-template-columns: 1fr 1fr; }
       .candidates { grid-column: 1 / -1; min-height: auto; }
-      .candidate-list { grid-template-columns: 1fr 1fr; }
     }
 
     @media (max-width: 760px) {
@@ -296,7 +302,6 @@
       .topbar { display: block; }
       .top-actions { justify-content: flex-start; margin-top: 16px; }
       .setup, .workspace { grid-template-columns: 1fr; }
-      .candidate-list { grid-template-columns: 1fr; }
       .candidates { grid-column: auto; }
       .entry { min-height: 510px; }
       .dropzone { min-height: 390px; }
@@ -306,10 +311,10 @@
       .overlap-explainer { grid-template-columns: 1fr; }
     }
 
-    @media (max-width: 450px) {
-      .team-row { grid-template-columns: minmax(120px, 1fr) 62px 62px; }
-      .quick-locks { grid-column: 1 / -1; justify-content: flex-start; }
-      .quick-lock { width: 42px; }
+    @media (max-width: 620px) {
+      .team-row { grid-template-columns: 1fr 1fr; align-items: end; }
+      .team-name-wrap, .placement-group { grid-column: 1 / -1; }
+      .choice-btn { min-width: 36px; }
       .overlap-wrap { grid-template-columns: 1fr; }
       .build-actions { grid-template-columns: 1fr; }
     }
@@ -330,9 +335,9 @@
   <main class="app">
     <header class="topbar">
       <div>
-        <p class="eyebrow">Standalone tool • Light v2</p>
+        <p class="eyebrow">Standalone tool • Light v3</p>
         <h1>CFB Splash Pool Builder</h1>
-        <p class="subtitle">Build two 7-pick entries, control every team's minimum and maximum exposure, choose the exact number of shared picks, and lock teams to a specific entry by dragging them there.</p>
+        <p class="subtitle">Build two 7-pick entries, control every team's exposure, drag teams between entries to move them, or use Lock both to place a team in both entries.</p>
       </div>
       <div class="top-actions">
         <button class="btn" id="printBtn" type="button">Print / Save PDF</button>
@@ -389,7 +394,7 @@
         <div class="candidate-toolbar">
           <div>
             <h2>3. Set exposure &amp; locks</h2>
-            <p class="helper">Drag a row to an entry, or tap 1 / 2.</p>
+            <p class="helper">Use the Min/Max buttons, drag to an entry, or tap S1, S2, or Lock both.</p>
           </div>
           <span class="badge" id="candidateBadge">0 teams</span>
         </div>
@@ -434,7 +439,7 @@
     </section>
   </main>
 
-  <script>
+  <script type="text/plain" id="legacy-v2-script">
     (() => {
       'use strict';
 
@@ -812,6 +817,459 @@
       restore();
       renderAll();
       if (state.teams.length) setStatus('Saved setup restored', 'Your teams, limits, locks, and latest build were loaded from this browser.', 'success');
+    })();
+  </script>
+  <script>
+    (() => {
+      'use strict';
+
+      const STORAGE_KEY = 'cfb-splash-pool-builder-v1';
+      const $ = (selector) => document.querySelector(selector);
+      const els = {
+        input: $('#teamInput'), inputCount: $('#inputCount'), load: $('#loadTeamsBtn'),
+        overlap: $('#overlapSelect'), overlapValue: $('#overlapValue'), overlapSentence: $('#overlapSentence'),
+        uniqueNeeded: $('#uniqueNeeded'), differentPicks: $('#differentPicks'), candidateList: $('#candidateList'),
+        candidateEmpty: $('#candidateEmpty'), candidateBadge: $('#candidateBadge'),
+        zones: { 1: $('#entry1Zone'), 2: $('#entry2Zone') },
+        counts: { 1: $('#entry1Count'), 2: $('#entry2Count') },
+        clear: { 1: $('#clearEntry1'), 2: $('#clearEntry2') },
+        copy: { 1: $('#copyEntry1'), 2: $('#copyEntry2') },
+        build: $('#buildBtn'), another: $('#anotherBtn'), status: $('#statusBox'),
+        reset: $('#resetBtn'), print: $('#printBtn')
+      };
+
+      let state = { teams: [], overlap: 3, result: null };
+      let dragData = { teamId: null, sourceEntry: 0 };
+
+      const escapeHtml = (value) => String(value).replace(/[&<>"']/g, char => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[char]));
+      const uid = () => 't-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+      const popcount = (mask) => mask === 3 ? 2 : mask === 0 ? 0 : 1;
+      const includesEntry = (mask, entry) => Boolean(mask & entry);
+      const clone = (value) => JSON.parse(JSON.stringify(value));
+      const shuffled = (items) => {
+        const copy = items.slice();
+        for (let i = copy.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [copy[i], copy[j]] = [copy[j], copy[i]];
+        }
+        return copy;
+      };
+
+      function save() {
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (_) {}
+      }
+
+      function restore() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return;
+          const saved = JSON.parse(raw);
+          if (!saved || !Array.isArray(saved.teams)) return;
+          state.teams = saved.teams.map(team => {
+            const oldLocks = Array.isArray(team.locks) ? team.locks : [];
+            const migratedMask = oldLocks.reduce((mask, entry) => mask | (entry === 1 ? 1 : entry === 2 ? 2 : 0), 0);
+            const fixedMask = [0, 1, 2, 3].includes(Number(team.fixedMask)) ? Number(team.fixedMask) : migratedMask;
+            const exposure = popcount(fixedMask);
+            let min = Math.max(0, Math.min(2, Number(team.min) || 0));
+            let max = Math.max(0, Math.min(2, Number.isFinite(Number(team.max)) ? Number(team.max) : 2));
+            if (fixedMask) {
+              min = Math.min(min, exposure);
+              max = Math.max(max, exposure);
+            }
+            return { id: String(team.id || uid()), name: String(team.name || ''), min, max, fixedMask };
+          }).filter(team => team.name);
+          state.overlap = Math.max(0, Math.min(7, Number(saved.overlap) || 0));
+          state.result = saved.result && Array.isArray(saved.result[1]) && Array.isArray(saved.result[2]) ? saved.result : null;
+        } catch (_) {}
+      }
+
+      function setStatus(title, detail, type = '') {
+        els.status.className = 'status' + (type ? ' ' + type : '');
+        els.status.innerHTML = '<strong>' + escapeHtml(title) + '</strong><span>' + escapeHtml(detail) + '</span>';
+      }
+
+      function parseInput() {
+        const seen = new Set();
+        return els.input.value.split(/\n|,/).map(x => x.trim()).filter(Boolean).filter(name => {
+          const key = name.toLowerCase();
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        }).slice(0, 40);
+      }
+
+      function updateInputCount() {
+        const count = parseInput().length;
+        els.inputCount.textContent = count + ' entered';
+      }
+
+      function updateOverlapUI() {
+        state.overlap = Number(els.overlap.value);
+        els.overlapValue.textContent = state.overlap;
+        els.overlapSentence.textContent = 'Each entry will share exactly ' + state.overlap + ' of its 7 teams.';
+        els.uniqueNeeded.textContent = 14 - state.overlap;
+        els.differentPicks.textContent = (7 - state.overlap) + ' + ' + (7 - state.overlap);
+      }
+
+      function maskFromResult(teamId, result) {
+        if (!result) return null;
+        return (result[1].includes(teamId) ? 1 : 0) | (result[2].includes(teamId) ? 2 : 0);
+      }
+
+      function allowedMasks(team) {
+        if (team.fixedMask) {
+          const exposure = popcount(team.fixedMask);
+          return exposure >= team.min && exposure <= team.max ? [team.fixedMask] : [];
+        }
+        return [0, 1, 2, 3].filter(mask => {
+          const exposure = popcount(mask);
+          return exposure >= team.min && exposure <= team.max;
+        });
+      }
+
+      function validate() {
+        if (state.teams.length < 7) return { ok: false, title: 'Add more teams', detail: 'You need at least 7 candidate teams.' };
+        const uniqueRequired = 14 - state.overlap;
+        const usable = state.teams.filter(team => team.max > 0).length;
+        if (usable < uniqueRequired) return { ok: false, title: 'Not enough usable teams', detail: 'A ' + state.overlap + '-pick overlap requires at least ' + uniqueRequired + ' teams with Max above 0.' };
+
+        let fixed1 = 0, fixed2 = 0, fixedBoth = 0;
+        for (const team of state.teams) {
+          if (team.min > team.max) return { ok: false, title: 'Invalid exposure', detail: team.name + ' has a minimum above its maximum.' };
+          if (!allowedMasks(team).length) return { ok: false, title: 'Placement conflicts with exposure', detail: team.name + ' cannot satisfy its current placement and Min/Max settings.' };
+          if (includesEntry(team.fixedMask, 1)) fixed1++;
+          if (includesEntry(team.fixedMask, 2)) fixed2++;
+          if (team.fixedMask === 3) fixedBoth++;
+        }
+        if (fixed1 > 7 || fixed2 > 7) return { ok: false, title: 'Too many fixed picks', detail: 'An entry cannot contain more than 7 fixed teams.' };
+        if (fixedBoth > state.overlap) return { ok: false, title: 'Too many teams locked in both', detail: fixedBoth + ' teams are locked in both entries, above your shared-pick target of ' + state.overlap + '.' };
+        return { ok: true };
+      }
+
+      function loadTeams() {
+        const names = parseInput();
+        const existing = new Map(state.teams.map(team => [team.name.toLowerCase(), team]));
+        state.teams = names.map(name => {
+          const old = existing.get(name.toLowerCase());
+          return old ? { ...old, name } : { id: uid(), name, min: 0, max: 2, fixedMask: 0 };
+        });
+        state.result = null;
+        save();
+        renderAll();
+        setStatus(names.length ? 'Teams loaded' : 'Ready for your teams', names.length ? 'Set exposure, drag teams into place, then build.' : 'Paste one team per line above.');
+      }
+
+      function exposureButtons(team, field) {
+        const fixedExposure = popcount(team.fixedMask);
+        return [0, 1, 2].map(value => {
+          const disabled = team.fixedMask && ((field === 'min' && value > fixedExposure) || (field === 'max' && value < fixedExposure));
+          return '<button type="button" class="choice-btn exposure-btn ' + (team[field] === value ? 'active' : '') + '" data-field="' + field + '" data-value="' + value + '" data-team-id="' + escapeHtml(team.id) + '"' + (disabled ? ' disabled' : '') + ' aria-label="Set ' + field + 'imum exposure for ' + escapeHtml(team.name) + ' to ' + value + '">' + value + '</button>';
+        }).join('');
+      }
+
+      function placementText(mask) {
+        if (mask === 1) return 'Fixed: Splash 1';
+        if (mask === 2) return 'Fixed: Splash 2';
+        if (mask === 3) return 'Locked in both entries';
+        return 'Drag to place';
+      }
+
+      function renderCandidates() {
+        els.candidateEmpty.classList.toggle('hidden', state.teams.length > 0);
+        els.candidateBadge.textContent = state.teams.length + (state.teams.length === 1 ? ' team' : ' teams');
+        els.candidateList.innerHTML = state.teams.map(team =>
+          '<div class="team-row" draggable="true" data-team-id="' + escapeHtml(team.id) + '" data-source-entry="0">' +
+            '<div class="team-name-wrap"><div class="team-name" title="' + escapeHtml(team.name) + '">' + escapeHtml(team.name) + '</div>' +
+            '<div class="lock-line ' + (team.fixedMask ? 'active' : '') + '">' + placementText(team.fixedMask) + '</div></div>' +
+            '<div class="setting-group"><span class="field-label">Min</span><div class="segmented">' + exposureButtons(team, 'min') + '</div></div>' +
+            '<div class="setting-group"><span class="field-label">Max</span><div class="segmented">' + exposureButtons(team, 'max') + '</div></div>' +
+            '<div class="placement-group"><span class="field-label">Place</span><div class="placement-buttons">' +
+              '<button type="button" class="choice-btn place-btn ' + (team.fixedMask === 1 ? 'active' : '') + '" data-mask="1" data-team-id="' + escapeHtml(team.id) + '">S1</button>' +
+              '<button type="button" class="choice-btn place-btn ' + (team.fixedMask === 2 ? 'active' : '') + '" data-mask="2" data-team-id="' + escapeHtml(team.id) + '">S2</button>' +
+              '<button type="button" class="choice-btn place-btn both ' + (team.fixedMask === 3 ? 'active' : '') + '" data-mask="3" data-team-id="' + escapeHtml(team.id) + '">🔒 Both</button>' +
+            '</div></div></div>'
+        ).join('');
+      }
+
+      function picksForEntry(entry) {
+        if (state.result) {
+          return state.result[entry].map(id => {
+            const team = state.teams.find(item => item.id === id);
+            return team ? { team, locked: includesEntry(team.fixedMask, entry) } : null;
+          }).filter(Boolean);
+        }
+        return state.teams.filter(team => includesEntry(team.fixedMask, entry)).map(team => ({ team, locked: true }));
+      }
+
+      function renderEntries() {
+        [1, 2].forEach(entry => {
+          const picks = picksForEntry(entry);
+          const zone = els.zones[entry];
+          const otherIds = new Set(picksForEntry(entry === 1 ? 2 : 1).map(item => item.team.id));
+          if (!picks.length) {
+            zone.innerHTML = '<div class="empty-state"><strong>Drop teams here</strong><span>Drag from candidates or from the other entry.</span></div>';
+          } else {
+            zone.innerHTML = picks.map((item, index) => {
+              const both = item.team.fixedMask === 3;
+              const meta = both ? 'Locked in both entries' : item.locked ? 'Fixed to this entry' : 'Builder selection';
+              return '<div class="pick-card ' + (item.locked ? 'locked' : '') + '" draggable="true" data-team-id="' + escapeHtml(item.team.id) + '" data-source-entry="' + entry + '">' +
+                '<span class="pick-num">' + (index + 1) + '</span><div class="pick-main"><div class="pick-name">' + escapeHtml(item.team.name) + '</div><div class="pick-meta">' +
+                meta + (otherIds.has(item.team.id) ? ' <span class="shared-marker">• Shared</span>' : '') + '</div></div>' +
+                (item.locked ? '<button type="button" class="remove-lock" data-team-id="' + escapeHtml(item.team.id) + '">' + (both ? 'Unlock both' : 'Unlock') + '</button>' : '') + '</div>';
+            }).join('');
+          }
+          els.counts[entry].textContent = picks.length + ' / 7';
+          els.counts[entry].classList.toggle('complete', picks.length === 7);
+          els.clear[entry].disabled = !state.teams.some(team => includesEntry(team.fixedMask, entry));
+          els.copy[entry].disabled = picks.length !== 7;
+        });
+      }
+
+      function renderButtons() {
+        const check = validate();
+        els.build.disabled = !check.ok;
+        if (!check.ok && state.teams.length) setStatus(check.title, check.detail, 'error');
+      }
+
+      function renderAll() {
+        els.input.value = state.teams.map(team => team.name).join('\n');
+        els.overlap.value = String(state.overlap);
+        updateInputCount();
+        updateOverlapUI();
+        renderCandidates();
+        renderEntries();
+        renderButtons();
+      }
+
+      function solve(preferredResult = null, randomize = false) {
+        const validation = validate();
+        if (!validation.ok) return null;
+
+        const prepared = state.teams.map((team, originalIndex) => {
+          const previousMask = maskFromResult(team.id, preferredResult);
+          let masks = allowedMasks(team).slice();
+          if (randomize) masks = shuffled(masks);
+          else if (previousMask !== null && masks.includes(previousMask)) masks.sort((a, b) => Number(b === previousMask) - Number(a === previousMask));
+          return { team, masks, previousMask, originalIndex };
+        });
+        prepared.sort((a, b) => a.masks.length - b.masks.length || (randomize ? Math.random() - .5 : a.originalIndex - b.originalIndex));
+        const memo = new Set();
+
+        function walk(index, count1, count2, shared) {
+          if (count1 > 7 || count2 > 7 || shared > state.overlap) return null;
+          if (index === prepared.length) return count1 === 7 && count2 === 7 && shared === state.overlap ? [] : null;
+          const remaining = prepared.length - index;
+          if (count1 + remaining < 7 || count2 + remaining < 7 || shared + remaining < state.overlap) return null;
+          const key = index + '|' + count1 + '|' + count2 + '|' + shared;
+          if (memo.has(key)) return null;
+
+          const item = prepared[index];
+          for (const mask of item.masks) {
+            const next1 = count1 + (includesEntry(mask, 1) ? 1 : 0);
+            const next2 = count2 + (includesEntry(mask, 2) ? 1 : 0);
+            const nextShared = shared + (mask === 3 ? 1 : 0);
+            const tail = walk(index + 1, next1, next2, nextShared);
+            if (tail) return [{ id: item.team.id, mask }, ...tail];
+          }
+          memo.add(key);
+          return null;
+        }
+
+        return walk(0, 0, 0, 0);
+      }
+
+      function solutionToResult(solved, preferredResult = null) {
+        const result = { 1: [], 2: [] };
+        solved.forEach(({ id, mask }) => {
+          if (includesEntry(mask, 1)) result[1].push(id);
+          if (includesEntry(mask, 2)) result[2].push(id);
+        });
+        [1, 2].forEach(entry => {
+          const oldOrder = preferredResult ? preferredResult[entry] : [];
+          result[entry].sort((a, b) => {
+            const ai = oldOrder.indexOf(a), bi = oldOrder.indexOf(b);
+            if (ai >= 0 && bi >= 0) return ai - bi;
+            if (ai >= 0) return -1;
+            if (bi >= 0) return 1;
+            return state.teams.findIndex(t => t.id === a) - state.teams.findIndex(t => t.id === b);
+          });
+        });
+        return result;
+      }
+
+      function commitSolution(solved, preferredResult, detail) {
+        state.result = solutionToResult(solved, preferredResult);
+        save();
+        renderCandidates();
+        renderEntries();
+        renderButtons();
+        els.another.disabled = false;
+        setStatus('Entries updated', detail || ('Both entries have 7 picks and share exactly ' + state.overlap + '.'), 'success');
+      }
+
+      function applyMutation(change, detail) {
+        const before = clone(state);
+        const preferred = state.result ? clone(state.result) : null;
+        change();
+        const validation = validate();
+        if (!validation.ok) {
+          state = before;
+          renderAll();
+          setStatus(validation.title, validation.detail, 'error');
+          return false;
+        }
+        if (preferred) {
+          const solved = solve(preferred, false);
+          if (!solved) {
+            state = before;
+            renderAll();
+            setStatus('Change could not be applied', 'That move conflicts with the overlap or exposure rules, so the previous entries were kept.', 'error');
+            return false;
+          }
+          commitSolution(solved, preferred, detail);
+        } else {
+          state.result = null;
+          save();
+          renderCandidates();
+          renderEntries();
+          renderButtons();
+          setStatus('Placement updated', detail);
+        }
+        return true;
+      }
+
+      function setPlacement(teamId, mask, toggleIfSame = true) {
+        const team = state.teams.find(item => item.id === teamId);
+        if (!team) return;
+        const nextMask = toggleIfSame && team.fixedMask === mask ? 0 : mask;
+        const action = nextMask === 3 ? team.name + ' is now locked in both entries.' : nextMask ? team.name + ' moved and fixed in Splash ' + nextMask + '.' : team.name + ' is no longer fixed to an entry.';
+        applyMutation(() => {
+          team.fixedMask = nextMask;
+          if (nextMask) {
+            const exposure = popcount(nextMask);
+            team.min = Math.min(team.min, exposure);
+            team.max = Math.max(team.max, exposure);
+          }
+        }, action);
+      }
+
+      function setExposure(teamId, field, value) {
+        const team = state.teams.find(item => item.id === teamId);
+        if (!team) return;
+        applyMutation(() => {
+          team[field] = value;
+          if (field === 'min' && team.min > team.max) team.max = team.min;
+          if (field === 'max' && team.max < team.min) team.min = team.max;
+        }, 'Exposure settings updated for ' + team.name + '.');
+      }
+
+      function build(randomize = true) {
+        const solved = solve(null, randomize);
+        if (!solved) return setStatus('No valid build found', 'The overlap, placements, and exposure limits conflict. Adjust a Min/Max button or unlock a team.', 'error');
+        commitSolution(solved, null, 'Both entries have 7 picks and share exactly ' + state.overlap + '.');
+      }
+
+      async function copyEntry(entry) {
+        const picks = picksForEntry(entry).map((item, index) => (index + 1) + '. ' + item.team.name).join('\n');
+        if (!picks) return;
+        const text = 'Splash Entry ' + entry + '\n' + picks;
+        try {
+          await navigator.clipboard.writeText(text);
+        } catch (_) {
+          const temp = document.createElement('textarea');
+          temp.value = text; document.body.appendChild(temp); temp.select(); document.execCommand('copy'); temp.remove();
+        }
+        setStatus('Entry ' + entry + ' copied', 'The seven picks are on your clipboard.', 'success');
+      }
+
+      els.input.addEventListener('input', updateInputCount);
+      els.load.addEventListener('click', loadTeams);
+      els.overlap.addEventListener('change', () => {
+        const next = Number(els.overlap.value);
+        const beforeOverlap = state.overlap;
+        const preferred = state.result ? clone(state.result) : null;
+        state.overlap = next;
+        updateOverlapUI();
+        const validation = validate();
+        const solved = validation.ok && preferred ? solve(preferred, false) : null;
+        if (!validation.ok || (preferred && !solved)) {
+          state.overlap = beforeOverlap;
+          renderAll();
+          return setStatus(validation.ok ? 'Overlap change could not be applied' : validation.title, validation.ok ? 'The previous entries were kept because that overlap conflicts with current placements.' : validation.detail, 'error');
+        }
+        if (solved) commitSolution(solved, preferred, 'Exact overlap changed to ' + state.overlap + ' while keeping as many picks as possible.');
+        else {
+          save(); renderAll(); setStatus('Overlap updated', 'Exact overlap is now ' + state.overlap + '.');
+        }
+      });
+
+      els.candidateList.addEventListener('click', event => {
+        const exposure = event.target.closest('.exposure-btn');
+        if (exposure) return setExposure(exposure.dataset.teamId, exposure.dataset.field, Number(exposure.dataset.value));
+        const placement = event.target.closest('.place-btn');
+        if (placement) return setPlacement(placement.dataset.teamId, Number(placement.dataset.mask));
+      });
+
+      document.addEventListener('dragstart', event => {
+        const card = event.target.closest('[data-team-id][draggable="true"]');
+        if (!card || event.target.closest('button')) return event.preventDefault();
+        dragData = { teamId: card.dataset.teamId, sourceEntry: Number(card.dataset.sourceEntry || 0) };
+        card.classList.add('dragging');
+        event.dataTransfer.effectAllowed = 'move';
+        event.dataTransfer.setData('text/plain', dragData.teamId);
+      });
+      document.addEventListener('dragend', event => {
+        event.target.closest('[data-team-id]')?.classList.remove('dragging');
+        dragData = { teamId: null, sourceEntry: 0 };
+        Object.values(els.zones).forEach(zone => zone.classList.remove('over'));
+      });
+
+      Object.values(els.zones).forEach(zone => {
+        zone.addEventListener('dragover', event => { event.preventDefault(); zone.classList.add('over'); event.dataTransfer.dropEffect = 'move'; });
+        zone.addEventListener('dragleave', event => { if (!zone.contains(event.relatedTarget)) zone.classList.remove('over'); });
+        zone.addEventListener('drop', event => {
+          event.preventDefault();
+          zone.classList.remove('over');
+          const teamId = event.dataTransfer.getData('text/plain') || dragData.teamId;
+          const targetEntry = Number(zone.dataset.entry);
+          if (!teamId || dragData.sourceEntry === targetEntry) return;
+          setPlacement(teamId, targetEntry, false);
+        });
+        zone.addEventListener('click', event => {
+          const button = event.target.closest('.remove-lock');
+          if (button) setPlacement(button.dataset.teamId, 0);
+        });
+      });
+
+      [1, 2].forEach(entry => {
+        els.clear[entry].addEventListener('click', () => {
+          applyMutation(() => {
+            state.teams.forEach(team => {
+              if (team.fixedMask === entry) team.fixedMask = 0;
+              else if (team.fixedMask === 3) team.fixedMask = entry === 1 ? 2 : 1;
+            });
+          }, 'Fixed placements cleared from Splash ' + entry + '.');
+        });
+        els.copy[entry].addEventListener('click', () => copyEntry(entry));
+      });
+
+      els.build.addEventListener('click', () => build(true));
+      els.another.addEventListener('click', () => build(true));
+      els.print.addEventListener('click', () => window.print());
+      els.reset.addEventListener('click', () => {
+        if (!confirm('Clear all teams, placements, and saved settings?')) return;
+        state = { teams: [], overlap: 3, result: null };
+        try { localStorage.removeItem(STORAGE_KEY); } catch (_) {}
+        els.input.value = '';
+        renderAll();
+        setStatus('Reset complete', 'Paste your candidate teams above to start a new build.');
+      });
+
+      restore();
+      renderAll();
+      if (state.teams.length) setStatus('Saved setup restored', 'Your teams, exposure settings, placements, and latest build were loaded.', 'success');
     })();
   </script>
 </body>
