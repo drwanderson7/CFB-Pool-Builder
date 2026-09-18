@@ -160,7 +160,7 @@
 
     .workspace {
       display: grid;
-      grid-template-columns: minmax(390px, 1.08fr) repeat(2, minmax(270px, .96fr));
+      grid-template-columns: minmax(470px, 1.28fr) repeat(2, minmax(250px, .86fr));
       gap: 16px;
       align-items: stretch;
     }
@@ -184,8 +184,8 @@
     .candidate-list { display: grid; gap: 8px; }
     .team-row {
       display: grid;
-      grid-template-columns: minmax(145px, 1fr) auto auto auto;
-      gap: 10px;
+      grid-template-columns: minmax(100px, 1fr) 95px 95px 106px;
+      gap: 6px;
       align-items: center;
       padding: 10px;
       border: 1px solid var(--line);
@@ -200,7 +200,7 @@
     .lock-line { min-height: 17px; margin-top: 3px; color: var(--muted); font-size: .71rem; }
     .lock-line.active { color: var(--green); }
     .field-label { display: block; margin-bottom: 4px; color: var(--muted); font-size: .65rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
-    .setting-group { min-width: 96px; }
+    .setting-group { min-width: 0; }
     .segmented, .placement-buttons { display: flex; gap: 4px; }
     .choice-btn {
       min-width: 29px;
@@ -216,9 +216,9 @@
     .choice-btn:hover { border-color: #91aa99; color: var(--text); }
     .choice-btn.active { color: #ffffff; background: var(--green); border-color: var(--green); }
     .choice-btn:disabled { opacity: .35; cursor: not-allowed; }
-    .placement-group { min-width: 140px; }
-    .place-btn { min-width: 34px; }
-    .place-btn.both { min-width: 66px; }
+    .placement-group { min-width: 0; }
+    .place-btn { min-width: 32px; padding: 0 5px; }
+    .place-btn.both { width: 34px; min-width: 34px; padding: 0; }
 
     .entry { display: flex; flex-direction: column; }
     .entry-head { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-bottom: 11px; }
@@ -335,7 +335,7 @@
   <main class="app">
     <header class="topbar">
       <div>
-        <p class="eyebrow">Standalone tool • Light v3</p>
+        <p class="eyebrow">Standalone tool • Light v4</p>
         <h1>CFB Splash Pool Builder</h1>
         <p class="subtitle">Build two 7-pick entries, control every team's exposure, drag teams between entries to move them, or use Lock both to place a team in both entries.</p>
       </div>
@@ -988,7 +988,7 @@
             '<div class="placement-group"><span class="field-label">Place</span><div class="placement-buttons">' +
               '<button type="button" class="choice-btn place-btn ' + (team.fixedMask === 1 ? 'active' : '') + '" data-mask="1" data-team-id="' + escapeHtml(team.id) + '">S1</button>' +
               '<button type="button" class="choice-btn place-btn ' + (team.fixedMask === 2 ? 'active' : '') + '" data-mask="2" data-team-id="' + escapeHtml(team.id) + '">S2</button>' +
-              '<button type="button" class="choice-btn place-btn both ' + (team.fixedMask === 3 ? 'active' : '') + '" data-mask="3" data-team-id="' + escapeHtml(team.id) + '">🔒 Both</button>' +
+              '<button type="button" class="choice-btn place-btn both ' + (team.fixedMask === 3 ? 'active' : '') + '" data-mask="3" data-team-id="' + escapeHtml(team.id) + '" aria-label="Lock ' + escapeHtml(team.name) + ' in both entries" title="Lock in both entries">🔒</button>' +
             '</div></div></div>'
         ).join('');
       }
