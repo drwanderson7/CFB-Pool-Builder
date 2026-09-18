@@ -1,0 +1,808 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#07150f">
+  <title>CFB Splash Pool Builder</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #07100c;
+      --panel: #0d1b14;
+      --panel-2: #10251a;
+      --panel-3: #162c20;
+      --text: #f4f7f5;
+      --muted: #9daf9f;
+      --line: #284034;
+      --green: #36d17c;
+      --green-2: #1fa661;
+      --green-soft: rgba(54, 209, 124, .12);
+      --amber: #ffc75a;
+      --red: #ff746c;
+      --shadow: 0 20px 55px rgba(0, 0, 0, .32);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 8% -10%, rgba(54, 209, 124, .13), transparent 32rem),
+        var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+
+    .app { width: min(1480px, 100%); margin: 0 auto; padding: 28px; }
+
+    .topbar {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 22px;
+      margin-bottom: 22px;
+    }
+
+    .eyebrow {
+      margin: 0 0 7px;
+      color: var(--green);
+      font-size: .78rem;
+      font-weight: 800;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+
+    h1 { margin: 0; font-size: clamp(1.8rem, 4vw, 3rem); line-height: 1.05; letter-spacing: -.045em; }
+    h2, h3, p { margin-top: 0; }
+    .subtitle { max-width: 720px; margin: 10px 0 0; color: var(--muted); line-height: 1.55; }
+
+    .top-actions { display: flex; gap: 9px; flex-wrap: wrap; justify-content: flex-end; }
+    .btn {
+      min-height: 42px;
+      padding: 0 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-weight: 750;
+      transition: transform .15s ease, border-color .15s ease, background .15s ease;
+    }
+    .btn:hover { transform: translateY(-1px); border-color: #416650; }
+    .btn.primary { border-color: var(--green); background: var(--green); color: #032412; }
+    .btn.primary:hover { background: #49df8c; }
+    .btn.danger { color: var(--red); }
+    .btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255,255,255,.018), transparent), var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .setup {
+      display: grid;
+      grid-template-columns: minmax(280px, .85fr) minmax(390px, 1.15fr);
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .setup-panel { padding: 20px; }
+    .section-head { display: flex; justify-content: space-between; gap: 14px; align-items: flex-start; margin-bottom: 15px; }
+    .section-head h2 { margin-bottom: 5px; font-size: 1.02rem; }
+    .helper { margin: 0; color: var(--muted); font-size: .88rem; line-height: 1.45; }
+
+    textarea {
+      width: 100%;
+      min-height: 198px;
+      resize: vertical;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: #09150e;
+      color: var(--text);
+      padding: 13px 14px;
+      outline: none;
+      line-height: 1.5;
+    }
+    textarea:focus, select:focus, input:focus { border-color: var(--green); box-shadow: 0 0 0 3px var(--green-soft); outline: none; }
+    .load-row { display: flex; gap: 9px; align-items: center; margin-top: 11px; }
+    .count-note { color: var(--muted); font-size: .82rem; }
+
+    .overlap-wrap {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 18px;
+      padding: 14px;
+      border-radius: 14px;
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+      margin-bottom: 14px;
+    }
+    .overlap-number { display: flex; align-items: baseline; gap: 7px; }
+    .overlap-number strong { font-size: 2rem; color: var(--green); line-height: 1; }
+    .overlap-number span { color: var(--muted); font-size: .83rem; }
+    .overlap-select { min-width: 118px; }
+
+    select, input[type="text"] {
+      min-height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #09150e;
+      color: var(--text);
+      padding: 0 10px;
+    }
+
+    .overlap-explainer {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .mini-stat { padding: 11px; border-radius: 11px; background: rgba(255,255,255,.025); border: 1px solid var(--line); }
+    .mini-stat strong { display: block; margin-bottom: 3px; font-size: 1.08rem; }
+    .mini-stat span { color: var(--muted); font-size: .76rem; }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(390px, 1.08fr) repeat(2, minmax(270px, .96fr));
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .candidates, .entry { min-height: 590px; padding: 17px; }
+    .candidate-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 11px; }
+    .candidate-toolbar h2, .entry h2 { font-size: 1rem; margin: 0; }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 28px;
+      padding: 0 9px;
+      border-radius: 999px;
+      background: var(--green-soft);
+      color: #8df0b7;
+      font-size: .75rem;
+      font-weight: 800;
+    }
+
+    .candidate-list { display: grid; gap: 8px; }
+    .team-row {
+      display: grid;
+      grid-template-columns: minmax(125px, 1fr) 72px 72px 74px;
+      gap: 8px;
+      align-items: center;
+      padding: 9px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      transition: border-color .15s ease, background .15s ease, opacity .15s ease;
+    }
+    .team-row[draggable="true"] { cursor: grab; }
+    .team-row.dragging { opacity: .45; }
+    .team-name-wrap { min-width: 0; }
+    .team-name { font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .lock-line { min-height: 17px; margin-top: 3px; color: var(--muted); font-size: .71rem; }
+    .lock-line.active { color: var(--green); }
+    .field-label { display: block; margin-bottom: 4px; color: var(--muted); font-size: .65rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+    .team-row select { width: 100%; min-height: 36px; padding: 0 7px; }
+    .quick-locks { display: flex; justify-content: flex-end; gap: 5px; }
+    .quick-lock {
+      width: 32px;
+      height: 32px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #0a1710;
+      color: var(--muted);
+      font-weight: 850;
+    }
+    .quick-lock.on { color: #052313; background: var(--green); border-color: var(--green); }
+
+    .entry { display: flex; flex-direction: column; }
+    .entry-head { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-bottom: 11px; }
+    .entry-count { color: var(--muted); font-size: .8rem; font-weight: 750; }
+    .entry-count.complete { color: var(--green); }
+    .dropzone {
+      flex: 1;
+      min-height: 465px;
+      padding: 10px;
+      border: 1px dashed #365b46;
+      border-radius: 14px;
+      background: rgba(0,0,0,.11);
+      transition: border-color .15s ease, background .15s ease;
+    }
+    .dropzone.over { border-color: var(--green); background: var(--green-soft); }
+    .empty-state { display: grid; place-content: center; min-height: 410px; padding: 30px; text-align: center; color: var(--muted); }
+    .empty-state strong { color: var(--text); margin-bottom: 5px; }
+    .pick-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 48px;
+      margin-bottom: 7px;
+      padding: 8px 9px 8px 11px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-3);
+    }
+    .pick-card.locked { border-left: 3px solid var(--green); }
+    .pick-num { width: 21px; color: var(--muted); font-size: .78rem; font-variant-numeric: tabular-nums; }
+    .pick-main { flex: 1; min-width: 0; }
+    .pick-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 800; }
+    .pick-meta { margin-top: 2px; color: var(--muted); font-size: .69rem; }
+    .remove-lock {
+      min-width: 64px;
+      min-height: 31px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: transparent;
+      color: var(--muted);
+      font-size: .7rem;
+      font-weight: 800;
+    }
+    .remove-lock:hover { color: var(--red); border-color: rgba(255,116,108,.55); }
+    .entry-footer { display: flex; gap: 8px; margin-top: 11px; }
+    .entry-footer .btn { flex: 1; }
+
+    .buildbar {
+      position: sticky;
+      bottom: 12px;
+      z-index: 5;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+      align-items: center;
+      margin-top: 18px;
+      padding: 14px 16px;
+      border: 1px solid #365b46;
+      border-radius: 15px;
+      background: rgba(11, 27, 18, .94);
+      box-shadow: 0 15px 40px rgba(0,0,0,.38);
+      backdrop-filter: blur(13px);
+    }
+    .status { min-width: 0; }
+    .status strong { display: block; margin-bottom: 3px; }
+    .status span { color: var(--muted); font-size: .84rem; }
+    .status.error strong, .status.error span { color: var(--red); }
+    .status.success strong { color: var(--green); }
+    .build-actions { display: flex; gap: 8px; }
+
+    .shared-marker { color: var(--amber); }
+    .hidden { display: none !important; }
+
+    @media (max-width: 1120px) {
+      .workspace { grid-template-columns: 1fr 1fr; }
+      .candidates { grid-column: 1 / -1; min-height: auto; }
+      .candidate-list { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 760px) {
+      .app { padding: 18px 12px 28px; }
+      .topbar { display: block; }
+      .top-actions { justify-content: flex-start; margin-top: 16px; }
+      .setup, .workspace { grid-template-columns: 1fr; }
+      .candidate-list { grid-template-columns: 1fr; }
+      .candidates { grid-column: auto; }
+      .entry { min-height: 510px; }
+      .dropzone { min-height: 390px; }
+      .empty-state { min-height: 340px; }
+      .buildbar { position: static; grid-template-columns: 1fr; }
+      .build-actions { display: grid; grid-template-columns: 1fr 1fr; }
+      .overlap-explainer { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 450px) {
+      .team-row { grid-template-columns: minmax(120px, 1fr) 62px 62px; }
+      .quick-locks { grid-column: 1 / -1; justify-content: flex-start; }
+      .quick-lock { width: 42px; }
+      .overlap-wrap { grid-template-columns: 1fr; }
+      .build-actions { grid-template-columns: 1fr; }
+    }
+
+    @media print {
+      body { background: #fff; color: #111; }
+      .app { width: 100%; padding: 0; }
+      .top-actions, .setup, .candidates, .buildbar, .entry-footer, .remove-lock { display: none !important; }
+      .workspace { grid-template-columns: 1fr 1fr; }
+      .card, .dropzone, .pick-card { box-shadow: none; background: #fff; color: #111; border-color: #bbb; }
+      .entry { min-height: 0; }
+      .dropzone { min-height: 0; }
+      .pick-meta, .entry-count, .subtitle { color: #555; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Standalone tool</p>
+        <h1>CFB Splash Pool Builder</h1>
+        <p class="subtitle">Build two 7-pick entries, control every team's minimum and maximum exposure, choose the exact number of shared picks, and lock teams to a specific entry by dragging them there.</p>
+      </div>
+      <div class="top-actions">
+        <button class="btn" id="printBtn" type="button">Print / Save PDF</button>
+        <button class="btn danger" id="resetBtn" type="button">Reset</button>
+      </div>
+    </header>
+
+    <section class="setup">
+      <div class="card setup-panel">
+        <div class="section-head">
+          <div>
+            <h2>1. Add candidate teams</h2>
+            <p class="helper">One per line. Spreads can be included in the name.</p>
+          </div>
+        </div>
+        <textarea id="teamInput" placeholder="Georgia -6.5&#10;Alabama +3&#10;Texas -7&#10;Penn State -4.5"></textarea>
+        <div class="load-row">
+          <button class="btn primary" id="loadTeamsBtn" type="button">Load / update teams</button>
+          <span class="count-note" id="inputCount">0 entered</span>
+        </div>
+      </div>
+
+      <div class="card setup-panel">
+        <div class="section-head">
+          <div>
+            <h2>2. Set exact overlap</h2>
+            <p class="helper">This is the number of teams that must appear in both entries.</p>
+          </div>
+        </div>
+        <div class="overlap-wrap">
+          <div>
+            <div class="overlap-number"><strong id="overlapValue">3</strong><span>shared picks</span></div>
+            <p class="helper" id="overlapSentence">Each entry will share exactly 3 of its 7 teams.</p>
+          </div>
+          <label>
+            <span class="field-label">Shared</span>
+            <select id="overlapSelect" class="overlap-select" aria-label="Exact shared picks">
+              <option value="0">0 picks</option><option value="1">1 pick</option><option value="2">2 picks</option>
+              <option value="3" selected>3 picks</option><option value="4">4 picks</option><option value="5">5 picks</option>
+              <option value="6">6 picks</option><option value="7">7 picks</option>
+            </select>
+          </label>
+        </div>
+        <div class="overlap-explainer">
+          <div class="mini-stat"><strong id="totalSlots">14</strong><span>Total pick slots</span></div>
+          <div class="mini-stat"><strong id="uniqueNeeded">11</strong><span>Distinct teams needed</span></div>
+          <div class="mini-stat"><strong id="differentPicks">4 + 4</strong><span>Entry-specific picks</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="workspace">
+      <div class="card candidates">
+        <div class="candidate-toolbar">
+          <div>
+            <h2>3. Set exposure &amp; locks</h2>
+            <p class="helper">Drag a row to an entry, or tap 1 / 2.</p>
+          </div>
+          <span class="badge" id="candidateBadge">0 teams</span>
+        </div>
+        <div class="candidate-list" id="candidateList"></div>
+        <div class="empty-state" id="candidateEmpty"><strong>No teams loaded</strong><span>Paste your 10–15 candidates above to begin.</span></div>
+      </div>
+
+      <div class="card entry" data-entry="1">
+        <div class="entry-head">
+          <h2>Splash Entry 1</h2>
+          <span class="entry-count" id="entry1Count">0 / 7</span>
+        </div>
+        <div class="dropzone" id="entry1Zone" data-entry="1" aria-label="Splash Entry 1 drop zone"></div>
+        <div class="entry-footer">
+          <button class="btn" id="copyEntry1" type="button" disabled>Copy entry</button>
+          <button class="btn" id="clearEntry1" type="button" disabled>Clear locks</button>
+        </div>
+      </div>
+
+      <div class="card entry" data-entry="2">
+        <div class="entry-head">
+          <h2>Splash Entry 2</h2>
+          <span class="entry-count" id="entry2Count">0 / 7</span>
+        </div>
+        <div class="dropzone" id="entry2Zone" data-entry="2" aria-label="Splash Entry 2 drop zone"></div>
+        <div class="entry-footer">
+          <button class="btn" id="copyEntry2" type="button" disabled>Copy entry</button>
+          <button class="btn" id="clearEntry2" type="button" disabled>Clear locks</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="buildbar" aria-live="polite">
+      <div class="status" id="statusBox">
+        <strong>Ready for your teams</strong>
+        <span>The builder saves your setup automatically in this browser.</span>
+      </div>
+      <div class="build-actions">
+        <button class="btn" id="anotherBtn" type="button" disabled>Another valid build</button>
+        <button class="btn primary" id="buildBtn" type="button" disabled>Build 2 entries</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      'use strict';
+
+      const STORAGE_KEY = 'cfb-splash-pool-builder-v1';
+      const $ = (selector) => document.querySelector(selector);
+      const els = {
+        input: $('#teamInput'), inputCount: $('#inputCount'), load: $('#loadTeamsBtn'),
+        overlap: $('#overlapSelect'), overlapValue: $('#overlapValue'), overlapSentence: $('#overlapSentence'),
+        uniqueNeeded: $('#uniqueNeeded'), differentPicks: $('#differentPicks'), candidateList: $('#candidateList'),
+        candidateEmpty: $('#candidateEmpty'), candidateBadge: $('#candidateBadge'),
+        zones: { 1: $('#entry1Zone'), 2: $('#entry2Zone') },
+        counts: { 1: $('#entry1Count'), 2: $('#entry2Count') },
+        clear: { 1: $('#clearEntry1'), 2: $('#clearEntry2') },
+        copy: { 1: $('#copyEntry1'), 2: $('#copyEntry2') },
+        build: $('#buildBtn'), another: $('#anotherBtn'), status: $('#statusBox'),
+        reset: $('#resetBtn'), print: $('#printBtn')
+      };
+
+      let state = { teams: [], overlap: 3, result: null };
+      let draggedTeamId = null;
+
+      const escapeHtml = (value) => String(value).replace(/[&<>"']/g, char => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[char]));
+
+      const uid = () => 't-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+      const lockMask = (team) => (team.locks.includes(1) ? 1 : 0) | (team.locks.includes(2) ? 2 : 0);
+      const popcount = (mask) => mask === 3 ? 2 : mask === 0 ? 0 : 1;
+      const shuffled = (items) => {
+        const copy = items.slice();
+        for (let i = copy.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [copy[i], copy[j]] = [copy[j], copy[i]];
+        }
+        return copy;
+      };
+
+      function save() {
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (_) {}
+      }
+
+      function restore() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return;
+          const saved = JSON.parse(raw);
+          if (!saved || !Array.isArray(saved.teams)) return;
+          state.teams = saved.teams.map(team => ({
+            id: String(team.id || uid()), name: String(team.name || ''),
+            min: Math.max(0, Math.min(2, Number(team.min) || 0)),
+            max: Math.max(0, Math.min(2, Number.isFinite(Number(team.max)) ? Number(team.max) : 2)),
+            locks: Array.isArray(team.locks) ? team.locks.filter(x => x === 1 || x === 2) : []
+          })).filter(team => team.name);
+          state.overlap = Math.max(0, Math.min(7, Number(saved.overlap) || 0));
+          state.result = saved.result && Array.isArray(saved.result[1]) && Array.isArray(saved.result[2]) ? saved.result : null;
+        } catch (_) {}
+      }
+
+      function setStatus(title, detail, type = '') {
+        els.status.className = 'status' + (type ? ' ' + type : '');
+        els.status.innerHTML = '<strong>' + escapeHtml(title) + '</strong><span>' + escapeHtml(detail) + '</span>';
+      }
+
+      function parseInput() {
+        const seen = new Set();
+        return els.input.value.split(/\n|,/).map(x => x.trim()).filter(Boolean).filter(name => {
+          const key = name.toLowerCase();
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        }).slice(0, 40);
+      }
+
+      function updateInputCount() {
+        const count = parseInput().length;
+        els.inputCount.textContent = count + (count === 1 ? ' entered' : ' entered');
+      }
+
+      function updateOverlapUI() {
+        state.overlap = Number(els.overlap.value);
+        els.overlapValue.textContent = state.overlap;
+        els.overlapSentence.textContent = 'Each entry will share exactly ' + state.overlap + ' of its 7 teams.';
+        els.uniqueNeeded.textContent = 14 - state.overlap;
+        els.differentPicks.textContent = (7 - state.overlap) + ' + ' + (7 - state.overlap);
+      }
+
+      function allowedMasks(team) {
+        const required = lockMask(team);
+        return [0, 1, 2, 3].filter(mask => {
+          const exposure = popcount(mask);
+          return (mask & required) === required && exposure >= team.min && exposure <= team.max;
+        });
+      }
+
+      function validate() {
+        if (state.teams.length < 7) return { ok: false, title: 'Add more teams', detail: 'You need at least 7 candidate teams.' };
+        const uniqueRequired = 14 - state.overlap;
+        const usable = state.teams.filter(team => team.max > 0).length;
+        if (usable < uniqueRequired) return { ok: false, title: 'Not enough usable teams', detail: 'A ' + state.overlap + '-pick overlap requires at least ' + uniqueRequired + ' teams with Max above 0.' };
+
+        let locked1 = 0, locked2 = 0, lockedBoth = 0;
+        for (const team of state.teams) {
+          if (team.min > team.max) return { ok: false, title: 'Invalid exposure', detail: team.name + ' has a minimum above its maximum.' };
+          const required = lockMask(team);
+          if (!allowedMasks(team).length) return { ok: false, title: 'Lock conflicts with exposure', detail: team.name + ' is locked more times than its maximum allows.' };
+          if (required & 1) locked1++;
+          if (required & 2) locked2++;
+          if (required === 3) lockedBoth++;
+        }
+        if (locked1 > 7 || locked2 > 7) return { ok: false, title: 'Too many locked picks', detail: 'An entry cannot contain more than 7 locked teams.' };
+        if (lockedBoth > state.overlap) return { ok: false, title: 'Too many shared locks', detail: lockedBoth + ' teams are locked to both entries, above your target of ' + state.overlap + '.' };
+        return { ok: true };
+      }
+
+      function invalidate(message = 'Settings changed. Build again to refresh the entries.') {
+        state.result = null;
+        els.another.disabled = true;
+        setStatus('Ready to build', message);
+        save();
+        renderEntries();
+      }
+
+      function loadTeams() {
+        const names = parseInput();
+        const existing = new Map(state.teams.map(team => [team.name.toLowerCase(), team]));
+        state.teams = names.map(name => {
+          const old = existing.get(name.toLowerCase());
+          return old ? { ...old, name } : { id: uid(), name, min: 0, max: 2, locks: [] };
+        });
+        state.result = null;
+        save();
+        renderAll();
+        setStatus(names.length ? 'Teams loaded' : 'Ready for your teams', names.length ? 'Set exposure limits, drag any locks into place, then build.' : 'Paste one team per line above.');
+      }
+
+      function renderCandidates() {
+        els.candidateEmpty.classList.toggle('hidden', state.teams.length > 0);
+        els.candidateBadge.textContent = state.teams.length + (state.teams.length === 1 ? ' team' : ' teams');
+        els.candidateList.innerHTML = state.teams.map(team => {
+          const locks = team.locks.slice().sort().map(n => 'Entry ' + n).join(' + ');
+          return '<div class="team-row" draggable="true" data-team-id="' + escapeHtml(team.id) + '">' +
+            '<div class="team-name-wrap"><div class="team-name" title="' + escapeHtml(team.name) + '">' + escapeHtml(team.name) + '</div>' +
+            '<div class="lock-line ' + (locks ? 'active' : '') + '">' + (locks ? 'Locked: ' + locks : 'Drag to lock') + '</div></div>' +
+            '<label><span class="field-label">Min</span><select class="min-select" data-team-id="' + escapeHtml(team.id) + '" aria-label="Minimum exposure for ' + escapeHtml(team.name) + '">' + optionList(team.min) + '</select></label>' +
+            '<label><span class="field-label">Max</span><select class="max-select" data-team-id="' + escapeHtml(team.id) + '" aria-label="Maximum exposure for ' + escapeHtml(team.name) + '">' + optionList(team.max) + '</select></label>' +
+            '<div class="quick-locks" aria-label="Entry locks"><button type="button" class="quick-lock ' + (team.locks.includes(1) ? 'on' : '') + '" data-lock="1" data-team-id="' + escapeHtml(team.id) + '" title="Lock to Entry 1">1</button>' +
+            '<button type="button" class="quick-lock ' + (team.locks.includes(2) ? 'on' : '') + '" data-lock="2" data-team-id="' + escapeHtml(team.id) + '" title="Lock to Entry 2">2</button></div></div>';
+        }).join('');
+      }
+
+      function optionList(selected) {
+        return [0, 1, 2].map(value => '<option value="' + value + '"' + (value === selected ? ' selected' : '') + '>' + value + '</option>').join('');
+      }
+
+      function picksForEntry(entry) {
+        if (state.result) return state.result[entry].map(id => ({ team: state.teams.find(t => t.id === id), locked: state.teams.find(t => t.id === id)?.locks.includes(entry) })).filter(x => x.team);
+        return state.teams.filter(team => team.locks.includes(entry)).map(team => ({ team, locked: true }));
+      }
+
+      function renderEntries() {
+        [1, 2].forEach(entry => {
+          const picks = picksForEntry(entry);
+          const zone = els.zones[entry];
+          const otherIds = new Set(picksForEntry(entry === 1 ? 2 : 1).map(x => x.team.id));
+          if (!picks.length) {
+            zone.innerHTML = '<div class="empty-state"><strong>Drop teams here</strong><span>Dragging creates a fixed lock for Entry ' + entry + '.</span></div>';
+          } else {
+            zone.innerHTML = picks.map((item, index) => '<div class="pick-card ' + (item.locked ? 'locked' : '') + '" draggable="true" data-team-id="' + escapeHtml(item.team.id) + '">' +
+              '<span class="pick-num">' + (index + 1) + '</span><div class="pick-main"><div class="pick-name">' + escapeHtml(item.team.name) + '</div><div class="pick-meta">' +
+              (item.locked ? 'Locked to this entry' : 'Builder selection') + (otherIds.has(item.team.id) ? ' <span class="shared-marker">• Shared</span>' : '') + '</div></div>' +
+              (item.locked ? '<button type="button" class="remove-lock" data-entry="' + entry + '" data-team-id="' + escapeHtml(item.team.id) + '">Unlock</button>' : '') + '</div>').join('');
+          }
+          els.counts[entry].textContent = picks.length + ' / 7';
+          els.counts[entry].classList.toggle('complete', picks.length === 7);
+          els.clear[entry].disabled = !state.teams.some(team => team.locks.includes(entry));
+          els.copy[entry].disabled = picks.length !== 7;
+        });
+      }
+
+      function renderButtons() {
+        const check = validate();
+        els.build.disabled = !check.ok;
+        if (!check.ok && state.teams.length) setStatus(check.title, check.detail, 'error');
+      }
+
+      function renderAll() {
+        els.input.value = state.teams.map(team => team.name).join('\n');
+        els.overlap.value = String(state.overlap);
+        updateInputCount();
+        updateOverlapUI();
+        renderCandidates();
+        renderEntries();
+        renderButtons();
+      }
+
+      function toggleLock(teamId, entry, forceOn = null) {
+        const team = state.teams.find(item => item.id === teamId);
+        if (!team) return;
+        const has = team.locks.includes(entry);
+        const turnOn = forceOn === null ? !has : forceOn;
+        if (turnOn && !has) {
+          const currentLocked = state.teams.filter(t => t.locks.includes(entry)).length;
+          if (currentLocked >= 7) return setStatus('Entry ' + entry + ' is full', 'Unlock a team before adding another fixed pick.', 'error');
+          team.locks.push(entry);
+          if (team.max < team.locks.length) team.max = team.locks.length;
+        } else if (!turnOn && has) {
+          team.locks = team.locks.filter(n => n !== entry);
+        }
+        invalidate(team.name + (turnOn ? ' locked to Entry ' + entry + '.' : ' unlocked from Entry ' + entry + '.'));
+        renderCandidates();
+        renderButtons();
+      }
+
+      function solve() {
+        const validation = validate();
+        if (!validation.ok) return null;
+
+        const prepared = state.teams.map(team => ({ team, masks: shuffled(allowedMasks(team)) }));
+        prepared.sort((a, b) => a.masks.length - b.masks.length || Math.random() - .5);
+        const memo = new Set();
+
+        function walk(index, count1, count2, shared) {
+          if (count1 > 7 || count2 > 7 || shared > state.overlap) return null;
+          if (index === prepared.length) return count1 === 7 && count2 === 7 && shared === state.overlap ? [] : null;
+          const remaining = prepared.length - index;
+          if (count1 + remaining < 7 || count2 + remaining < 7 || shared + remaining < state.overlap) return null;
+          const key = index + '|' + count1 + '|' + count2 + '|' + shared;
+          if (memo.has(key)) return null;
+
+          const item = prepared[index];
+          const preferred = shuffled(item.masks).sort((a, b) => {
+            const needShared = state.overlap - shared;
+            if (needShared > 0 && a === 3) return -1;
+            if (needShared > 0 && b === 3) return 1;
+            return Math.random() - .5;
+          });
+
+          for (const mask of preferred) {
+            const next1 = count1 + ((mask & 1) ? 1 : 0);
+            const next2 = count2 + ((mask & 2) ? 1 : 0);
+            const nextShared = shared + (mask === 3 ? 1 : 0);
+            const tail = walk(index + 1, next1, next2, nextShared);
+            if (tail) return [{ id: item.team.id, mask }, ...tail];
+          }
+          memo.add(key);
+          return null;
+        }
+
+        return walk(0, 0, 0, 0);
+      }
+
+      function build() {
+        const solved = solve();
+        if (!solved) {
+          state.result = null;
+          els.another.disabled = true;
+          renderEntries();
+          return setStatus('No valid build found', 'The overlap, locks, and exposure limits conflict. Loosen a Min/Max or remove a lock.', 'error');
+        }
+        const result = { 1: [], 2: [] };
+        solved.forEach(({ id, mask }) => {
+          if (mask & 1) result[1].push(id);
+          if (mask & 2) result[2].push(id);
+        });
+        const orderPicks = (ids, entry) => ids.sort((a, b) => {
+          const ta = state.teams.find(t => t.id === a), tb = state.teams.find(t => t.id === b);
+          return Number(tb.locks.includes(entry)) - Number(ta.locks.includes(entry)) || Math.random() - .5;
+        });
+        result[1] = orderPicks(result[1], 1);
+        result[2] = orderPicks(result[2], 2);
+        state.result = result;
+        save();
+        renderEntries();
+        els.another.disabled = false;
+        setStatus('Valid entries built', 'Both entries have 7 picks and share exactly ' + state.overlap + '. All locks and exposure limits are satisfied.', 'success');
+      }
+
+      async function copyEntry(entry) {
+        const picks = picksForEntry(entry).map((item, index) => (index + 1) + '. ' + item.team.name).join('\n');
+        if (!picks) return;
+        try {
+          await navigator.clipboard.writeText('Splash Entry ' + entry + '\n' + picks);
+          setStatus('Entry ' + entry + ' copied', 'The seven picks are on your clipboard.', 'success');
+        } catch (_) {
+          const temp = document.createElement('textarea');
+          temp.value = picks; document.body.appendChild(temp); temp.select(); document.execCommand('copy'); temp.remove();
+          setStatus('Entry ' + entry + ' copied', 'The seven picks are on your clipboard.', 'success');
+        }
+      }
+
+      els.input.addEventListener('input', updateInputCount);
+      els.load.addEventListener('click', loadTeams);
+      els.overlap.addEventListener('change', () => {
+        updateOverlapUI();
+        invalidate('Exact overlap changed to ' + state.overlap + '.');
+        renderButtons();
+      });
+
+      els.candidateList.addEventListener('change', event => {
+        const id = event.target.dataset.teamId;
+        const team = state.teams.find(item => item.id === id);
+        if (!team) return;
+        if (event.target.classList.contains('min-select')) {
+          team.min = Number(event.target.value);
+          if (team.min > team.max) team.max = team.min;
+        }
+        if (event.target.classList.contains('max-select')) {
+          team.max = Number(event.target.value);
+          if (team.max < team.min) team.min = team.max;
+          if (team.max < team.locks.length) {
+            team.max = team.locks.length;
+            setStatus('Maximum kept at ' + team.max, 'Unlock ' + team.name + ' from an entry before lowering its maximum.', 'error');
+          }
+        }
+        invalidate('Exposure setting updated for ' + team.name + '.');
+        renderCandidates();
+        renderButtons();
+      });
+
+      els.candidateList.addEventListener('click', event => {
+        const button = event.target.closest('.quick-lock');
+        if (!button) return;
+        toggleLock(button.dataset.teamId, Number(button.dataset.lock));
+      });
+
+      document.addEventListener('dragstart', event => {
+        const card = event.target.closest('[data-team-id][draggable="true"]');
+        if (!card) return;
+        draggedTeamId = card.dataset.teamId;
+        card.classList.add('dragging');
+        event.dataTransfer.effectAllowed = 'copy';
+        event.dataTransfer.setData('text/plain', draggedTeamId);
+      });
+      document.addEventListener('dragend', event => {
+        event.target.closest('[data-team-id]')?.classList.remove('dragging');
+        draggedTeamId = null;
+        Object.values(els.zones).forEach(zone => zone.classList.remove('over'));
+      });
+
+      Object.values(els.zones).forEach(zone => {
+        zone.addEventListener('dragover', event => { event.preventDefault(); zone.classList.add('over'); event.dataTransfer.dropEffect = 'copy'; });
+        zone.addEventListener('dragleave', event => { if (!zone.contains(event.relatedTarget)) zone.classList.remove('over'); });
+        zone.addEventListener('drop', event => {
+          event.preventDefault(); zone.classList.remove('over');
+          const id = event.dataTransfer.getData('text/plain') || draggedTeamId;
+          toggleLock(id, Number(zone.dataset.entry), true);
+        });
+        zone.addEventListener('click', event => {
+          const button = event.target.closest('.remove-lock');
+          if (button) toggleLock(button.dataset.teamId, Number(button.dataset.entry), false);
+        });
+      });
+
+      [1, 2].forEach(entry => {
+        els.clear[entry].addEventListener('click', () => {
+          state.teams.forEach(team => { team.locks = team.locks.filter(n => n !== entry); });
+          invalidate('All fixed locks cleared from Entry ' + entry + '.');
+          renderCandidates(); renderButtons();
+        });
+        els.copy[entry].addEventListener('click', () => copyEntry(entry));
+      });
+
+      els.build.addEventListener('click', build);
+      els.another.addEventListener('click', build);
+      els.print.addEventListener('click', () => window.print());
+      els.reset.addEventListener('click', () => {
+        if (!confirm('Clear all teams, locks, and saved settings?')) return;
+        state = { teams: [], overlap: 3, result: null };
+        try { localStorage.removeItem(STORAGE_KEY); } catch (_) {}
+        els.input.value = '';
+        renderAll();
+        setStatus('Reset complete', 'Paste your candidate teams above to start a new build.');
+      });
+
+      restore();
+      renderAll();
+      if (state.teams.length) setStatus('Saved setup restored', 'Your teams, limits, locks, and latest build were loaded from this browser.', 'success');
+    })();
+  </script>
+</body>
+</html>
