@@ -3,25 +3,34 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#07150f">
+  <meta name="theme-color" content="#f3f7f4">
+  <meta name="color-scheme" content="light only">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>CFB Splash Pool Builder</title>
   <style>
     :root {
-      color-scheme: dark;
-      --bg: #07100c;
-      --panel: #0d1b14;
-      --panel-2: #10251a;
-      --panel-3: #162c20;
-      --text: #f4f7f5;
-      --muted: #9daf9f;
-      --line: #284034;
-      --green: #36d17c;
-      --green-2: #1fa661;
-      --green-soft: rgba(54, 209, 124, .12);
-      --amber: #ffc75a;
-      --red: #ff746c;
-      --shadow: 0 20px 55px rgba(0, 0, 0, .32);
+      color-scheme: light;
+      --bg: #f3f7f4;
+      --panel: #ffffff;
+      --panel-2: #f7faf8;
+      --panel-3: #eef6f1;
+      --text: #17251d;
+      --muted: #68786d;
+      --line: #d7e2da;
+      --green: #168a4c;
+      --green-2: #0f733e;
+      --green-soft: rgba(22, 138, 76, .11);
+      --amber: #9a6200;
+      --red: #c83d36;
+      --shadow: 0 14px 38px rgba(36, 64, 46, .09);
       --radius: 18px;
+    }
+
+    html {
+      color-scheme: only light;
+      background: #f3f7f4;
     }
 
     * { box-sizing: border-box; }
@@ -30,9 +39,10 @@
       margin: 0;
       min-height: 100vh;
       background:
-        radial-gradient(circle at 8% -10%, rgba(54, 209, 124, .13), transparent 32rem),
+        radial-gradient(circle at 8% -10%, rgba(22, 138, 76, .12), transparent 32rem),
         var(--bg);
       color: var(--text);
+      forced-color-adjust: none;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
@@ -73,16 +83,16 @@
       font-weight: 750;
       transition: transform .15s ease, border-color .15s ease, background .15s ease;
     }
-    .btn:hover { transform: translateY(-1px); border-color: #416650; }
-    .btn.primary { border-color: var(--green); background: var(--green); color: #032412; }
-    .btn.primary:hover { background: #49df8c; }
+    .btn:hover { transform: translateY(-1px); border-color: #91aa99; }
+    .btn.primary { border-color: var(--green); background: var(--green); color: #ffffff; }
+    .btn.primary:hover { background: var(--green-2); }
     .btn.danger { color: var(--red); }
     .btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
 
     .card {
       border: 1px solid var(--line);
       border-radius: var(--radius);
-      background: linear-gradient(180deg, rgba(255,255,255,.018), transparent), var(--panel);
+      background: linear-gradient(180deg, rgba(22,138,76,.018), transparent), var(--panel);
       box-shadow: var(--shadow);
     }
 
@@ -104,7 +114,7 @@
       resize: vertical;
       border: 1px solid var(--line);
       border-radius: 13px;
-      background: #09150e;
+      background: #ffffff;
       color: var(--text);
       padding: 13px 14px;
       outline: none;
@@ -134,7 +144,7 @@
       min-height: 40px;
       border: 1px solid var(--line);
       border-radius: 10px;
-      background: #09150e;
+      background: #ffffff;
       color: var(--text);
       padding: 0 10px;
     }
@@ -144,7 +154,7 @@
       grid-template-columns: repeat(3, 1fr);
       gap: 8px;
     }
-    .mini-stat { padding: 11px; border-radius: 11px; background: rgba(255,255,255,.025); border: 1px solid var(--line); }
+    .mini-stat { padding: 11px; border-radius: 11px; background: #f7faf8; border: 1px solid var(--line); }
     .mini-stat strong { display: block; margin-bottom: 3px; font-size: 1.08rem; }
     .mini-stat span { color: var(--muted); font-size: .76rem; }
 
@@ -166,7 +176,7 @@
       padding: 0 9px;
       border-radius: 999px;
       background: var(--green-soft);
-      color: #8df0b7;
+      color: #0f733e;
       font-size: .75rem;
       font-weight: 800;
     }
@@ -197,11 +207,11 @@
       height: 32px;
       border: 1px solid var(--line);
       border-radius: 8px;
-      background: #0a1710;
+      background: #ffffff;
       color: var(--muted);
       font-weight: 850;
     }
-    .quick-lock.on { color: #052313; background: var(--green); border-color: var(--green); }
+    .quick-lock.on { color: #ffffff; background: var(--green); border-color: var(--green); }
 
     .entry { display: flex; flex-direction: column; }
     .entry-head { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-bottom: 11px; }
@@ -211,9 +221,9 @@
       flex: 1;
       min-height: 465px;
       padding: 10px;
-      border: 1px dashed #365b46;
+      border: 1px dashed #a8bcae;
       border-radius: 14px;
-      background: rgba(0,0,0,.11);
+      background: #f8fbf9;
       transition: border-color .15s ease, background .15s ease;
     }
     .dropzone.over { border-color: var(--green); background: var(--green-soft); }
@@ -259,10 +269,10 @@
       align-items: center;
       margin-top: 18px;
       padding: 14px 16px;
-      border: 1px solid #365b46;
+      border: 1px solid #bdd0c2;
       border-radius: 15px;
-      background: rgba(11, 27, 18, .94);
-      box-shadow: 0 15px 40px rgba(0,0,0,.38);
+      background: rgba(255, 255, 255, .96);
+      box-shadow: 0 15px 40px rgba(36, 64, 46, .14);
       backdrop-filter: blur(13px);
     }
     .status { min-width: 0; }
@@ -320,7 +330,7 @@
   <main class="app">
     <header class="topbar">
       <div>
-        <p class="eyebrow">Standalone tool</p>
+        <p class="eyebrow">Standalone tool • Light v2</p>
         <h1>CFB Splash Pool Builder</h1>
         <p class="subtitle">Build two 7-pick entries, control every team's minimum and maximum exposure, choose the exact number of shared picks, and lock teams to a specific entry by dragging them there.</p>
       </div>
