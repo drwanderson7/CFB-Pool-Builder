@@ -76,6 +76,28 @@
     .subtitle { max-width: 720px; margin: 10px 0 0; color: var(--muted); line-height: 1.55; }
 
     .top-actions { display: flex; gap: 9px; flex-wrap: wrap; justify-content: flex-end; }
+    .sync-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      min-height: 42px;
+      padding: 0 13px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #ffffff;
+      color: var(--muted);
+      font-size: .78rem;
+      font-weight: 750;
+      white-space: nowrap;
+    }
+    .sync-pill::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #9ca3af; }
+    .sync-pill.sync-ok::before { background: var(--green); }
+    .sync-pill.sync-warn { color: #9a3412; border-color: rgba(234, 88, 12, .45); }
+    .sync-pill.sync-warn::before { background: #ea580c; }
+    .sync-pill.sync-error { color: var(--red); border-color: rgba(220, 38, 38, .45); }
+    .sync-pill.sync-error::before { background: var(--red); }
+    .sync-pill.sync-pending::before { animation: syncPulse 1s ease-in-out infinite; }
+    @keyframes syncPulse { 50% { opacity: .25; } }
     .btn {
       min-height: 42px;
       padding: 0 15px;
@@ -124,7 +146,8 @@
       line-height: 1.5;
     }
     textarea:focus, select:focus, input:focus { border-color: var(--green); box-shadow: 0 0 0 3px var(--green-soft); outline: none; }
-    .load-row { display: flex; gap: 9px; align-items: center; margin-top: 11px; }
+    .load-row { display: flex; flex-wrap: wrap; gap: 9px; align-items: center; margin-top: 11px; }
+    .new-week-btn { margin-left: auto; }
     .count-note { color: var(--muted); font-size: .82rem; }
 
     .overlap-wrap {
@@ -213,7 +236,21 @@
     .team-row[draggable="true"] { cursor: grab; }
     .team-row.dragging { opacity: .45; }
     .team-name-wrap { min-width: 0; }
-    .team-name { font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .team-name { display: flex; align-items: baseline; gap: 5px; min-width: 0; font-weight: 800; }
+    /* Team text truncates on its own so the spread chip never gets cut off. */
+    .name-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .spread {
+      flex: none;
+      padding: 1px 6px;
+      border-radius: 6px;
+      font-size: .72rem;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+    }
+    .spread-dog { border: 1px solid #cbd5e1; background: #eef2f7; color: #334155; }
+    .spread-fav { border: 1px solid #1e2a3a; background: #1e2a3a; color: #ffffff; }
+    .spread-pk { border: 1px solid var(--line); background: #f3f4f6; color: var(--muted); }
+    .entry-mix { margin-left: auto; color: var(--muted); font-size: .72rem; font-weight: 700; white-space: nowrap; }
     .lock-line { display: block; min-height: 17px; margin-top: 3px; color: var(--muted); font-size: .71rem; }
     .lock-line.active { color: var(--green); }
     .field-label { display: block; margin-bottom: 4px; color: var(--muted); font-size: .65rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
@@ -234,7 +271,7 @@
     .tier-divider::after { content: ''; flex: 1; height: 1px; background: var(--line); }
     .tier-divider.tier-0 span { color: var(--green-2); }
     .tier-divider.tier-1 span { color: #1d4ed8; }
-    .tier-divider.tier-2 span { color: var(--amber); }
+    .tier-divider.tier-2 span { color: #6d28d9; }
     .tier-divider.tier-3 span { color: var(--muted); }
     /* A dropdown rather than four buttons: the candidate panel sits beside both entries on
        desktop, and four labeled buttons left the team name with no room at all. The tier
@@ -253,7 +290,7 @@
     }
     .tier-select.tier-0 { border-color: var(--green); color: var(--green-2); }
     .tier-select.tier-1 { border-color: #2563eb; color: #1d4ed8; }
-    .tier-select.tier-2 { border-color: var(--amber); color: var(--amber); }
+    .tier-select.tier-2 { border-color: #7c3aed; color: #6d28d9; }
     .tier-select.tier-3 { border-color: #9ca3af; color: var(--muted); }
     /* Side-by-side rather than stacked: two adjacent tap targets are much harder to mix up on a
        touchscreen than two tiny ones stacked a pixel apart, and this keeps the row from growing
@@ -326,7 +363,7 @@
     .pick-card.shared.locked { border-left: 3px solid var(--amber); }
     .pick-num { width: 16px; flex: none; color: var(--muted); font-size: .76rem; font-variant-numeric: tabular-nums; }
     .pick-main { flex: 1; min-width: 0; }
-    .pick-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 800; font-size: .95rem; }
+    .pick-name { display: flex; align-items: baseline; gap: 5px; min-width: 0; font-weight: 800; font-size: .95rem; }
     /* Status text and the action buttons share one line (wrapping only if space runs out), so
        each card is two short lines instead of a name, a status line, and a whole button row. */
     .pick-sub { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; margin-top: 3px; }
@@ -370,6 +407,11 @@
     .status.error strong, .status.error span { color: var(--red); }
     .status.success strong { color: var(--green); }
     .build-actions { display: flex; gap: 8px; }
+    /* The bar lives inside the workspace grid right after the candidates panel. On wider
+       screens it's pushed to a full-width last row (order) and floats at the bottom as before;
+       on phones it stays in DOM position — under the candidates, above the entries — and
+       doesn't move (see the 760px rule). */
+    .workspace > .buildbar { grid-column: 1 / -1; order: 1; margin-top: 2px; }
 
     .shared-marker {
       display: inline-block;
@@ -417,6 +459,37 @@
     .history-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .history-columns h4 { margin: 0 0 5px; font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
     .history-columns ol { margin: 0; padding-left: 18px; font-size: .84rem; line-height: 1.5; }
+    .history-columns li { margin-bottom: 3px; }
+    .h-pick { display: flex; align-items: center; gap: 6px; }
+    .h-name { flex: 1; display: flex; align-items: baseline; gap: 5px; min-width: 0; }
+    .h-record { margin-left: 4px; color: var(--text); letter-spacing: 0; }
+    .grade-btn {
+      flex: none;
+      min-width: 40px;
+      height: 28px;
+      padding: 0 6px;
+      border: 1px dashed var(--line);
+      border-radius: 7px;
+      background: #ffffff;
+      color: var(--muted);
+      font-size: .7rem;
+      font-weight: 800;
+    }
+    .grade-btn.grade-W { border: 1px solid var(--green); background: var(--green); color: #fff; }
+    .grade-btn.grade-L { border: 1px solid var(--red); background: var(--red); color: #fff; }
+    .grade-btn.grade-P { border: 1px solid #9ca3af; background: #9ca3af; color: #fff; }
+    .history-summary { margin-top: 12px; padding: 12px; border: 1px solid var(--line); border-radius: 13px; background: #ffffff; }
+    .summary-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .summary-stats div { display: flex; flex-direction: column; gap: 1px; }
+    .summary-stats span, .summary-tiers > span { color: var(--muted); font-size: .68rem; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; }
+    .summary-stats strong { font-size: 1.05rem; }
+    .summary-stats em { color: var(--muted); font-size: .74rem; font-style: normal; }
+    .summary-tiers { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 10px; }
+    .tier-chip { padding: 3px 8px; border: 1.5px solid var(--line); border-radius: 999px; font-size: .72rem; font-weight: 800; }
+    .tier-chip.tier-0 { border-color: var(--green); color: var(--green-2); }
+    .tier-chip.tier-1 { border-color: #2563eb; color: #1d4ed8; }
+    .tier-chip.tier-2 { border-color: #7c3aed; color: #6d28d9; }
+    .tier-chip.tier-3 { border-color: #9ca3af; color: var(--muted); }
     .history-actions { display: flex; gap: 8px; margin-top: 10px; }
     .history-actions .btn { min-height: 34px; padding: 0 12px; font-size: .82rem; }
     @media (max-width: 480px) {
@@ -452,15 +525,14 @@
       .setup, .workspace { grid-template-columns: 1fr; }
       .candidates { grid-column: auto; }
       .dropzone { min-height: 200px; }
-      /* Kept sticky (not static) here on purpose: below this width the layout stacks into one
-         long column (candidates, then both entries, then this bar), so this is the one place
-         you'd otherwise have to scroll furthest to reach Build/Save/Another. */
       .buildbar {
-        bottom: 8px;
+        position: static;
         grid-template-columns: 1fr;
-        padding: 12px 14px calc(12px + env(safe-area-inset-bottom, 0px));
+        box-shadow: none;
+        padding: 12px 14px;
       }
-      .build-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+      .workspace > .buildbar { order: 0; margin-top: 0; }
+      .build-actions { display: grid; grid-template-columns: auto 1fr 1fr; gap: 8px; }
       #buildBtn { grid-column: 1 / -1; }
       .overlap-explainer { grid-template-columns: 1fr; }
     }
@@ -498,10 +570,10 @@
         <p class="subtitle">Build two 7-pick entries, control every team's exposure, and place any team with a tap — S1, S2, or Lock both for both entries (drag works too on desktop).</p>
       </div>
       <div class="top-actions">
+        <button class="sync-pill sync-pending" id="syncStatus" type="button" title="Sync status between your devices. Tap to sync now.">Checking sync…</button>
         <button class="btn" id="historyBtn" type="button">Saved weeks</button>
         <button class="btn" id="transferBtn" type="button">Copy / Load setup</button>
         <button class="btn" id="printBtn" type="button">Print / Save PDF</button>
-        <button class="btn danger" id="resetBtn" type="button">Reset</button>
       </div>
     </header>
 
@@ -510,13 +582,14 @@
         <div class="section-head">
           <div>
             <h2>1. Add candidate teams</h2>
-            <p class="helper">One per line. Spreads can be included in the name.</p>
+            <p class="helper">One per line. Add the spread after the name (e.g. Purdue +14.5) to see favorites and underdogs at a glance.</p>
           </div>
         </div>
         <textarea id="teamInput" placeholder="Georgia -6.5&#10;Alabama +3&#10;Texas -7&#10;Penn State -4.5"></textarea>
         <div class="load-row">
           <button class="btn primary" id="loadTeamsBtn" type="button">Load / update teams</button>
           <span class="count-note" id="inputCount">0 entered</span>
+          <button class="btn danger new-week-btn" id="resetBtn" type="button">Start new week</button>
         </div>
       </div>
 
@@ -563,9 +636,22 @@
         <div class="empty-state" id="candidateEmpty"><strong>No teams loaded</strong><span>Paste your 10–15 candidates above to begin.</span></div>
       </div>
 
+      <section class="buildbar" aria-live="polite">
+        <div class="status" id="statusBox">
+          <strong>Ready for your teams</strong>
+          <span>The builder saves your setup automatically in this browser.</span>
+        </div>
+        <div class="build-actions">
+          <button class="btn" id="undoBtn" type="button" disabled title="Undo last change (Ctrl+Z / Cmd+Z)">Undo</button>
+          <button class="btn" id="saveWeekBtn" type="button" disabled>Save this week</button>
+          <button class="btn" id="anotherBtn" type="button" disabled>Another valid build</button>
+          <button class="btn primary" id="buildBtn" type="button" disabled>Build 2 entries</button>
+        </div>
+      </section>
       <div class="card entry" data-entry="1">
         <div class="entry-head">
           <h2>Splash Entry 1</h2>
+          <span class="entry-mix" id="entry1Mix"></span>
           <span class="entry-count" id="entry1Count">0 / 7</span>
         </div>
         <div class="dropzone" id="entry1Zone" data-entry="1" aria-label="Splash Entry 1 drop zone"></div>
@@ -578,6 +664,7 @@
       <div class="card entry" data-entry="2">
         <div class="entry-head">
           <h2>Splash Entry 2</h2>
+          <span class="entry-mix" id="entry2Mix"></span>
           <span class="entry-count" id="entry2Count">0 / 7</span>
         </div>
         <div class="dropzone" id="entry2Zone" data-entry="2" aria-label="Splash Entry 2 drop zone"></div>
@@ -588,17 +675,6 @@
       </div>
     </section>
 
-    <section class="buildbar" aria-live="polite">
-      <div class="status" id="statusBox">
-        <strong>Ready for your teams</strong>
-        <span>The builder saves your setup automatically in this browser.</span>
-      </div>
-      <div class="build-actions">
-        <button class="btn" id="saveWeekBtn" type="button" disabled>Save this week</button>
-        <button class="btn" id="anotherBtn" type="button" disabled>Another valid build</button>
-        <button class="btn primary" id="buildBtn" type="button" disabled>Build 2 entries</button>
-      </div>
-    </section>
 
     <div class="modal-overlay hidden" id="transferOverlay" role="dialog" aria-modal="true" aria-labelledby="transferTitle">
       <div class="card modal-card">
@@ -629,7 +705,8 @@
           <h2 id="historyTitle">Saved weeks</h2>
           <button class="btn" id="historyCloseBtn" type="button" aria-label="Close">✕</button>
         </div>
-        <p class="helper">A record of builds you've saved, so you can check back later on what you actually picked. Saving here doesn't happen automatically — use "Save this week" once you're happy with a build.</p>
+        <p class="helper">A record of builds you've saved, so you can check back later on what you actually picked. Saving here doesn't happen automatically — use "Save this week" once you're happy with a build. Tap the dash next to a pick to grade it (W, then L, then Push, then clear); your season record builds from those grades.</p>
+        <div id="historySummary"></div>
         <div id="historyList"></div>
         <div class="empty-state" id="historyEmpty"><strong>No saved weeks yet</strong><span>Build your two entries, then tap "Save this week."</span></div>
         <div class="modal-actions" id="historyClearRow" hidden>
@@ -661,6 +738,8 @@
         copySetup: $('#copySetupBtn'), downloadSetup: $('#downloadSetupBtn'),
         loadSetup: $('#loadSetupBtn'), uploadSetup: $('#uploadSetupBtn'), setupFile: $('#setupFileInput'),
         saveWeek: $('#saveWeekBtn'), historyBtn: $('#historyBtn'), historyOverlay: $('#historyOverlay'),
+        undo: $('#undoBtn'), historySummary: $('#historySummary'), syncStatus: $('#syncStatus'),
+        mix: { 1: $('#entry1Mix'), 2: $('#entry2Mix') },
         historyClose: $('#historyCloseBtn'), historyList: $('#historyList'), historyEmpty: $('#historyEmpty'),
         historyClearRow: $('#historyClearRow'), clearHistory: $('#clearHistoryBtn')
       };
@@ -684,7 +763,49 @@
         return copy;
       };
 
+      // --- Undo ---
+      // Every save() compares the setup (teams, tiers, exposure, locks, overlap, build) with the
+      // previous one; if it changed, the previous version goes on a stack. Undo pops it back.
+      // Saved weeks and grades aren't part of this — those have their own confirmations — and
+      // the stack lives in memory only, so it starts fresh on each page load.
+      const UNDO_LIMIT = 30;
+      let undoStack = [];
+      let lastSetupJSON = null;
+      let applyingUndo = false;
+
+      function setupSnapshot() {
+        return JSON.stringify({ teams: state.teams, overlap: state.overlap, result: state.result });
+      }
+      function resetUndoBaseline() {
+        lastSetupJSON = setupSnapshot();
+        undoStack = [];
+        updateUndoButton();
+      }
+      function updateUndoButton() {
+        if (els.undo) els.undo.disabled = undoStack.length === 0;
+      }
+      function undo() {
+        const previous = undoStack.pop();
+        if (!previous) return;
+        const snap = JSON.parse(previous);
+        state.teams = snap.teams;
+        state.overlap = snap.overlap;
+        state.result = snap.result;
+        applyingUndo = true;
+        save();
+        applyingUndo = false;
+        renderAll();
+        setStatus('Undone', 'Reverted your last change.' + (undoStack.length ? ' Tap Undo again to go back further.' : ''), 'success');
+      }
+
       function save() {
+        const snap = setupSnapshot();
+        if (!applyingUndo && lastSetupJSON !== null && snap !== lastSetupJSON) {
+          undoStack.push(lastSetupJSON);
+          if (undoStack.length > UNDO_LIMIT) undoStack.shift();
+        }
+        lastSetupJSON = snap;
+        updateUndoButton();
         try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (_) {}
         scheduleServerPush();
       }
@@ -699,6 +820,49 @@
       let lastSyncedJSON = null;
       let syncing = false;
 
+      // --- Sync status pill ---
+      // Shows whether this device is in step with the other one. "Offline"/"not set up" mean
+      // changes are still saved on this device and get pushed on the next successful sync
+      // (tapping the pill, coming back online, or switching back to this tab).
+      let syncStatus = 'checking';
+      let lastSyncAt = null;
+      let pushFailed = false;
+
+      function relativeTime(ts) {
+        const seconds = (Date.now() - ts) / 1000;
+        if (seconds < 45) return 'just now';
+        if (seconds < 3600) return Math.round(seconds / 60) + ' min ago';
+        return 'at ' + new Date(ts).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+      }
+      function renderSyncStatus() {
+        if (!els.syncStatus) return;
+        const views = {
+          checking: ['Checking sync\u2026', 'pending', 'Checking for changes from your other device.'],
+          saving: ['Syncing\u2026', 'pending', 'Sending your latest changes.'],
+          ok: ['Synced ' + (lastSyncAt ? relativeTime(lastSyncAt) : ''), 'ok', 'Your other device will see the same setup. Tap to check for changes now.'],
+          offline: ['Offline \u00b7 saved on this device', 'warn', 'Couldn\u2019t reach the sync server. Changes are saved here and will sync when you\u2019re back online. Tap to retry.'],
+          unavailable: ['Sync not set up \u00b7 this device only', 'warn', 'The /api/setup sync route isn\u2019t reachable (not deployed, or Redis not connected). Changes are saved on this device only.'],
+          error: ['Sync error \u00b7 tap to retry', 'error', 'The sync server returned an error. Changes are saved on this device. Tap to retry.']
+        };
+        const view = views[syncStatus];
+        els.syncStatus.textContent = view[0];
+        els.syncStatus.className = 'sync-pill sync-' + view[1];
+        els.syncStatus.title = view[2];
+      }
+      function setSync(status) {
+        syncStatus = status;
+        if (status === 'ok') lastSyncAt = Date.now();
+        renderSyncStatus();
+      }
+      async function failureStatus(response) {
+        if (response.status === 404) return 'unavailable';
+        try {
+          const body = await response.json();
+          if (body && typeof body.error === 'string' && /not connected/i.test(body.error)) return 'unavailable';
+        } catch (_) {}
+        return 'error';
+      }
+
       function scheduleServerPush() {
         clearTimeout(pushTimer);
         pushTimer = setTimeout(pushToServer, 600);
@@ -712,26 +876,42 @@
         pushTimer = null;
         if (syncing) return; // don't echo a just-pulled state straight back up
         const json = JSON.stringify(fullSyncPayload());
-        if (json === lastSyncedJSON) return;
+        if (json === lastSyncedJSON) { pushFailed = false; setSync('ok'); return; }
+        setSync('saving');
         try {
-          await fetch('/api/setup', {
+          const response = await fetch('/api/setup', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: json
           });
+          if (!response.ok) { pushFailed = true; setSync(await failureStatus(response)); return; }
           lastSyncedJSON = json;
+          pushFailed = false;
+          setSync('ok');
         } catch (_) {
-          // offline or API not set up yet — local save already succeeded, so no error shown
+          // offline — the local save already succeeded; retried on the next sync attempt
+          pushFailed = true;
+          setSync('offline');
         }
       }
 
       async function pullFromServer() {
         if (pushTimer) return; // a local edit is about to push; don't clobber it with a pull
+        // Changes made here while offline go up first, so the server's older copy can't
+        // overwrite them.
+        if (pushFailed) {
+          await pushToServer();
+          if (pushFailed) return;
+        }
         try {
           const response = await fetch('/api/setup');
-          if (!response.ok) return;
+          if (!response.ok) { setSync(await failureStatus(response)); return; }
           const body = await response.json();
-          if (!body || !body.data) return;
+          setSync('ok');
+          if (!body || !body.data) {
+            if (state.teams.length || state.history.length) scheduleServerPush(); // server empty: seed it
+            return;
+          }
           const sanitized = sanitizeSavedState(body.data);
           if (!sanitized) return;
 
@@ -750,6 +930,7 @@
             state.teams = sanitized.teams;
             state.overlap = sanitized.overlap;
             state.result = sanitized.result;
+            resetUndoBaseline();
           }
           state.history = mergedHistory;
           try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (_) {}
@@ -765,7 +946,7 @@
           if (finalJSON !== incomingFullJSON) scheduleServerPush(); // our merge has data the server doesn't yet
           else lastSyncedJSON = finalJSON;
         } catch (_) {
-          // offline or API not set up yet — stay on whatever's local
+          setSync('offline'); // stay on whatever's local
         }
       }
 
@@ -773,25 +954,56 @@
       // setup code), so both paths validate and migrate data identically.
       const MAX_HISTORY = 30;
 
+      const validIso = value => typeof value === 'string' && !isNaN(Date.parse(value));
+
       function sanitizeHistory(history) {
         if (!Array.isArray(history)) return [];
         return history
           .filter(entry => entry && Array.isArray(entry.entry1) && Array.isArray(entry.entry2))
-          .map(entry => ({
-            id: String(entry.id || uid()),
-            savedAt: typeof entry.savedAt === 'string' && !isNaN(Date.parse(entry.savedAt)) ? entry.savedAt : new Date().toISOString(),
-            overlap: Math.max(0, Math.min(7, Number(entry.overlap) || 0)),
-            entry1: entry.entry1.map(String).slice(0, 7),
-            entry2: entry.entry2.map(String).slice(0, 7)
-          }));
+          .map(entry => {
+            const savedAt = validIso(entry.savedAt) ? entry.savedAt : new Date().toISOString();
+            // results: { teamName: 'W' | 'L' | 'P' } — keyed by name, so a shared pick is graded
+            // once and counts in both entries. tiers: each pick's tier when the week was saved
+            // (absent on weeks saved before grading existed, which just skip the by-tier stats).
+            const results = {};
+            if (entry.results && typeof entry.results === 'object') {
+              Object.keys(entry.results).forEach(name => {
+                if (['W', 'L', 'P'].includes(entry.results[name])) results[name] = entry.results[name];
+              });
+            }
+            let tiers = null;
+            if (entry.tiers && typeof entry.tiers === 'object') {
+              tiers = {};
+              Object.keys(entry.tiers).forEach(name => {
+                const t = Number(entry.tiers[name]);
+                if ([0, 1, 2, 3].includes(t)) tiers[name] = t;
+              });
+            }
+            return {
+              id: String(entry.id || uid()),
+              savedAt: savedAt,
+              updatedAt: validIso(entry.updatedAt) ? entry.updatedAt : savedAt,
+              overlap: Math.max(0, Math.min(7, Number(entry.overlap) || 0)),
+              entry1: entry.entry1.map(String).slice(0, 7),
+              entry2: entry.entry2.map(String).slice(0, 7),
+              results: results,
+              tiers: tiers
+            };
+          });
       }
 
       // Saved weeks are a cumulative record, never something a sync or import should be able to
       // erase, so every place history comes in from elsewhere (localStorage, a pasted/uploaded
       // setup, or a server pull) merges with what's already here instead of replacing it.
       function mergeHistory(a, b) {
+        // When both sides have the same week, keep whichever copy was edited (graded) most
+        // recently, so grading on one device isn't overwritten by an older copy from the other.
+        const stamp = entry => Date.parse(entry.updatedAt || entry.savedAt) || 0;
         const map = new Map();
-        a.concat(b).forEach(entry => map.set(entry.id, entry));
+        a.concat(b).forEach(entry => {
+          const existing = map.get(entry.id);
+          if (!existing || stamp(entry) >= stamp(existing)) map.set(entry.id, entry);
+        });
         return Array.from(map.values())
           .sort((x, y) => new Date(y.savedAt) - new Date(x.savedAt))
           .slice(0, MAX_HISTORY);
@@ -947,6 +1159,32 @@
 
       const TIER_LABELS = ['Lock', 'Strong', 'Lean', 'Meh'];
 
+      // Splits "Purdue +14.5" into team + line for display. The stored name is never changed —
+      // this is purely how it's shown — so saved data, sync, and copied text are unaffected.
+      // Needs a space before the line, so names like "Texas A&M" or "UNLV" are left alone.
+      function splitSpread(name) {
+        const match = String(name).match(/^(.*\S)\s+([+-]\d+(?:\.\d+)?|pk|pick(?:'?em)?)$/i);
+        if (!match) return { team: String(name), line: null, kind: null };
+        if (/^p/i.test(match[2])) return { team: match[1], line: 'PK', kind: 'pk' };
+        const value = parseFloat(match[2]);
+        return { team: match[1], line: match[2], kind: value > 0 ? 'dog' : value < 0 ? 'fav' : 'pk' };
+      }
+      function nameHtml(name) {
+        const parsed = splitSpread(name);
+        if (!parsed.line) return '<span class="name-text">' + escapeHtml(name) + '</span>';
+        const title = parsed.kind === 'dog' ? 'Underdog' : parsed.kind === 'fav' ? 'Favorite' : "Pick'em";
+        return '<span class="name-text">' + escapeHtml(parsed.team) + '</span> <span class="spread spread-' + parsed.kind + '" title="' + title + '">' + escapeHtml(parsed.line) + '</span>';
+      }
+      function spreadMix(names) {
+        const counts = { dog: 0, fav: 0, pk: 0 };
+        names.forEach(name => { const kind = splitSpread(name).kind; if (kind) counts[kind]++; });
+        const parts = [];
+        if (counts.dog) parts.push(counts.dog + (counts.dog === 1 ? ' dog' : ' dogs'));
+        if (counts.fav) parts.push(counts.fav + (counts.fav === 1 ? ' fav' : ' favs'));
+        if (counts.pk) parts.push(counts.pk + ' PK');
+        return parts.join(' \u00b7 ');
+      }
+
       function renderCandidates() {
         els.candidateEmpty.classList.toggle('hidden', state.teams.length > 0);
         els.candidateBadge.textContent = state.teams.length + (state.teams.length === 1 ? ' team' : ' teams');
@@ -965,7 +1203,7 @@
               '<div class="team-row" draggable="true" data-team-id="' + escapeHtml(team.id) + '" data-source-entry="0" data-tier="' + team.tier + '">' +
                 '<div class="team-name-wrap">' +
                   '<div class="team-top-row">' +
-                    '<div class="team-name" title="' + escapeHtml(team.name) + '">' + escapeHtml(team.name) + '</div>' +
+                    '<div class="team-name" title="' + escapeHtml(team.name) + '">' + nameHtml(team.name) + '</div>' +
                     '<div class="rank-arrows">' +
                       '<button type="button" class="rank-btn" data-dir="up" data-team-id="' + escapeHtml(team.id) + '"' + (i === 0 ? ' disabled' : '') + ' aria-label="Move ' + escapeHtml(team.name) + ' earlier within its tier" title="Move up within tier">▲</button>' +
                       '<button type="button" class="rank-btn" data-dir="down" data-team-id="' + escapeHtml(team.id) + '"' + (i === group.length - 1 ? ' disabled' : '') + ' aria-label="Move ' + escapeHtml(team.name) + ' later within its tier" title="Move down within tier">▼</button>' +
@@ -1071,12 +1309,13 @@
                 }
               }
               return '<div class="' + cardClasses + '" draggable="true" data-team-id="' + escapeHtml(item.team.id) + '" data-source-entry="' + entry + '">' +
-                '<span class="pick-num">' + (index + 1) + '</span><div class="pick-main"><div class="pick-name" title="' + escapeHtml(item.team.name) + '">' + escapeHtml(item.team.name) + '</div>' +
+                '<span class="pick-num">' + (index + 1) + '</span><div class="pick-main"><div class="pick-name" title="' + escapeHtml(item.team.name) + '">' + nameHtml(item.team.name) + '</div>' +
                 '<div class="pick-sub">' + (shared ? '<span class="shared-marker">Shared</span>' : '') + '<span class="pick-meta">' + meta + '</span>' +
                 (actions.length ? '<div class="pick-actions">' + actions.join('') + '</div>' : '') + '</div></div></div>';
             }).join('');
           }
           els.counts[entry].textContent = picks.length + ' / 7';
+          els.mix[entry].textContent = spreadMix(picks.map(item => item.team.name));
           els.counts[entry].classList.toggle('complete', picks.length === 7);
           els.clear[entry].disabled = !state.teams.some(team => includesEntry(team.fixedMask, entry));
           els.copy[entry].disabled = picks.length !== 7;
@@ -1096,23 +1335,90 @@
         return date.toLocaleString(undefined, { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' });
       }
 
+      const NEXT_GRADE = { '': 'W', W: 'L', L: 'P', P: '' };
+      const GRADE_LABEL = { W: 'W', L: 'L', P: 'Push' };
+
+      function tally(names, results) {
+        const t = { W: 0, L: 0, P: 0 };
+        names.forEach(name => { const g = results[name]; if (g) t[g]++; });
+        return t;
+      }
+      function recordText(t) {
+        return t.W + '-' + t.L + (t.P ? '-' + t.P : '');
+      }
+      function winPct(t) {
+        return t.W + t.L ? Math.round(100 * t.W / (t.W + t.L)) + '%' : '\u2014';
+      }
+
+      function renderSeasonSummary() {
+        const season = { e1: { W: 0, L: 0, P: 0 }, e2: { W: 0, L: 0, P: 0 }, all: { W: 0, L: 0, P: 0 } };
+        const byTier = [0, 1, 2, 3].map(() => ({ W: 0, L: 0, P: 0 }));
+        let graded = 0;
+        state.history.forEach(week => {
+          const add = (target, t) => { target.W += t.W; target.L += t.L; target.P += t.P; };
+          add(season.e1, tally(week.entry1, week.results));
+          add(season.e2, tally(week.entry2, week.results));
+          // Each team counted once per week for the overall and by-tier numbers, even if shared.
+          const unique = Array.from(new Set(week.entry1.concat(week.entry2)));
+          add(season.all, tally(unique, week.results));
+          unique.forEach(name => {
+            const g = week.results[name];
+            if (!g) return;
+            graded++;
+            if (week.tiers && week.tiers[name] !== undefined) byTier[week.tiers[name]][g]++;
+          });
+        });
+        if (!graded) { els.historySummary.innerHTML = ''; return; }
+        const tierChips = byTier.map((t, i) => (t.W + t.L + t.P)
+          ? '<span class="tier-chip tier-' + i + '">' + TIER_LABELS[i] + ' ' + recordText(t) + ' \u00b7 ' + winPct(t) + '</span>' : '').join('');
+        els.historySummary.innerHTML =
+          '<div class="history-summary">' +
+            '<div class="summary-stats">' +
+              '<div><span>Entry 1</span><strong>' + recordText(season.e1) + '</strong><em>' + winPct(season.e1) + '</em></div>' +
+              '<div><span>Entry 2</span><strong>' + recordText(season.e2) + '</strong><em>' + winPct(season.e2) + '</em></div>' +
+              '<div><span>All picks</span><strong>' + recordText(season.all) + '</strong><em>' + winPct(season.all) + '</em></div>' +
+            '</div>' +
+            (tierChips ? '<div class="summary-tiers"><span>By tier</span>' + tierChips + '</div>' : '') +
+          '</div>';
+      }
+
       function renderHistory() {
         const entries = state.history;
         els.historyEmpty.classList.toggle('hidden', entries.length > 0);
         els.historyClearRow.hidden = entries.length === 0;
-        els.historyList.innerHTML = entries.map(entry =>
-          '<div class="history-entry" data-history-id="' + escapeHtml(entry.id) + '">' +
+        renderSeasonSummary();
+        const pickList = (entry, names) => '<ol>' + names.map(name => {
+          const g = entry.results[name] || '';
+          return '<li><span class="h-pick"><span class="h-name" title="' + escapeHtml(name) + '">' + nameHtml(name) + '</span>' +
+            '<button type="button" class="grade-btn' + (g ? ' grade-' + g : '') + '" data-history-id="' + escapeHtml(entry.id) + '" data-team="' + escapeHtml(name) + '" aria-label="Grade ' + escapeHtml(name) + ' (currently ' + (g ? GRADE_LABEL[g] : 'ungraded') + ')">' + (g ? GRADE_LABEL[g] : '\u2013') + '</button></span></li>';
+        }).join('') + '</ol>';
+        els.historyList.innerHTML = entries.map(entry => {
+          const t1 = tally(entry.entry1, entry.results), t2 = tally(entry.entry2, entry.results);
+          const rec = t => (t.W + t.L + t.P) ? ' <span class="h-record">' + recordText(t) + '</span>' : '';
+          return '<div class="history-entry" data-history-id="' + escapeHtml(entry.id) + '">' +
             '<div class="history-head"><strong>' + escapeHtml(formatSavedAt(entry.savedAt)) + '</strong><span>Shared ' + entry.overlap + '</span></div>' +
             '<div class="history-columns">' +
-              '<div><h4>Splash Entry 1</h4><ol>' + entry.entry1.map(name => '<li>' + escapeHtml(name) + '</li>').join('') + '</ol></div>' +
-              '<div><h4>Splash Entry 2</h4><ol>' + entry.entry2.map(name => '<li>' + escapeHtml(name) + '</li>').join('') + '</ol></div>' +
+              '<div><h4>Splash Entry 1' + rec(t1) + '</h4>' + pickList(entry, entry.entry1) + '</div>' +
+              '<div><h4>Splash Entry 2' + rec(t2) + '</h4>' + pickList(entry, entry.entry2) + '</div>' +
             '</div>' +
             '<div class="history-actions">' +
               '<button type="button" class="btn history-copy-btn" data-history-id="' + escapeHtml(entry.id) + '">Copy</button>' +
               '<button type="button" class="btn danger history-delete-btn" data-history-id="' + escapeHtml(entry.id) + '">Delete</button>' +
             '</div>' +
-          '</div>'
-        ).join('');
+          '</div>';
+        }).join('');
+      }
+
+      function gradePick(id, name) {
+        const entry = state.history.find(item => item.id === id);
+        if (!entry) return;
+        const next = NEXT_GRADE[entry.results[name] || ''];
+        const results = Object.assign({}, entry.results);
+        if (next) results[name] = next; else delete results[name];
+        entry.results = results;
+        entry.updatedAt = new Date().toISOString();
+        save();
+        renderHistory();
       }
 
       function saveWeek() {
@@ -1125,12 +1431,18 @@
         if (last && JSON.stringify(last.entry1) === JSON.stringify(entry1) && JSON.stringify(last.entry2) === JSON.stringify(entry2)) {
           return setStatus('Already saved', 'This exact build is already your most recent saved week.', 'error');
         }
+        const tiers = {};
+        state.teams.forEach(team => { if (entry1.includes(team.name) || entry2.includes(team.name)) tiers[team.name] = team.tier; });
+        const now = new Date().toISOString();
         state.history = mergeHistory(state.history, [{
           id: uid(),
-          savedAt: new Date().toISOString(),
+          savedAt: now,
+          updatedAt: now,
           overlap: state.overlap,
           entry1: entry1,
-          entry2: entry2
+          entry2: entry2,
+          results: {},
+          tiers: tiers
         }]);
         save();
         renderHistory();
@@ -1141,9 +1453,9 @@
         const entry = state.history.find(item => item.id === id);
         if (!entry) return;
         const text = 'Splash Entry 1 (' + formatSavedAt(entry.savedAt) + ')\n' +
-          entry.entry1.map((name, i) => (i + 1) + '. ' + name).join('\n') +
+          entry.entry1.map((name, i) => (i + 1) + '. ' + name + (entry.results[name] ? ' (' + GRADE_LABEL[entry.results[name]] + ')' : '')).join('\n') +
           '\n\nSplash Entry 2 (' + formatSavedAt(entry.savedAt) + ')\n' +
-          entry.entry2.map((name, i) => (i + 1) + '. ' + name).join('\n');
+          entry.entry2.map((name, i) => (i + 1) + '. ' + name + (entry.results[name] ? ' (' + GRADE_LABEL[entry.results[name]] + ')' : '')).join('\n');
         try {
           await navigator.clipboard.writeText(text);
         } catch (_) {
@@ -1494,13 +1806,23 @@
       els.build.addEventListener('click', () => build(true));
       els.another.addEventListener('click', () => build(true));
       els.print.addEventListener('click', () => window.print());
+      // Clears this week's teams, tiers, exposure, locks and build so you can paste next week's
+      // slate. Keeps your overlap setting (usually the same week to week) and saved-weeks history.
       els.reset.addEventListener('click', () => {
-        if (!confirm('Clear all teams, placements, and saved settings? This also clears the copy synced to your other device. Your saved-weeks history is kept.')) return;
-        state = { teams: [], overlap: 3, result: null, history: state.history };
+        const entry1 = picksForEntry(1).map(item => item.team.name);
+        const entry2 = picksForEntry(2).map(item => item.team.name);
+        const last = state.history[0];
+        const unsaved = entry1.length === 7 && entry2.length === 7 &&
+          !(last && JSON.stringify(last.entry1) === JSON.stringify(entry1) && JSON.stringify(last.entry2) === JSON.stringify(entry2));
+        const message = 'Start a new week? This clears your teams, tiers, exposure, locks, and current build on both devices. Your overlap setting and saved weeks are kept.' +
+          (unsaved ? '\n\nHeads up: your current build hasn\u2019t been saved to Saved weeks yet. Cancel and tap "Save this week" first if you want a record of it.' : '');
+        if (!confirm(message)) return;
+        state = { teams: [], overlap: state.overlap, result: null, history: state.history };
         els.input.value = '';
         save();
         renderAll();
-        setStatus('Reset complete', 'Paste your candidate teams above to start a new build.');
+        setStatus('Ready for a new week', 'Paste this week\u2019s candidate teams above to start.');
+        els.input.focus();
       });
 
       els.transferBtn.addEventListener('click', () => {
@@ -1560,6 +1882,8 @@
         if (event.target === els.historyOverlay) els.historyOverlay.classList.add('hidden');
       });
       els.historyList.addEventListener('click', event => {
+        const grade = event.target.closest('.grade-btn');
+        if (grade) return gradePick(grade.dataset.historyId, grade.dataset.team);
         const copyBtn = event.target.closest('.history-copy-btn');
         if (copyBtn) return copyHistoryEntry(copyBtn.dataset.historyId);
         const deleteBtn = event.target.closest('.history-delete-btn');
@@ -1573,13 +1897,25 @@
         setStatus('Saved weeks cleared', 'Your history is now empty.');
       });
 
+      els.undo.addEventListener('click', undo);
+      document.addEventListener('keydown', event => {
+        if (!(event.ctrlKey || event.metaKey) || event.shiftKey || event.key.toLowerCase() !== 'z') return;
+        if (event.target.closest('input, textarea, select')) return; // leave text-field undo alone
+        event.preventDefault();
+        undo();
+      });
+
       restore();
+      resetUndoBaseline();
       renderAll();
       if (state.teams.length) setStatus('Saved setup restored', 'Your teams, exposure settings, placements, and latest build were loaded.', 'success');
       pullFromServer();
       document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible') pullFromServer();
       });
+      window.addEventListener('online', () => pullFromServer());
+      els.syncStatus.addEventListener('click', () => pullFromServer());
+      setInterval(() => { if (syncStatus === 'ok') renderSyncStatus(); }, 30000);
     })();
   </script>
 </body>
