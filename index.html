@@ -212,9 +212,40 @@
     .team-row.dragging { opacity: .45; }
     .team-name-wrap { min-width: 0; }
     .team-name { font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .lock-line { min-height: 17px; margin-top: 3px; color: var(--muted); font-size: .71rem; }
+    .lock-line { display: block; min-height: 17px; margin-top: 3px; color: var(--muted); font-size: .71rem; }
     .lock-line.active { color: var(--green); }
     .field-label { display: block; margin-bottom: 4px; color: var(--muted); font-size: .65rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+
+    .team-top-row { display: flex; align-items: center; gap: 6px; }
+    .team-top-row .team-name { flex: 1; min-width: 0; }
+    .rank-badge {
+      flex: none;
+      min-width: 24px;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: var(--green-soft);
+      color: var(--green-2);
+      font-size: .68rem;
+      font-weight: 800;
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+    }
+    .rank-arrows { display: flex; flex-direction: column; gap: 1px; flex: none; }
+    .rank-btn {
+      min-width: 20px;
+      height: 15px;
+      padding: 0;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      background: #ffffff;
+      color: var(--muted);
+      font-size: .55rem;
+      line-height: 1;
+    }
+    .rank-btn:hover:not(:disabled) { border-color: var(--green); color: var(--green); }
+    .rank-btn:disabled { opacity: .3; cursor: not-allowed; }
+    .team-row.drag-over-top { box-shadow: inset 0 2px 0 var(--green); }
+    .team-row.drag-over-bottom { box-shadow: inset 0 -2px 0 var(--green); }
     .setting-group { min-width: 0; }
     .segmented, .placement-buttons { display: flex; gap: 4px; }
     .choice-btn {
@@ -307,6 +338,58 @@
     .shared-marker { color: var(--amber); }
     .hidden { display: none !important; }
 
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(23, 37, 29, .5);
+    }
+    .modal-overlay.hidden { display: none; }
+    .modal-card { width: min(560px, 100%); max-height: 88vh; overflow-y: auto; padding: 20px; }
+    .modal-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 4px; }
+    .modal-head h2 { font-size: 1.05rem; margin: 0; }
+    .modal-head .btn { min-height: 32px; min-width: 32px; padding: 0; }
+    .modal-divider { border: none; border-top: 1px solid var(--line); margin: 18px 0; }
+    .modal-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+    .modal-actions .btn { flex: 1; min-width: 140px; }
+    .history-entry {
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel-2);
+      padding: 13px;
+      margin-top: 12px;
+    }
+    .history-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 9px; }
+    .history-head strong { font-size: .92rem; }
+    .history-head span { color: var(--muted); font-size: .78rem; }
+    .history-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .history-columns h4 { margin: 0 0 5px; font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+    .history-columns ol { margin: 0; padding-left: 18px; font-size: .84rem; line-height: 1.5; }
+    .history-actions { display: flex; gap: 8px; margin-top: 10px; }
+    .history-actions .btn { min-height: 34px; padding: 0 12px; font-size: .82rem; }
+    @media (max-width: 480px) {
+      .history-columns { grid-template-columns: 1fr; }
+    }
+
+    #transferOut, #transferIn {
+      width: 100%;
+      min-height: 92px;
+      margin-top: 10px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #ffffff;
+      color: var(--text);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: .74rem;
+      line-height: 1.4;
+      resize: vertical;
+    }
+
     @media (max-width: 1120px) {
       .workspace { grid-template-columns: 1fr 1fr; }
       .candidates { grid-column: 1 / -1; min-height: auto; }
@@ -339,7 +422,7 @@
     @media print {
       body { background: #fff; color: #111; }
       .app { width: 100%; padding: 0; }
-      .top-actions, .setup, .candidates, .buildbar, .entry-footer, .remove-lock { display: none !important; }
+      .top-actions, .setup, .candidates, .buildbar, .entry-footer, .remove-lock, .modal-overlay { display: none !important; }
       .workspace { grid-template-columns: 1fr 1fr; }
       .card, .dropzone, .pick-card { box-shadow: none; background: #fff; color: #111; border-color: #bbb; }
       .entry { min-height: 0; }
@@ -357,6 +440,8 @@
         <p class="subtitle">Build two 7-pick entries, control every team's exposure, drag teams between entries to move them, or use Lock both to place a team in both entries.</p>
       </div>
       <div class="top-actions">
+        <button class="btn" id="historyBtn" type="button">Saved weeks</button>
+        <button class="btn" id="transferBtn" type="button">Copy / Load setup</button>
         <button class="btn" id="printBtn" type="button">Print / Save PDF</button>
         <button class="btn danger" id="resetBtn" type="button">Reset</button>
       </div>
@@ -410,8 +495,8 @@
       <div class="card candidates">
         <div class="candidate-toolbar">
           <div>
-            <h2>3. Set exposure &amp; locks</h2>
-            <p class="helper">Use the Min/Max buttons, drag to an entry, or tap S1, S2, or Lock both.</p>
+            <h2>3. Set exposure, locks &amp; confidence</h2>
+            <p class="helper">Use the Min/Max buttons, drag to an entry, or tap S1, S2, or Lock both. Drag a row up or down here (or use the ▲▼ arrows) to rank your confidence — entries are ordered by that rank, and the builder favors your top teams for double exposure.</p>
           </div>
           <span class="badge" id="candidateBadge">0 teams</span>
         </div>
@@ -451,10 +536,49 @@
         <span>The builder saves your setup automatically in this browser.</span>
       </div>
       <div class="build-actions">
+        <button class="btn" id="saveWeekBtn" type="button" disabled>Save this week</button>
         <button class="btn" id="anotherBtn" type="button" disabled>Another valid build</button>
         <button class="btn primary" id="buildBtn" type="button" disabled>Build 2 entries</button>
       </div>
     </section>
+
+    <div class="modal-overlay hidden" id="transferOverlay" role="dialog" aria-modal="true" aria-labelledby="transferTitle">
+      <div class="card modal-card">
+        <div class="modal-head">
+          <h2 id="transferTitle">Copy / load setup</h2>
+          <button class="btn" id="transferCloseBtn" type="button" aria-label="Close">✕</button>
+        </div>
+        <p class="helper">Copy this code, then paste it into this tool on your other device (laptop ⇄ phone) to bring over your teams, exposure, locks, confidence order, and latest build. It's also a plain-text backup you can save anywhere.</p>
+        <textarea id="transferOut" readonly aria-label="Setup code to copy"></textarea>
+        <div class="modal-actions">
+          <button class="btn primary" id="copySetupBtn" type="button">Copy code</button>
+          <button class="btn" id="downloadSetupBtn" type="button">Download as file</button>
+        </div>
+        <hr class="modal-divider">
+        <p class="helper">To load a setup, paste a code below (or load a downloaded file), then tap Load.</p>
+        <textarea id="transferIn" placeholder="Paste setup code here" aria-label="Setup code to load"></textarea>
+        <div class="modal-actions">
+          <button class="btn primary" id="loadSetupBtn" type="button">Load pasted code</button>
+          <button class="btn" id="uploadSetupBtn" type="button">Load from file</button>
+        </div>
+        <input type="file" id="setupFileInput" accept="application/json,.json" hidden>
+      </div>
+    </div>
+
+    <div class="modal-overlay hidden" id="historyOverlay" role="dialog" aria-modal="true" aria-labelledby="historyTitle">
+      <div class="card modal-card">
+        <div class="modal-head">
+          <h2 id="historyTitle">Saved weeks</h2>
+          <button class="btn" id="historyCloseBtn" type="button" aria-label="Close">✕</button>
+        </div>
+        <p class="helper">A record of builds you've saved, so you can check back later on what you actually picked. Saving here doesn't happen automatically — use "Save this week" once you're happy with a build.</p>
+        <div id="historyList"></div>
+        <div class="empty-state" id="historyEmpty"><strong>No saved weeks yet</strong><span>Build your two entries, then tap "Save this week."</span></div>
+        <div class="modal-actions" id="historyClearRow" hidden>
+          <button class="btn danger" id="clearHistoryBtn" type="button">Clear all saved weeks</button>
+        </div>
+      </div>
+    </div>
   </main>
 
   <script type="text/plain" id="legacy-v2-script">
@@ -853,10 +977,17 @@
         clear: { 1: $('#clearEntry1'), 2: $('#clearEntry2') },
         copy: { 1: $('#copyEntry1'), 2: $('#copyEntry2') },
         build: $('#buildBtn'), another: $('#anotherBtn'), status: $('#statusBox'),
-        reset: $('#resetBtn'), print: $('#printBtn')
+        reset: $('#resetBtn'), print: $('#printBtn'),
+        transferBtn: $('#transferBtn'), transferOverlay: $('#transferOverlay'), transferClose: $('#transferCloseBtn'),
+        transferOut: $('#transferOut'), transferIn: $('#transferIn'),
+        copySetup: $('#copySetupBtn'), downloadSetup: $('#downloadSetupBtn'),
+        loadSetup: $('#loadSetupBtn'), uploadSetup: $('#uploadSetupBtn'), setupFile: $('#setupFileInput'),
+        saveWeek: $('#saveWeekBtn'), historyBtn: $('#historyBtn'), historyOverlay: $('#historyOverlay'),
+        historyClose: $('#historyCloseBtn'), historyList: $('#historyList'), historyEmpty: $('#historyEmpty'),
+        historyClearRow: $('#historyClearRow'), clearHistory: $('#clearHistoryBtn')
       };
 
-      let state = { teams: [], overlap: 3, result: null };
+      let state = { teams: [], overlap: 3, result: null, history: [] };
       let dragData = { teamId: null, sourceEntry: 0 };
 
       const escapeHtml = (value) => String(value).replace(/[&<>"']/g, char => ({
@@ -877,30 +1008,171 @@
 
       function save() {
         try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (_) {}
+        scheduleServerPush();
+      }
+
+      // --- Cross-device sync via /api/setup (Redis on Vercel) ---
+      // Every save() debounces a push to the server; on load, and whenever this tab
+      // becomes visible again, we pull the server's copy so the other device's
+      // latest changes show up automatically. Best-effort: any network failure here
+      // is silent and falls back to whatever's in localStorage, so the tool still
+      // works fine offline or before the API route is set up.
+      let pushTimer = null;
+      let lastSyncedJSON = null;
+      let syncing = false;
+
+      function scheduleServerPush() {
+        clearTimeout(pushTimer);
+        pushTimer = setTimeout(pushToServer, 600);
+      }
+
+      function fullSyncPayload() {
+        return { teams: state.teams, overlap: state.overlap, result: state.result, history: state.history };
+      }
+
+      async function pushToServer() {
+        pushTimer = null;
+        if (syncing) return; // don't echo a just-pulled state straight back up
+        const json = JSON.stringify(fullSyncPayload());
+        if (json === lastSyncedJSON) return;
+        try {
+          await fetch('/api/setup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: json
+          });
+          lastSyncedJSON = json;
+        } catch (_) {
+          // offline or API not set up yet — local save already succeeded, so no error shown
+        }
+      }
+
+      async function pullFromServer() {
+        if (pushTimer) return; // a local edit is about to push; don't clobber it with a pull
+        try {
+          const response = await fetch('/api/setup');
+          if (!response.ok) return;
+          const body = await response.json();
+          if (!body || !body.data) return;
+          const sanitized = sanitizeSavedState(body.data);
+          if (!sanitized) return;
+
+          const incomingFullJSON = JSON.stringify({ teams: sanitized.teams, overlap: sanitized.overlap, result: sanitized.result, history: sanitized.history });
+          if (incomingFullJSON === lastSyncedJSON) return; // just our own last push, echoed back
+
+          const mergedHistory = mergeHistory(state.history, sanitized.history);
+          const buildChanged = sanitized.teams.length > 0 &&
+            JSON.stringify({ teams: sanitized.teams, overlap: sanitized.overlap, result: sanitized.result }) !==
+            JSON.stringify({ teams: state.teams, overlap: state.overlap, result: state.result });
+          const historyChanged = JSON.stringify(mergedHistory) !== JSON.stringify(state.history);
+          if (!buildChanged && !historyChanged) return;
+
+          syncing = true;
+          if (buildChanged) {
+            state.teams = sanitized.teams;
+            state.overlap = sanitized.overlap;
+            state.result = sanitized.result;
+          }
+          state.history = mergedHistory;
+          try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (_) {}
+          renderAll();
+          setStatus(
+            buildChanged ? 'Synced from your other device' : 'Synced saved weeks',
+            buildChanged ? 'Loaded the latest teams, exposure, locks, and build.' : 'Picked up saved-week history from your other device.',
+            'success'
+          );
+          syncing = false;
+
+          const finalJSON = JSON.stringify(fullSyncPayload());
+          if (finalJSON !== incomingFullJSON) scheduleServerPush(); // our merge has data the server doesn't yet
+          else lastSyncedJSON = finalJSON;
+        } catch (_) {
+          // offline or API not set up yet — stay on whatever's local
+        }
+      }
+
+      // Shared by restore() (reading localStorage) and importSetup() (reading a pasted/uploaded
+      // setup code), so both paths validate and migrate data identically.
+      const MAX_HISTORY = 30;
+
+      function sanitizeHistory(history) {
+        if (!Array.isArray(history)) return [];
+        return history
+          .filter(entry => entry && Array.isArray(entry.entry1) && Array.isArray(entry.entry2))
+          .map(entry => ({
+            id: String(entry.id || uid()),
+            savedAt: typeof entry.savedAt === 'string' && !isNaN(Date.parse(entry.savedAt)) ? entry.savedAt : new Date().toISOString(),
+            overlap: Math.max(0, Math.min(7, Number(entry.overlap) || 0)),
+            entry1: entry.entry1.map(String).slice(0, 7),
+            entry2: entry.entry2.map(String).slice(0, 7)
+          }));
+      }
+
+      // Saved weeks are a cumulative record, never something a sync or import should be able to
+      // erase, so every place history comes in from elsewhere (localStorage, a pasted/uploaded
+      // setup, or a server pull) merges with what's already here instead of replacing it.
+      function mergeHistory(a, b) {
+        const map = new Map();
+        a.concat(b).forEach(entry => map.set(entry.id, entry));
+        return Array.from(map.values())
+          .sort((x, y) => new Date(y.savedAt) - new Date(x.savedAt))
+          .slice(0, MAX_HISTORY);
+      }
+
+      function sanitizeSavedState(saved) {
+        if (!saved || !Array.isArray(saved.teams)) return null;
+        const teams = saved.teams.map(team => {
+          const oldLocks = Array.isArray(team.locks) ? team.locks : [];
+          const migratedMask = oldLocks.reduce((mask, entry) => mask | (entry === 1 ? 1 : entry === 2 ? 2 : 0), 0);
+          const fixedMask = [0, 1, 2, 3].includes(Number(team.fixedMask)) ? Number(team.fixedMask) : migratedMask;
+          const exposure = popcount(fixedMask);
+          let min = Math.max(0, Math.min(2, Number(team.min) || 0));
+          let max = Math.max(0, Math.min(2, Number.isFinite(Number(team.max)) ? Number(team.max) : 2));
+          if (fixedMask) {
+            min = Math.min(min, exposure);
+            max = Math.max(max, exposure);
+          }
+          return { id: String(team.id || uid()), name: String(team.name || ''), min, max, fixedMask };
+        }).filter(team => team.name);
+        const overlap = Math.max(0, Math.min(7, Number(saved.overlap) || 0));
+        const result = saved.result && Array.isArray(saved.result[1]) && Array.isArray(saved.result[2]) ? saved.result : null;
+        const history = sanitizeHistory(saved.history);
+        return { teams, overlap, result, history };
       }
 
       function restore() {
         try {
           const raw = localStorage.getItem(STORAGE_KEY);
           if (!raw) return;
-          const saved = JSON.parse(raw);
-          if (!saved || !Array.isArray(saved.teams)) return;
-          state.teams = saved.teams.map(team => {
-            const oldLocks = Array.isArray(team.locks) ? team.locks : [];
-            const migratedMask = oldLocks.reduce((mask, entry) => mask | (entry === 1 ? 1 : entry === 2 ? 2 : 0), 0);
-            const fixedMask = [0, 1, 2, 3].includes(Number(team.fixedMask)) ? Number(team.fixedMask) : migratedMask;
-            const exposure = popcount(fixedMask);
-            let min = Math.max(0, Math.min(2, Number(team.min) || 0));
-            let max = Math.max(0, Math.min(2, Number.isFinite(Number(team.max)) ? Number(team.max) : 2));
-            if (fixedMask) {
-              min = Math.min(min, exposure);
-              max = Math.max(max, exposure);
-            }
-            return { id: String(team.id || uid()), name: String(team.name || ''), min, max, fixedMask };
-          }).filter(team => team.name);
-          state.overlap = Math.max(0, Math.min(7, Number(saved.overlap) || 0));
-          state.result = saved.result && Array.isArray(saved.result[1]) && Array.isArray(saved.result[2]) ? saved.result : null;
+          const sanitized = sanitizeSavedState(JSON.parse(raw));
+          if (!sanitized) return;
+          state.teams = sanitized.teams;
+          state.overlap = sanitized.overlap;
+          state.result = sanitized.result;
+          state.history = mergeHistory(state.history, sanitized.history);
         } catch (_) {}
+      }
+
+      function importSetup(text) {
+        let parsed;
+        try {
+          parsed = JSON.parse(text);
+        } catch (_) {
+          return setStatus('Could not load setup', 'That doesn\u2019t look like a valid setup code \u2014 copy it exactly, with nothing added or missing.', 'error');
+        }
+        const sanitized = sanitizeSavedState(parsed);
+        if (!sanitized || !sanitized.teams.length) {
+          return setStatus('Could not load setup', 'That code doesn\u2019t contain a recognizable CFB Splash Pool Builder setup.', 'error');
+        }
+        if (state.teams.length && !confirm('Load this setup? It will replace the teams, exposure, locks, and build currently loaded here. Saved-week history from both is kept.')) return;
+        state.teams = sanitized.teams;
+        state.overlap = sanitized.overlap;
+        state.result = sanitized.result;
+        state.history = mergeHistory(state.history, sanitized.history);
+        save();
+        renderAll();
+        els.transferOverlay.classList.add('hidden');
+        setStatus('Setup loaded', 'Teams, exposure, locks, confidence order, and the latest build were loaded from the code.', 'success');
       }
 
       function setStatus(title, detail, type = '') {
@@ -997,10 +1269,20 @@
       function renderCandidates() {
         els.candidateEmpty.classList.toggle('hidden', state.teams.length > 0);
         els.candidateBadge.textContent = state.teams.length + (state.teams.length === 1 ? ' team' : ' teams');
-        els.candidateList.innerHTML = state.teams.map(team =>
+        const total = state.teams.length;
+        els.candidateList.innerHTML = state.teams.map((team, index) =>
           '<div class="team-row" draggable="true" data-team-id="' + escapeHtml(team.id) + '" data-source-entry="0">' +
-            '<div class="team-name-wrap"><div class="team-name" title="' + escapeHtml(team.name) + '">' + escapeHtml(team.name) + '</div>' +
-            '<div class="lock-line ' + (team.fixedMask ? 'active' : '') + '">' + placementText(team.fixedMask) + '</div></div>' +
+            '<div class="team-name-wrap">' +
+              '<div class="team-top-row">' +
+                '<span class="rank-badge" title="Confidence rank">#' + (index + 1) + '</span>' +
+                '<div class="team-name" title="' + escapeHtml(team.name) + '">' + escapeHtml(team.name) + '</div>' +
+                '<div class="rank-arrows">' +
+                  '<button type="button" class="rank-btn" data-dir="up" data-team-id="' + escapeHtml(team.id) + '"' + (index === 0 ? ' disabled' : '') + ' aria-label="More confident in ' + escapeHtml(team.name) + '" title="More confident">▲</button>' +
+                  '<button type="button" class="rank-btn" data-dir="down" data-team-id="' + escapeHtml(team.id) + '"' + (index === total - 1 ? ' disabled' : '') + ' aria-label="Less confident in ' + escapeHtml(team.name) + '" title="Less confident">▼</button>' +
+                '</div>' +
+              '</div>' +
+              '<div class="lock-line ' + (team.fixedMask ? 'active' : '') + '">' + placementText(team.fixedMask) + '</div>' +
+            '</div>' +
             '<div class="setting-group"><span class="field-label">Min</span><div class="segmented">' + exposureButtons(team, 'min') + '</div></div>' +
             '<div class="setting-group"><span class="field-label">Max</span><div class="segmented">' + exposureButtons(team, 'max') + '</div></div>' +
             '<div class="placement-group"><span class="field-label">Place</span><div class="placement-buttons">' +
@@ -1009,6 +1291,30 @@
               '<button type="button" class="choice-btn place-btn both ' + (team.fixedMask === 3 ? 'active' : '') + '" data-mask="3" data-team-id="' + escapeHtml(team.id) + '" aria-label="Lock ' + escapeHtml(team.name) + ' in both entries" title="Lock in both entries">🔒</button>' +
             '</div></div></div>'
         ).join('');
+      }
+
+      function moveRank(teamId, direction) {
+        const fromIndex = state.teams.findIndex(t => t.id === teamId);
+        if (fromIndex === -1) return;
+        const toIndex = fromIndex + (direction === 'up' ? -1 : 1);
+        if (toIndex < 0 || toIndex >= state.teams.length) return;
+        applyMutation(() => {
+          const [team] = state.teams.splice(fromIndex, 1);
+          state.teams.splice(toIndex, 0, team);
+        }, 'Confidence order updated.');
+      }
+
+      function reorderTeam(draggedId, targetId, placeBefore) {
+        if (draggedId === targetId) return;
+        applyMutation(() => {
+          const fromIndex = state.teams.findIndex(t => t.id === draggedId);
+          if (fromIndex === -1) return;
+          const [team] = state.teams.splice(fromIndex, 1);
+          let toIndex = state.teams.findIndex(t => t.id === targetId);
+          if (toIndex === -1) toIndex = state.teams.length;
+          else if (!placeBefore) toIndex += 1;
+          state.teams.splice(toIndex, 0, team);
+        }, 'Confidence order updated.');
       }
 
       function picksForEntry(entry) {
@@ -1043,12 +1349,84 @@
           els.clear[entry].disabled = !state.teams.some(team => includesEntry(team.fixedMask, entry));
           els.copy[entry].disabled = picks.length !== 7;
         });
+        els.saveWeek.disabled = picksForEntry(1).length !== 7 || picksForEntry(2).length !== 7;
       }
 
       function renderButtons() {
         const check = validate();
         els.build.disabled = !check.ok;
         if (!check.ok && state.teams.length) setStatus(check.title, check.detail, 'error');
+      }
+
+      function formatSavedAt(iso) {
+        const date = new Date(iso);
+        if (isNaN(date)) return 'Unknown date';
+        return date.toLocaleString(undefined, { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' });
+      }
+
+      function renderHistory() {
+        const entries = state.history;
+        els.historyEmpty.classList.toggle('hidden', entries.length > 0);
+        els.historyClearRow.hidden = entries.length === 0;
+        els.historyList.innerHTML = entries.map(entry =>
+          '<div class="history-entry" data-history-id="' + escapeHtml(entry.id) + '">' +
+            '<div class="history-head"><strong>' + escapeHtml(formatSavedAt(entry.savedAt)) + '</strong><span>Shared ' + entry.overlap + '</span></div>' +
+            '<div class="history-columns">' +
+              '<div><h4>Splash Entry 1</h4><ol>' + entry.entry1.map(name => '<li>' + escapeHtml(name) + '</li>').join('') + '</ol></div>' +
+              '<div><h4>Splash Entry 2</h4><ol>' + entry.entry2.map(name => '<li>' + escapeHtml(name) + '</li>').join('') + '</ol></div>' +
+            '</div>' +
+            '<div class="history-actions">' +
+              '<button type="button" class="btn history-copy-btn" data-history-id="' + escapeHtml(entry.id) + '">Copy</button>' +
+              '<button type="button" class="btn danger history-delete-btn" data-history-id="' + escapeHtml(entry.id) + '">Delete</button>' +
+            '</div>' +
+          '</div>'
+        ).join('');
+      }
+
+      function saveWeek() {
+        const entry1 = picksForEntry(1).map(item => item.team.name);
+        const entry2 = picksForEntry(2).map(item => item.team.name);
+        if (entry1.length !== 7 || entry2.length !== 7) {
+          return setStatus('Nothing to save yet', 'Build both entries to 7 picks first.', 'error');
+        }
+        const last = state.history[0];
+        if (last && JSON.stringify(last.entry1) === JSON.stringify(entry1) && JSON.stringify(last.entry2) === JSON.stringify(entry2)) {
+          return setStatus('Already saved', 'This exact build is already your most recent saved week.', 'error');
+        }
+        state.history = mergeHistory(state.history, [{
+          id: uid(),
+          savedAt: new Date().toISOString(),
+          overlap: state.overlap,
+          entry1: entry1,
+          entry2: entry2
+        }]);
+        save();
+        renderHistory();
+        setStatus('Week saved', 'This build is now in your saved-weeks history (' + state.history.length + ' total).', 'success');
+      }
+
+      async function copyHistoryEntry(id) {
+        const entry = state.history.find(item => item.id === id);
+        if (!entry) return;
+        const text = 'Splash Entry 1 (' + formatSavedAt(entry.savedAt) + ')\n' +
+          entry.entry1.map((name, i) => (i + 1) + '. ' + name).join('\n') +
+          '\n\nSplash Entry 2 (' + formatSavedAt(entry.savedAt) + ')\n' +
+          entry.entry2.map((name, i) => (i + 1) + '. ' + name).join('\n');
+        try {
+          await navigator.clipboard.writeText(text);
+        } catch (_) {
+          const temp = document.createElement('textarea');
+          temp.value = text; document.body.appendChild(temp); temp.select(); document.execCommand('copy'); temp.remove();
+        }
+        setStatus('Saved week copied', 'Both entries from that week are on your clipboard.', 'success');
+      }
+
+      function deleteHistoryEntry(id) {
+        if (!confirm('Delete this saved week? This cannot be undone.')) return;
+        state.history = state.history.filter(item => item.id !== id);
+        save();
+        renderHistory();
+        setStatus('Saved week deleted', state.history.length + ' saved week' + (state.history.length === 1 ? '' : 's') + ' remaining.');
       }
 
       function renderAll() {
@@ -1059,11 +1437,68 @@
         renderCandidates();
         renderEntries();
         renderButtons();
+        renderHistory();
+      }
+
+      // Confidence rank comes from a team's position in state.teams (index 0 = most confident,
+      // set by dragging or the ▲▼ arrows in the candidate list). When building fresh, this greedy
+      // pass walks teams in confidence order and hands out the shared "both entries" slots to the
+      // most confident teams first, then single-entry slots to the next tier, leaving the least
+      // confident teams excluded — while still respecting every lock and min/max. It only decides
+      // team membership; which physical entry (1 vs 2) gets which single-exposure team is randomized
+      // each build for variety. If a fixed lock or exposure limit makes a clean greedy pass
+      // impossible, it returns null and the original random solver below is used instead, so a
+      // valid build is always still found.
+      function confidenceGreedyAssign() {
+        let need1 = 7, need2 = 7, needShared = state.overlap;
+        const assigned = [];
+        const free = [];
+        for (const team of state.teams) {
+          if (team.fixedMask) {
+            assigned.push({ id: team.id, mask: team.fixedMask });
+            if (includesEntry(team.fixedMask, 1)) need1--;
+            if (includesEntry(team.fixedMask, 2)) need2--;
+            if (team.fixedMask === 3) needShared--;
+          } else {
+            free.push(team);
+          }
+        }
+        if (need1 < 0 || need2 < 0 || needShared < 0) return null;
+
+        const singleOrder = Math.random() < 0.5 ? [2, 1] : [1, 2];
+        const priority = [3, singleOrder[0], singleOrder[1], 0];
+
+        for (let i = 0; i < free.length; i++) {
+          const team = free[i];
+          const remaining = free.length - i - 1;
+          let chosen = null;
+          for (const mask of priority) {
+            const exposure = popcount(mask);
+            if (exposure < team.min || exposure > team.max) continue;
+            const n1 = need1 - (includesEntry(mask, 1) ? 1 : 0);
+            const n2 = need2 - (includesEntry(mask, 2) ? 1 : 0);
+            const ns = needShared - (mask === 3 ? 1 : 0);
+            if (n1 < 0 || n2 < 0 || ns < 0) continue;
+            if (n1 > remaining || n2 > remaining || ns > remaining) continue;
+            if (ns > Math.min(n1, n2)) continue;
+            if ((n1 + n2 - ns) > remaining) continue;
+            chosen = mask; need1 = n1; need2 = n2; needShared = ns;
+            break;
+          }
+          if (chosen === null) return null;
+          assigned.push({ id: team.id, mask: chosen });
+        }
+        return (need1 === 0 && need2 === 0 && needShared === 0) ? assigned : null;
       }
 
       function solve(preferredResult = null, randomize = false) {
         const validation = validate();
         if (!validation.ok) return null;
+
+        if (randomize) {
+          const greedy = confidenceGreedyAssign();
+          if (greedy) return greedy;
+        }
 
         const prepared = state.teams.map((team, originalIndex) => {
           const previousMask = maskFromResult(team.id, preferredResult);
@@ -1098,27 +1533,20 @@
         return walk(0, 0, 0, 0);
       }
 
-      function solutionToResult(solved, preferredResult = null) {
+      function solutionToResult(solved) {
         const result = { 1: [], 2: [] };
         solved.forEach(({ id, mask }) => {
           if (includesEntry(mask, 1)) result[1].push(id);
           if (includesEntry(mask, 2)) result[2].push(id);
         });
         [1, 2].forEach(entry => {
-          const oldOrder = preferredResult ? preferredResult[entry] : [];
-          result[entry].sort((a, b) => {
-            const ai = oldOrder.indexOf(a), bi = oldOrder.indexOf(b);
-            if (ai >= 0 && bi >= 0) return ai - bi;
-            if (ai >= 0) return -1;
-            if (bi >= 0) return 1;
-            return state.teams.findIndex(t => t.id === a) - state.teams.findIndex(t => t.id === b);
-          });
+          result[entry].sort((a, b) => state.teams.findIndex(t => t.id === a) - state.teams.findIndex(t => t.id === b));
         });
         return result;
       }
 
-      function commitSolution(solved, preferredResult, detail) {
-        state.result = solutionToResult(solved, preferredResult);
+      function commitSolution(solved, detail) {
+        state.result = solutionToResult(solved);
         save();
         renderCandidates();
         renderEntries();
@@ -1146,7 +1574,7 @@
             setStatus('Change could not be applied', 'That move conflicts with the overlap or exposure rules, so the previous entries were kept.', 'error');
             return false;
           }
-          commitSolution(solved, preferred, detail);
+          commitSolution(solved, detail);
         } else {
           state.result = null;
           save();
@@ -1186,7 +1614,7 @@
       function build(randomize = true) {
         const solved = solve(null, randomize);
         if (!solved) return setStatus('No valid build found', 'The overlap, placements, and exposure limits conflict. Adjust a Min/Max button or unlock a team.', 'error');
-        commitSolution(solved, null, 'Both entries have 7 picks and share exactly ' + state.overlap + '.');
+        commitSolution(solved, 'Both entries have 7 picks and share exactly ' + state.overlap + '.');
       }
 
       async function copyEntry(entry) {
@@ -1217,7 +1645,7 @@
           renderAll();
           return setStatus(validation.ok ? 'Overlap change could not be applied' : validation.title, validation.ok ? 'The previous entries were kept because that overlap conflicts with current placements.' : validation.detail, 'error');
         }
-        if (solved) commitSolution(solved, preferred, 'Exact overlap changed to ' + state.overlap + ' while keeping as many picks as possible.');
+        if (solved) commitSolution(solved, 'Exact overlap changed to ' + state.overlap + ' while keeping as many picks as possible.');
         else {
           save(); renderAll(); setStatus('Overlap updated', 'Exact overlap is now ' + state.overlap + '.');
         }
@@ -1228,6 +1656,37 @@
         if (exposure) return setExposure(exposure.dataset.teamId, exposure.dataset.field, Number(exposure.dataset.value));
         const placement = event.target.closest('.place-btn');
         if (placement) return setPlacement(placement.dataset.teamId, Number(placement.dataset.mask));
+        const rank = event.target.closest('.rank-btn');
+        if (rank && !rank.disabled) return moveRank(rank.dataset.teamId, rank.dataset.dir);
+      });
+
+      function clearReorderIndicators() {
+        els.candidateList.querySelectorAll('.drag-over-top, .drag-over-bottom').forEach(row => {
+          row.classList.remove('drag-over-top', 'drag-over-bottom');
+        });
+      }
+
+      els.candidateList.addEventListener('dragover', event => {
+        if (!dragData.teamId || dragData.sourceEntry !== 0) return;
+        const row = event.target.closest('.team-row');
+        if (!row || row.dataset.teamId === dragData.teamId) return clearReorderIndicators();
+        event.preventDefault();
+        event.dataTransfer.dropEffect = 'move';
+        const before = event.clientY < row.getBoundingClientRect().top + row.getBoundingClientRect().height / 2;
+        clearReorderIndicators();
+        row.classList.add(before ? 'drag-over-top' : 'drag-over-bottom');
+      });
+      els.candidateList.addEventListener('dragleave', event => {
+        if (!els.candidateList.contains(event.relatedTarget)) clearReorderIndicators();
+      });
+      els.candidateList.addEventListener('drop', event => {
+        if (!dragData.teamId || dragData.sourceEntry !== 0) return;
+        const row = event.target.closest('.team-row');
+        clearReorderIndicators();
+        if (!row || row.dataset.teamId === dragData.teamId) return;
+        event.preventDefault();
+        const before = event.clientY < row.getBoundingClientRect().top + row.getBoundingClientRect().height / 2;
+        reorderTeam(dragData.teamId, row.dataset.teamId, before);
       });
 
       document.addEventListener('dragstart', event => {
@@ -1242,6 +1701,7 @@
         event.target.closest('[data-team-id]')?.classList.remove('dragging');
         dragData = { teamId: null, sourceEntry: 0 };
         Object.values(els.zones).forEach(zone => zone.classList.remove('over'));
+        clearReorderIndicators();
       });
 
       Object.values(els.zones).forEach(zone => {
@@ -1277,17 +1737,91 @@
       els.another.addEventListener('click', () => build(true));
       els.print.addEventListener('click', () => window.print());
       els.reset.addEventListener('click', () => {
-        if (!confirm('Clear all teams, placements, and saved settings?')) return;
-        state = { teams: [], overlap: 3, result: null };
-        try { localStorage.removeItem(STORAGE_KEY); } catch (_) {}
+        if (!confirm('Clear all teams, placements, and saved settings? This also clears the copy synced to your other device. Your saved-weeks history is kept.')) return;
+        state = { teams: [], overlap: 3, result: null, history: state.history };
         els.input.value = '';
+        save();
         renderAll();
         setStatus('Reset complete', 'Paste your candidate teams above to start a new build.');
+      });
+
+      els.transferBtn.addEventListener('click', () => {
+        els.transferOut.value = JSON.stringify(state);
+        els.transferIn.value = '';
+        els.transferOverlay.classList.remove('hidden');
+      });
+      els.transferClose.addEventListener('click', () => els.transferOverlay.classList.add('hidden'));
+      els.transferOverlay.addEventListener('click', event => {
+        if (event.target === els.transferOverlay) els.transferOverlay.classList.add('hidden');
+      });
+
+      els.copySetup.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(els.transferOut.value);
+        } catch (_) {
+          els.transferOut.select();
+          document.execCommand('copy');
+        }
+        setStatus('Setup copied', 'Paste it into this tool on your other device, then tap "Load pasted code".', 'success');
+      });
+
+      els.downloadSetup.addEventListener('click', () => {
+        try {
+          const blob = new Blob([els.transferOut.value], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = 'cfb-splash-pool-builder-' + new Date().toISOString().slice(0, 10) + '.json';
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+          URL.revokeObjectURL(url);
+          setStatus('Backup downloaded', 'Setup file saved to your device.', 'success');
+        } catch (_) {
+          setStatus('Download not available', 'Use "Copy code" instead and paste it somewhere to save it.', 'error');
+        }
+      });
+
+      els.loadSetup.addEventListener('click', () => importSetup(els.transferIn.value));
+
+      els.uploadSetup.addEventListener('click', () => els.setupFile.click());
+      els.setupFile.addEventListener('change', () => {
+        const file = els.setupFile.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => importSetup(String(reader.result || ''));
+        reader.readAsText(file);
+        els.setupFile.value = '';
+      });
+
+      els.saveWeek.addEventListener('click', saveWeek);
+
+      els.historyBtn.addEventListener('click', () => els.historyOverlay.classList.remove('hidden'));
+      els.historyClose.addEventListener('click', () => els.historyOverlay.classList.add('hidden'));
+      els.historyOverlay.addEventListener('click', event => {
+        if (event.target === els.historyOverlay) els.historyOverlay.classList.add('hidden');
+      });
+      els.historyList.addEventListener('click', event => {
+        const copyBtn = event.target.closest('.history-copy-btn');
+        if (copyBtn) return copyHistoryEntry(copyBtn.dataset.historyId);
+        const deleteBtn = event.target.closest('.history-delete-btn');
+        if (deleteBtn) return deleteHistoryEntry(deleteBtn.dataset.historyId);
+      });
+      els.clearHistory.addEventListener('click', () => {
+        if (!confirm('Delete all saved weeks? This cannot be undone.')) return;
+        state.history = [];
+        save();
+        renderHistory();
+        setStatus('Saved weeks cleared', 'Your history is now empty.');
       });
 
       restore();
       renderAll();
       if (state.teams.length) setStatus('Saved setup restored', 'Your teams, exposure settings, placements, and latest build were loaded.', 'success');
+      pullFromServer();
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') pullFromServer();
+      });
     })();
   </script>
 </body>
