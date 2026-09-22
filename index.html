@@ -24,6 +24,8 @@
       --green-2: #0f733e;
       --green-soft: rgba(22, 138, 76, .11);
       --amber: #9a6200;
+      --amber-soft: rgba(203, 138, 0, .16);
+      --amber-line: rgba(203, 138, 0, .45);
       --red: #c83d36;
       --shadow: 0 14px 38px rgba(36, 64, 46, .09);
       --radius: 18px;
@@ -294,6 +296,8 @@
       background: var(--panel-3);
     }
     .pick-card.locked { border-left: 3px solid var(--green); }
+    .pick-card.shared { background: var(--amber-soft); border-color: var(--amber-line); }
+    .pick-card.shared.locked { border-left: 3px solid var(--amber); }
     .pick-num { width: 21px; color: var(--muted); font-size: .78rem; font-variant-numeric: tabular-nums; }
     .pick-main { flex: 1; min-width: 0; }
     .pick-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 800; }
@@ -335,7 +339,19 @@
     .status.success strong { color: var(--green); }
     .build-actions { display: flex; gap: 8px; }
 
-    .shared-marker { color: var(--amber); }
+    .shared-marker {
+      display: inline-block;
+      margin-left: 6px;
+      padding: 1px 7px;
+      border-radius: 999px;
+      background: var(--amber);
+      color: #fff;
+      font-size: .64rem;
+      font-weight: 800;
+      letter-spacing: .03em;
+      text-transform: uppercase;
+      vertical-align: middle;
+    }
     .hidden { display: none !important; }
 
     .modal-overlay {
@@ -1329,18 +1345,26 @@
 
       function renderEntries() {
         [1, 2].forEach(entry => {
-          const picks = picksForEntry(entry);
-          const zone = els.zones[entry];
           const otherIds = new Set(picksForEntry(entry === 1 ? 2 : 1).map(item => item.team.id));
+          // Shared picks always lead the list, so the overlap between your two entries reads
+          // at a glance instead of being buried among the entry-only picks.
+          const picks = picksForEntry(entry).sort((a, b) => {
+            const aShared = otherIds.has(a.team.id) ? 0 : 1;
+            const bShared = otherIds.has(b.team.id) ? 0 : 1;
+            return aShared - bShared;
+          });
+          const zone = els.zones[entry];
           if (!picks.length) {
             zone.innerHTML = '<div class="empty-state"><strong>Drop teams here</strong><span>Drag from candidates or from the other entry.</span></div>';
           } else {
             zone.innerHTML = picks.map((item, index) => {
               const both = item.team.fixedMask === 3;
+              const shared = otherIds.has(item.team.id);
               const meta = both ? 'Locked in both entries' : item.locked ? 'Fixed to this entry' : 'Builder selection';
-              return '<div class="pick-card ' + (item.locked ? 'locked' : '') + '" draggable="true" data-team-id="' + escapeHtml(item.team.id) + '" data-source-entry="' + entry + '">' +
+              const cardClasses = ['pick-card', item.locked ? 'locked' : '', shared ? 'shared' : ''].filter(Boolean).join(' ');
+              return '<div class="' + cardClasses + '" draggable="true" data-team-id="' + escapeHtml(item.team.id) + '" data-source-entry="' + entry + '">' +
                 '<span class="pick-num">' + (index + 1) + '</span><div class="pick-main"><div class="pick-name">' + escapeHtml(item.team.name) + '</div><div class="pick-meta">' +
-                meta + (otherIds.has(item.team.id) ? ' <span class="shared-marker">• Shared</span>' : '') + '</div></div>' +
+                meta + (shared ? ' <span class="shared-marker">Shared</span>' : '') + '</div></div>' +
                 (item.locked ? '<button type="button" class="remove-lock" data-team-id="' + escapeHtml(item.team.id) + '">' + (both ? 'Unlock both' : 'Unlock') + '</button>' : '') + '</div>';
             }).join('');
           }
@@ -1534,13 +1558,22 @@
       }
 
       function solutionToResult(solved) {
+        const maskById = new Map(solved.map(item => [item.id, item.mask]));
         const result = { 1: [], 2: [] };
         solved.forEach(({ id, mask }) => {
           if (includesEntry(mask, 1)) result[1].push(id);
           if (includesEntry(mask, 2)) result[2].push(id);
         });
+        // Shared (both-entries) picks lead each list, then the rest in confidence order — this is
+        // the one place that decides pick order, so the entry views, Copy entry text, print output,
+        // and saved-week history all agree on shared-first without each having to re-sort.
         [1, 2].forEach(entry => {
-          result[entry].sort((a, b) => state.teams.findIndex(t => t.id === a) - state.teams.findIndex(t => t.id === b));
+          result[entry].sort((a, b) => {
+            const aShared = maskById.get(a) === 3 ? 0 : 1;
+            const bShared = maskById.get(b) === 3 ? 0 : 1;
+            if (aShared !== bShared) return aShared - bShared;
+            return state.teams.findIndex(t => t.id === a) - state.teams.findIndex(t => t.id === b);
+          });
         });
         return result;
       }
