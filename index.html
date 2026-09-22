@@ -163,12 +163,12 @@
 
     .workspace {
       display: grid;
-      grid-template-columns: minmax(470px, 1.28fr) repeat(2, minmax(250px, .86fr));
+      grid-template-columns: minmax(600px, 1.5fr) repeat(2, minmax(260px, .75fr));
       gap: 16px;
       align-items: stretch;
     }
 
-    .candidates, .entry { min-height: 590px; padding: 17px; }
+    .candidates, .entry { padding: 17px; }
     .candidate-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 11px; }
     .candidate-toolbar h2, .entry h2 { font-size: 1rem; margin: 0; }
     .badge {
@@ -187,7 +187,7 @@
     .candidate-list { display: grid; gap: 4px; }
     .candidate-columns {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 95px 95px 106px 232px;
+      grid-template-columns: minmax(0, 1fr) 95px 95px 106px 86px;
       gap: 6px;
       padding: 0 9px 6px;
       color: var(--muted);
@@ -201,7 +201,7 @@
     .team-row .field-label, .team-row .lock-line { display: none; }
     .team-row {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 95px 95px 106px 232px;
+      grid-template-columns: minmax(0, 1fr) 95px 95px 106px 86px;
       gap: 6px;
       align-items: center;
       padding: 5px 8px;
@@ -220,20 +220,6 @@
 
     .team-top-row { display: flex; align-items: center; gap: 6px; }
     .team-top-row .team-name { flex: 1; min-width: 0; }
-    .tier-badge {
-      flex: none;
-      padding: 2px 7px;
-      border-radius: 999px;
-      font-size: .64rem;
-      font-weight: 800;
-      text-align: center;
-      text-transform: uppercase;
-      letter-spacing: .02em;
-    }
-    .tier-badge.tier-0 { background: var(--green-soft); color: var(--green-2); }
-    .tier-badge.tier-1 { background: rgba(37, 99, 235, .14); color: #1d4ed8; }
-    .tier-badge.tier-2 { background: var(--amber-soft); color: var(--amber); }
-    .tier-badge.tier-3 { background: #eef0f2; color: var(--muted); }
     .tier-divider {
       display: flex;
       align-items: center;
@@ -250,37 +236,32 @@
     .tier-divider.tier-1 span { color: #1d4ed8; }
     .tier-divider.tier-2 span { color: var(--amber); }
     .tier-divider.tier-3 span { color: var(--muted); }
-    /* Its own grid column (not stacked under the team name) so a row stays one line tall — the
-       same mistake as the old rank badge, avoided by giving Tier the horizontal room it needs
-       instead of piling it vertically under an already two-line name column. */
+    /* A dropdown rather than four buttons: the candidate panel sits beside both entries on
+       desktop, and four labeled buttons left the team name with no room at all. The tier
+       dividers already label each group, and a native select is easy to use on a phone. */
     .tier-group { min-width: 0; }
-    .tier-row { display: flex; gap: 4px; }
-    .tier-btn {
-      flex: 1;
-      min-width: 0;
-      min-height: 34px;
-      padding: 0 3px;
-      border: 1px solid var(--line);
+    .tier-select {
+      width: 100%;
+      height: 36px;
+      padding: 0 6px;
+      border: 1.5px solid var(--line);
       border-radius: 8px;
       background: #ffffff;
-      color: var(--muted);
-      font-size: .68rem;
+      font-size: .74rem;
       font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: .01em;
+      cursor: pointer;
     }
-    .tier-btn:hover { border-color: #91aa99; color: var(--text); }
-    .tier-btn.active.tier-0 { background: var(--green); border-color: var(--green); color: #fff; }
-    .tier-btn.active.tier-1 { background: #2563eb; border-color: #2563eb; color: #fff; }
-    .tier-btn.active.tier-2 { background: var(--amber); border-color: var(--amber); color: #fff; }
-    .tier-btn.active.tier-3 { background: var(--muted); border-color: var(--muted); color: #fff; }
+    .tier-select.tier-0 { border-color: var(--green); color: var(--green-2); }
+    .tier-select.tier-1 { border-color: #2563eb; color: #1d4ed8; }
+    .tier-select.tier-2 { border-color: var(--amber); color: var(--amber); }
+    .tier-select.tier-3 { border-color: #9ca3af; color: var(--muted); }
     /* Side-by-side rather than stacked: two adjacent tap targets are much harder to mix up on a
        touchscreen than two tiny ones stacked a pixel apart, and this keeps the row from growing
        tall. Sized close to the ~44px touch-target guideline instead of the old 20x15px pair. */
     .rank-arrows { display: flex; gap: 6px; flex: none; }
     .rank-btn {
-      min-width: 38px;
-      height: 38px;
+      min-width: 32px;
+      height: 32px;
       padding: 0;
       border: 1px solid var(--line);
       border-radius: 8px;
@@ -320,7 +301,7 @@
     .entry-count.complete { color: var(--green); }
     .dropzone {
       flex: 1;
-      min-height: 465px;
+      min-height: 240px;
       padding: 10px;
       border: 1px dashed #a8bcae;
       border-radius: 14px;
@@ -328,41 +309,39 @@
       transition: border-color .15s ease, background .15s ease;
     }
     .dropzone.over { border-color: var(--green); background: var(--green-soft); }
-    .empty-state { display: grid; place-content: center; min-height: 410px; padding: 30px; text-align: center; color: var(--muted); }
+    .empty-state { display: grid; place-content: center; min-height: 200px; padding: 24px; text-align: center; color: var(--muted); }
     .empty-state strong { color: var(--text); margin-bottom: 5px; }
     .pick-card {
       display: flex;
-      flex-wrap: wrap;
       align-items: center;
-      gap: 10px;
-      min-height: 48px;
-      margin-bottom: 7px;
-      padding: 8px 9px 8px 11px;
+      gap: 9px;
+      margin-bottom: 6px;
+      padding: 7px 9px 7px 10px;
       border: 1px solid var(--line);
-      border-radius: 11px;
+      border-radius: 10px;
       background: var(--panel-3);
     }
     .pick-card.locked { border-left: 3px solid var(--green); }
     .pick-card.shared { background: var(--amber-soft); border-color: var(--amber-line); }
     .pick-card.shared.locked { border-left: 3px solid var(--amber); }
-    .pick-row { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
-    .pick-num { width: 21px; color: var(--muted); font-size: .78rem; font-variant-numeric: tabular-nums; }
+    .pick-num { width: 16px; flex: none; color: var(--muted); font-size: .76rem; font-variant-numeric: tabular-nums; }
     .pick-main { flex: 1; min-width: 0; }
-    .pick-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 800; }
-    .pick-meta { margin-top: 2px; color: var(--muted); font-size: .69rem; }
-    /* Its own full-width row (via flex-basis) rather than squeezed in beside the name — gives a
-       "Move to Entry X" button and an "Unlock" button both room to be comfortably tappable
-       instead of shrinking to fit next to the pick's text. */
-    .pick-actions { flex: 1 0 100%; display: flex; justify-content: flex-end; gap: 6px; }
+    .pick-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 800; font-size: .95rem; }
+    /* Status text and the action buttons share one line (wrapping only if space runs out), so
+       each card is two short lines instead of a name, a status line, and a whole button row. */
+    .pick-sub { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; margin-top: 3px; }
+    .pick-meta { color: var(--muted); font-size: .69rem; }
+    .pick-actions { display: flex; gap: 4px; margin-left: auto; }
     .pick-action-btn {
-      min-height: 36px;
-      padding: 0 12px;
+      min-height: 28px;
+      padding: 0 8px;
       border: 1px solid var(--line);
-      border-radius: 8px;
-      background: transparent;
+      border-radius: 7px;
+      background: #ffffff;
       color: var(--muted);
-      font-size: .74rem;
+      font-size: .68rem;
       font-weight: 800;
+      white-space: nowrap;
     }
     .pick-action-btn:hover { color: var(--text); border-color: #91aa99; }
     .pick-action-btn.unlock:hover { color: var(--red); border-color: rgba(255,116,108,.55); }
@@ -394,7 +373,7 @@
 
     .shared-marker {
       display: inline-block;
-      margin-left: 6px;
+      margin-left: 0;
       padding: 1px 7px;
       border-radius: 999px;
       background: var(--amber);
@@ -459,7 +438,9 @@
       resize: vertical;
     }
 
-    @media (max-width: 1120px) {
+    /* Below ~1400px there isn't room for the candidate table beside both entries, so the
+       candidates panel takes the full width on top and the two entries sit side by side below. */
+    @media (max-width: 1400px) {
       .workspace { grid-template-columns: 1fr 1fr; }
       .candidates { grid-column: 1 / -1; min-height: auto; }
     }
@@ -470,9 +451,7 @@
       .top-actions { justify-content: flex-start; margin-top: 16px; }
       .setup, .workspace { grid-template-columns: 1fr; }
       .candidates { grid-column: auto; }
-      .entry { min-height: 510px; }
-      .dropzone { min-height: 390px; }
-      .empty-state { min-height: 340px; }
+      .dropzone { min-height: 200px; }
       /* Kept sticky (not static) here on purpose: below this width the layout stacks into one
          long column (candidates, then both entries, then this bar), so this is the one place
          you'd otherwise have to scroll furthest to reach Build/Save/Another. */
@@ -490,8 +469,11 @@
       .candidate-columns { display: none; }
       .team-row .field-label { display: block; }
       .team-row { grid-template-columns: 1fr 1fr; align-items: end; }
-      .team-name-wrap, .placement-group, .tier-group { grid-column: 1 / -1; }
+      .team-name-wrap { grid-column: 1 / -1; }
       .choice-btn { min-width: 36px; }
+      .rank-btn { min-width: 38px; height: 38px; }
+      .placement-group { grid-column: 1; }
+      .tier-group { grid-column: 2; }
       .overlap-wrap { grid-template-columns: 1fr; }
     }
 
@@ -983,7 +965,6 @@
               '<div class="team-row" draggable="true" data-team-id="' + escapeHtml(team.id) + '" data-source-entry="0" data-tier="' + team.tier + '">' +
                 '<div class="team-name-wrap">' +
                   '<div class="team-top-row">' +
-                    '<span class="tier-badge tier-' + team.tier + '" title="Tier">' + TIER_LABELS[team.tier] + '</span>' +
                     '<div class="team-name" title="' + escapeHtml(team.name) + '">' + escapeHtml(team.name) + '</div>' +
                     '<div class="rank-arrows">' +
                       '<button type="button" class="rank-btn" data-dir="up" data-team-id="' + escapeHtml(team.id) + '"' + (i === 0 ? ' disabled' : '') + ' aria-label="Move ' + escapeHtml(team.name) + ' earlier within its tier" title="Move up within tier">▲</button>' +
@@ -999,10 +980,10 @@
                   '<button type="button" class="choice-btn place-btn ' + (team.fixedMask === 2 ? 'active' : '') + '" data-mask="2" data-team-id="' + escapeHtml(team.id) + '">S2</button>' +
                   '<button type="button" class="choice-btn place-btn both ' + (team.fixedMask === 3 ? 'active' : '') + '" data-mask="3" data-team-id="' + escapeHtml(team.id) + '" aria-label="Lock ' + escapeHtml(team.name) + ' in both entries" title="Lock in both entries">🔒</button>' +
                 '</div></div>' +
-                '<div class="tier-group"><span class="field-label">Tier</span><div class="tier-row">' + TIER_LABELS.map((label, t) =>
-                  '<button type="button" class="tier-btn tier-' + t + (t === team.tier ? ' active' : '') + '" data-tier="' + t + '" data-team-id="' + escapeHtml(team.id) + '">' + label + '</button>'
-                ).join('') + '</div>' +
-                '</div></div>'
+                '<label class="tier-group"><span class="field-label">Tier</span><select class="tier-select tier-' + team.tier + '" data-team-id="' + escapeHtml(team.id) + '" aria-label="Tier for ' + escapeHtml(team.name) + '">' +
+                  TIER_LABELS.map((label, t) => '<option value="' + t + '"' + (t === team.tier ? ' selected' : '') + '>' + label + '</option>').join('') +
+                '</select></label>' +
+                '</div>'
             );
           });
         });
@@ -1076,7 +1057,7 @@
             zone.innerHTML = picks.map((item, index) => {
               const both = item.team.fixedMask === 3;
               const shared = otherIds.has(item.team.id);
-              const meta = both ? 'Locked in both entries' : item.locked ? 'Fixed to this entry' : 'Builder selection';
+              const meta = item.locked ? 'Locked' : 'Auto-picked';
               const cardClasses = ['pick-card', item.locked ? 'locked' : '', shared ? 'shared' : ''].filter(Boolean).join(' ');
               const actions = [];
               if (both) {
@@ -1084,15 +1065,15 @@
               } else if (!shared) {
                 // Lets you move a pick to the other entry right from this view — no drag needed,
                 // and no trip back up to the candidate list's S1/S2 buttons required either.
-                actions.push('<button type="button" class="pick-action-btn move" data-action="move" data-target-entry="' + otherEntry + '" data-team-id="' + escapeHtml(item.team.id) + '">Move to Entry ' + otherEntry + '</button>');
+                actions.push('<button type="button" class="pick-action-btn move" data-action="move" data-target-entry="' + otherEntry + '" data-team-id="' + escapeHtml(item.team.id) + '" aria-label="Move ' + escapeHtml(item.team.name) + ' to Entry ' + otherEntry + '">Move to ' + otherEntry + '</button>');
                 if (item.locked) {
                   actions.push('<button type="button" class="pick-action-btn unlock" data-action="unlock" data-team-id="' + escapeHtml(item.team.id) + '">Unlock</button>');
                 }
               }
               return '<div class="' + cardClasses + '" draggable="true" data-team-id="' + escapeHtml(item.team.id) + '" data-source-entry="' + entry + '">' +
-                '<div class="pick-row"><span class="pick-num">' + (index + 1) + '</span><div class="pick-main"><div class="pick-name">' + escapeHtml(item.team.name) + '</div><div class="pick-meta">' +
-                meta + (shared ? ' <span class="shared-marker">Shared</span>' : '') + '</div></div></div>' +
-                (actions.length ? '<div class="pick-actions">' + actions.join('') + '</div>' : '') + '</div>';
+                '<span class="pick-num">' + (index + 1) + '</span><div class="pick-main"><div class="pick-name" title="' + escapeHtml(item.team.name) + '">' + escapeHtml(item.team.name) + '</div>' +
+                '<div class="pick-sub">' + (shared ? '<span class="shared-marker">Shared</span>' : '') + '<span class="pick-meta">' + meta + '</span>' +
+                (actions.length ? '<div class="pick-actions">' + actions.join('') + '</div>' : '') + '</div></div></div>';
             }).join('');
           }
           els.counts[entry].textContent = picks.length + ' / 7';
@@ -1427,8 +1408,10 @@
         if (placement) return setPlacement(placement.dataset.teamId, Number(placement.dataset.mask));
         const rank = event.target.closest('.rank-btn');
         if (rank && !rank.disabled) return moveRank(rank.dataset.teamId, rank.dataset.dir);
-        const tier = event.target.closest('.tier-btn');
-        if (tier) return setTier(tier.dataset.teamId, Number(tier.dataset.tier));
+      });
+      els.candidateList.addEventListener('change', event => {
+        const select = event.target.closest('.tier-select');
+        if (select) setTier(select.dataset.teamId, Number(select.value));
       });
 
       function clearReorderIndicators() {
