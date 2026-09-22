@@ -187,7 +187,7 @@
     .candidate-list { display: grid; gap: 4px; }
     .candidate-columns {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 95px 95px 106px;
+      grid-template-columns: minmax(0, 1fr) 95px 95px 106px 232px;
       gap: 6px;
       padding: 0 9px 6px;
       color: var(--muted);
@@ -201,7 +201,7 @@
     .team-row .field-label, .team-row .lock-line { display: none; }
     .team-row {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 95px 95px 106px;
+      grid-template-columns: minmax(0, 1fr) 95px 95px 106px 232px;
       gap: 6px;
       align-items: center;
       padding: 5px 8px;
@@ -234,11 +234,32 @@
     .tier-badge.tier-1 { background: rgba(37, 99, 235, .14); color: #1d4ed8; }
     .tier-badge.tier-2 { background: var(--amber-soft); color: var(--amber); }
     .tier-badge.tier-3 { background: #eef0f2; color: var(--muted); }
-    .tier-row { display: flex; gap: 4px; margin-top: 6px; }
+    .tier-divider {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 12px 2px 2px;
+      font-size: .68rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+    .tier-divider:first-child { margin-top: 2px; }
+    .tier-divider::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+    .tier-divider.tier-0 span { color: var(--green-2); }
+    .tier-divider.tier-1 span { color: #1d4ed8; }
+    .tier-divider.tier-2 span { color: var(--amber); }
+    .tier-divider.tier-3 span { color: var(--muted); }
+    /* Its own grid column (not stacked under the team name) so a row stays one line tall — the
+       same mistake as the old rank badge, avoided by giving Tier the horizontal room it needs
+       instead of piling it vertically under an already two-line name column. */
+    .tier-group { min-width: 0; }
+    .tier-row { display: flex; gap: 4px; }
     .tier-btn {
       flex: 1;
+      min-width: 0;
       min-height: 34px;
-      padding: 0 4px;
+      padding: 0 3px;
       border: 1px solid var(--line);
       border-radius: 8px;
       background: #ffffff;
@@ -469,7 +490,7 @@
       .candidate-columns { display: none; }
       .team-row .field-label { display: block; }
       .team-row { grid-template-columns: 1fr 1fr; align-items: end; }
-      .team-name-wrap, .placement-group { grid-column: 1 / -1; }
+      .team-name-wrap, .placement-group, .tier-group { grid-column: 1 / -1; }
       .choice-btn { min-width: 36px; }
       .overlap-wrap { grid-template-columns: 1fr; }
     }
@@ -555,7 +576,7 @@
           </div>
           <span class="badge" id="candidateBadge">0 teams</span>
         </div>
-        <div class="candidate-columns" id="candidateColumns" aria-hidden="true"><span>Team</span><span>Min</span><span>Max</span><span>Place</span></div>
+        <div class="candidate-columns" id="candidateColumns" aria-hidden="true"><span>Team</span><span>Min</span><span>Max</span><span>Place</span><span>Tier</span></div>
         <div class="candidate-list" id="candidateList"></div>
         <div class="empty-state" id="candidateEmpty"><strong>No teams loaded</strong><span>Paste your 10–15 candidates above to begin.</span></div>
       </div>
@@ -663,7 +684,7 @@
       };
 
       let state = { teams: [], overlap: 3, result: null, history: [] };
-      let dragData = { teamId: null, sourceEntry: 0 };
+      let dragData = { teamId: null, sourceEntry: 0, tier: null };
 
       const escapeHtml = (value) => String(value).replace(/[&<>"']/g, char => ({
         '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
@@ -947,31 +968,45 @@
       function renderCandidates() {
         els.candidateEmpty.classList.toggle('hidden', state.teams.length > 0);
         els.candidateBadge.textContent = state.teams.length + (state.teams.length === 1 ? ' team' : ' teams');
-        const total = state.teams.length;
-        els.candidateList.innerHTML = state.teams.map((team, index) =>
-          '<div class="team-row" draggable="true" data-team-id="' + escapeHtml(team.id) + '" data-source-entry="0">' +
-            '<div class="team-name-wrap">' +
-              '<div class="team-top-row">' +
-                '<span class="tier-badge tier-' + team.tier + '" title="Tier">' + TIER_LABELS[team.tier] + '</span>' +
-                '<div class="team-name" title="' + escapeHtml(team.name) + '">' + escapeHtml(team.name) + '</div>' +
-                '<div class="rank-arrows">' +
-                  '<button type="button" class="rank-btn" data-dir="up" data-team-id="' + escapeHtml(team.id) + '"' + (index === 0 ? ' disabled' : '') + ' aria-label="Move ' + escapeHtml(team.name) + ' earlier in the list" title="Move up">▲</button>' +
-                  '<button type="button" class="rank-btn" data-dir="down" data-team-id="' + escapeHtml(team.id) + '"' + (index === total - 1 ? ' disabled' : '') + ' aria-label="Move ' + escapeHtml(team.name) + ' later in the list" title="Move down">▼</button>' +
+        // Grouped by tier with a divider between groups, so the list reads the same way the
+        // solver treats it: Lock teams together, then Strong, then Lean, then Meh. A team's
+        // up/down arrows only move it within its own tier's group — reordering across a tier
+        // boundary is what the tier buttons are for, not drag/arrows.
+        const groups = [[], [], [], []];
+        state.teams.forEach(team => groups[team.tier].push(team));
+        const rowsHtml = [];
+        groups.forEach((group, tierIdx) => {
+          if (!group.length) return;
+          rowsHtml.push('<div class="tier-divider tier-' + tierIdx + '"><span>' + TIER_LABELS[tierIdx] + '</span></div>');
+          group.forEach((team, i) => {
+            rowsHtml.push(
+              '<div class="team-row" draggable="true" data-team-id="' + escapeHtml(team.id) + '" data-source-entry="0" data-tier="' + team.tier + '">' +
+                '<div class="team-name-wrap">' +
+                  '<div class="team-top-row">' +
+                    '<span class="tier-badge tier-' + team.tier + '" title="Tier">' + TIER_LABELS[team.tier] + '</span>' +
+                    '<div class="team-name" title="' + escapeHtml(team.name) + '">' + escapeHtml(team.name) + '</div>' +
+                    '<div class="rank-arrows">' +
+                      '<button type="button" class="rank-btn" data-dir="up" data-team-id="' + escapeHtml(team.id) + '"' + (i === 0 ? ' disabled' : '') + ' aria-label="Move ' + escapeHtml(team.name) + ' earlier within its tier" title="Move up within tier">▲</button>' +
+                      '<button type="button" class="rank-btn" data-dir="down" data-team-id="' + escapeHtml(team.id) + '"' + (i === group.length - 1 ? ' disabled' : '') + ' aria-label="Move ' + escapeHtml(team.name) + ' later within its tier" title="Move down within tier">▼</button>' +
+                    '</div>' +
+                  '</div>' +
+                  '<div class="lock-line ' + (team.fixedMask ? 'active' : '') + '">' + placementText(team.fixedMask) + '</div>' +
                 '</div>' +
-              '</div>' +
-              '<div class="tier-row">' + TIER_LABELS.map((label, t) =>
-                '<button type="button" class="tier-btn tier-' + t + (t === team.tier ? ' active' : '') + '" data-tier="' + t + '" data-team-id="' + escapeHtml(team.id) + '">' + label + '</button>'
-              ).join('') + '</div>' +
-              '<div class="lock-line ' + (team.fixedMask ? 'active' : '') + '">' + placementText(team.fixedMask) + '</div>' +
-            '</div>' +
-            '<div class="setting-group"><span class="field-label">Min</span><div class="segmented">' + exposureButtons(team, 'min') + '</div></div>' +
-            '<div class="setting-group"><span class="field-label">Max</span><div class="segmented">' + exposureButtons(team, 'max') + '</div></div>' +
-            '<div class="placement-group"><span class="field-label">Place</span><div class="placement-buttons">' +
-              '<button type="button" class="choice-btn place-btn ' + (team.fixedMask === 1 ? 'active' : '') + '" data-mask="1" data-team-id="' + escapeHtml(team.id) + '">S1</button>' +
-              '<button type="button" class="choice-btn place-btn ' + (team.fixedMask === 2 ? 'active' : '') + '" data-mask="2" data-team-id="' + escapeHtml(team.id) + '">S2</button>' +
-              '<button type="button" class="choice-btn place-btn both ' + (team.fixedMask === 3 ? 'active' : '') + '" data-mask="3" data-team-id="' + escapeHtml(team.id) + '" aria-label="Lock ' + escapeHtml(team.name) + ' in both entries" title="Lock in both entries">🔒</button>' +
-            '</div></div></div>'
-        ).join('');
+                '<div class="setting-group"><span class="field-label">Min</span><div class="segmented">' + exposureButtons(team, 'min') + '</div></div>' +
+                '<div class="setting-group"><span class="field-label">Max</span><div class="segmented">' + exposureButtons(team, 'max') + '</div></div>' +
+                '<div class="placement-group"><span class="field-label">Place</span><div class="placement-buttons">' +
+                  '<button type="button" class="choice-btn place-btn ' + (team.fixedMask === 1 ? 'active' : '') + '" data-mask="1" data-team-id="' + escapeHtml(team.id) + '">S1</button>' +
+                  '<button type="button" class="choice-btn place-btn ' + (team.fixedMask === 2 ? 'active' : '') + '" data-mask="2" data-team-id="' + escapeHtml(team.id) + '">S2</button>' +
+                  '<button type="button" class="choice-btn place-btn both ' + (team.fixedMask === 3 ? 'active' : '') + '" data-mask="3" data-team-id="' + escapeHtml(team.id) + '" aria-label="Lock ' + escapeHtml(team.name) + ' in both entries" title="Lock in both entries">🔒</button>' +
+                '</div></div>' +
+                '<div class="tier-group"><span class="field-label">Tier</span><div class="tier-row">' + TIER_LABELS.map((label, t) =>
+                  '<button type="button" class="tier-btn tier-' + t + (t === team.tier ? ' active' : '') + '" data-tier="' + t + '" data-team-id="' + escapeHtml(team.id) + '">' + label + '</button>'
+                ).join('') + '</div>' +
+                '</div></div>'
+            );
+          });
+        });
+        els.candidateList.innerHTML = rowsHtml.join('');
       }
 
       function setTier(teamId, tier) {
@@ -981,18 +1016,27 @@
       }
 
       function moveRank(teamId, direction) {
-        const fromIndex = state.teams.findIndex(t => t.id === teamId);
-        if (fromIndex === -1) return;
-        const toIndex = fromIndex + (direction === 'up' ? -1 : 1);
-        if (toIndex < 0 || toIndex >= state.teams.length) return;
+        const team = state.teams.find(t => t.id === teamId);
+        if (!team) return;
+        // Move relative to the nearest OTHER team in the same tier, skipping over any different-
+        // tier teams in between — since the list is grouped by tier, "up/down" means within that
+        // team's own group, matching what's on screen.
+        const sameTier = state.teams.filter(t => t.tier === team.tier);
+        const posInTier = sameTier.indexOf(team);
+        const neighbor = sameTier[posInTier + (direction === 'up' ? -1 : 1)];
+        if (!neighbor) return;
         applyMutation(() => {
-          const [team] = state.teams.splice(fromIndex, 1);
-          state.teams.splice(toIndex, 0, team);
+          const i1 = state.teams.indexOf(team), i2 = state.teams.indexOf(neighbor);
+          state.teams[i1] = neighbor;
+          state.teams[i2] = team;
         }, 'Confidence order updated.');
       }
 
       function reorderTeam(draggedId, targetId, placeBefore) {
         if (draggedId === targetId) return;
+        const dragged = state.teams.find(t => t.id === draggedId);
+        const target = state.teams.find(t => t.id === targetId);
+        if (!dragged || !target || dragged.tier !== target.tier) return; // tiers only change via the tier buttons
         applyMutation(() => {
           const fromIndex = state.teams.findIndex(t => t.id === draggedId);
           if (fromIndex === -1) return;
@@ -1396,7 +1440,9 @@
       els.candidateList.addEventListener('dragover', event => {
         if (!dragData.teamId || dragData.sourceEntry !== 0) return;
         const row = event.target.closest('.team-row');
-        if (!row || row.dataset.teamId === dragData.teamId) return clearReorderIndicators();
+        // No highlight over a row from a different tier — that drop wouldn't do anything, since
+        // tiers only change via the tier buttons, not drag.
+        if (!row || row.dataset.teamId === dragData.teamId || row.dataset.tier !== String(dragData.tier)) return clearReorderIndicators();
         event.preventDefault();
         event.dataTransfer.dropEffect = 'move';
         const before = event.clientY < row.getBoundingClientRect().top + row.getBoundingClientRect().height / 2;
@@ -1410,7 +1456,7 @@
         if (!dragData.teamId || dragData.sourceEntry !== 0) return;
         const row = event.target.closest('.team-row');
         clearReorderIndicators();
-        if (!row || row.dataset.teamId === dragData.teamId) return;
+        if (!row || row.dataset.teamId === dragData.teamId || row.dataset.tier !== String(dragData.tier)) return;
         event.preventDefault();
         const before = event.clientY < row.getBoundingClientRect().top + row.getBoundingClientRect().height / 2;
         reorderTeam(dragData.teamId, row.dataset.teamId, before);
@@ -1419,14 +1465,14 @@
       document.addEventListener('dragstart', event => {
         const card = event.target.closest('[data-team-id][draggable="true"]');
         if (!card || event.target.closest('button')) return event.preventDefault();
-        dragData = { teamId: card.dataset.teamId, sourceEntry: Number(card.dataset.sourceEntry || 0) };
+        dragData = { teamId: card.dataset.teamId, sourceEntry: Number(card.dataset.sourceEntry || 0), tier: card.dataset.tier !== undefined ? Number(card.dataset.tier) : null };
         card.classList.add('dragging');
         event.dataTransfer.effectAllowed = 'move';
         event.dataTransfer.setData('text/plain', dragData.teamId);
       });
       document.addEventListener('dragend', event => {
         event.target.closest('[data-team-id]')?.classList.remove('dragging');
-        dragData = { teamId: null, sourceEntry: 0 };
+        dragData = { teamId: null, sourceEntry: 0, tier: null };
         Object.values(els.zones).forEach(zone => zone.classList.remove('over'));
         clearReorderIndicators();
       });
