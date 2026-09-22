@@ -220,31 +220,56 @@
 
     .team-top-row { display: flex; align-items: center; gap: 6px; }
     .team-top-row .team-name { flex: 1; min-width: 0; }
-    .rank-badge {
+    .tier-badge {
       flex: none;
-      min-width: 24px;
-      padding: 2px 6px;
+      padding: 2px 7px;
       border-radius: 999px;
-      background: var(--green-soft);
-      color: var(--green-2);
-      font-size: .68rem;
+      font-size: .64rem;
       font-weight: 800;
       text-align: center;
-      font-variant-numeric: tabular-nums;
+      text-transform: uppercase;
+      letter-spacing: .02em;
     }
-    .rank-arrows { display: flex; flex-direction: column; gap: 1px; flex: none; }
-    .rank-btn {
-      min-width: 20px;
-      height: 15px;
-      padding: 0;
+    .tier-badge.tier-0 { background: var(--green-soft); color: var(--green-2); }
+    .tier-badge.tier-1 { background: rgba(37, 99, 235, .14); color: #1d4ed8; }
+    .tier-badge.tier-2 { background: var(--amber-soft); color: var(--amber); }
+    .tier-badge.tier-3 { background: #eef0f2; color: var(--muted); }
+    .tier-row { display: flex; gap: 4px; margin-top: 6px; }
+    .tier-btn {
+      flex: 1;
+      min-height: 34px;
+      padding: 0 4px;
       border: 1px solid var(--line);
-      border-radius: 4px;
+      border-radius: 8px;
       background: #ffffff;
       color: var(--muted);
-      font-size: .55rem;
+      font-size: .68rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .01em;
+    }
+    .tier-btn:hover { border-color: #91aa99; color: var(--text); }
+    .tier-btn.active.tier-0 { background: var(--green); border-color: var(--green); color: #fff; }
+    .tier-btn.active.tier-1 { background: #2563eb; border-color: #2563eb; color: #fff; }
+    .tier-btn.active.tier-2 { background: var(--amber); border-color: var(--amber); color: #fff; }
+    .tier-btn.active.tier-3 { background: var(--muted); border-color: var(--muted); color: #fff; }
+    /* Side-by-side rather than stacked: two adjacent tap targets are much harder to mix up on a
+       touchscreen than two tiny ones stacked a pixel apart, and this keeps the row from growing
+       tall. Sized close to the ~44px touch-target guideline instead of the old 20x15px pair. */
+    .rank-arrows { display: flex; gap: 6px; flex: none; }
+    .rank-btn {
+      min-width: 38px;
+      height: 38px;
+      padding: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      color: var(--muted);
+      font-size: .95rem;
       line-height: 1;
     }
     .rank-btn:hover:not(:disabled) { border-color: var(--green); color: var(--green); }
+    .rank-btn:active:not(:disabled) { background: var(--green-soft); border-color: var(--green); }
     .rank-btn:disabled { opacity: .3; cursor: not-allowed; }
     .team-row.drag-over-top { box-shadow: inset 0 2px 0 var(--green); }
     .team-row.drag-over-bottom { box-shadow: inset 0 -2px 0 var(--green); }
@@ -252,7 +277,7 @@
     .segmented, .placement-buttons { display: flex; gap: 4px; }
     .choice-btn {
       min-width: 29px;
-      height: 32px;
+      height: 36px;
       padding: 0 7px;
       border: 1px solid var(--line);
       border-radius: 8px;
@@ -286,6 +311,7 @@
     .empty-state strong { color: var(--text); margin-bottom: 5px; }
     .pick-card {
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
       gap: 10px;
       min-height: 48px;
@@ -298,21 +324,27 @@
     .pick-card.locked { border-left: 3px solid var(--green); }
     .pick-card.shared { background: var(--amber-soft); border-color: var(--amber-line); }
     .pick-card.shared.locked { border-left: 3px solid var(--amber); }
+    .pick-row { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
     .pick-num { width: 21px; color: var(--muted); font-size: .78rem; font-variant-numeric: tabular-nums; }
     .pick-main { flex: 1; min-width: 0; }
     .pick-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 800; }
     .pick-meta { margin-top: 2px; color: var(--muted); font-size: .69rem; }
-    .remove-lock {
-      min-width: 64px;
-      min-height: 31px;
+    /* Its own full-width row (via flex-basis) rather than squeezed in beside the name — gives a
+       "Move to Entry X" button and an "Unlock" button both room to be comfortably tappable
+       instead of shrinking to fit next to the pick's text. */
+    .pick-actions { flex: 1 0 100%; display: flex; justify-content: flex-end; gap: 6px; }
+    .pick-action-btn {
+      min-height: 36px;
+      padding: 0 12px;
       border: 1px solid var(--line);
       border-radius: 8px;
       background: transparent;
       color: var(--muted);
-      font-size: .7rem;
+      font-size: .74rem;
       font-weight: 800;
     }
-    .remove-lock:hover { color: var(--red); border-color: rgba(255,116,108,.55); }
+    .pick-action-btn:hover { color: var(--text); border-color: #91aa99; }
+    .pick-action-btn.unlock:hover { color: var(--red); border-color: rgba(255,116,108,.55); }
     .entry-footer { display: flex; gap: 8px; margin-top: 11px; }
     .entry-footer .btn { flex: 1; }
 
@@ -420,8 +452,16 @@
       .entry { min-height: 510px; }
       .dropzone { min-height: 390px; }
       .empty-state { min-height: 340px; }
-      .buildbar { position: static; grid-template-columns: 1fr; }
-      .build-actions { display: grid; grid-template-columns: 1fr 1fr; }
+      /* Kept sticky (not static) here on purpose: below this width the layout stacks into one
+         long column (candidates, then both entries, then this bar), so this is the one place
+         you'd otherwise have to scroll furthest to reach Build/Save/Another. */
+      .buildbar {
+        bottom: 8px;
+        grid-template-columns: 1fr;
+        padding: 12px 14px calc(12px + env(safe-area-inset-bottom, 0px));
+      }
+      .build-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+      #buildBtn { grid-column: 1 / -1; }
       .overlap-explainer { grid-template-columns: 1fr; }
     }
 
@@ -432,13 +472,12 @@
       .team-name-wrap, .placement-group { grid-column: 1 / -1; }
       .choice-btn { min-width: 36px; }
       .overlap-wrap { grid-template-columns: 1fr; }
-      .build-actions { grid-template-columns: 1fr; }
     }
 
     @media print {
       body { background: #fff; color: #111; }
       .app { width: 100%; padding: 0; }
-      .top-actions, .setup, .candidates, .buildbar, .entry-footer, .remove-lock, .modal-overlay { display: none !important; }
+      .top-actions, .setup, .candidates, .buildbar, .entry-footer, .pick-actions, .modal-overlay { display: none !important; }
       .workspace { grid-template-columns: 1fr 1fr; }
       .card, .dropzone, .pick-card { box-shadow: none; background: #fff; color: #111; border-color: #bbb; }
       .entry { min-height: 0; }
@@ -453,7 +492,7 @@
       <div>
         <p class="eyebrow">Standalone tool • Light v7</p>
         <h1>CFB Splash Pool Builder</h1>
-        <p class="subtitle">Build two 7-pick entries, control every team's exposure, drag teams between entries to move them, or use Lock both to place a team in both entries.</p>
+        <p class="subtitle">Build two 7-pick entries, control every team's exposure, and place any team with a tap — S1, S2, or Lock both for both entries (drag works too on desktop).</p>
       </div>
       <div class="top-actions">
         <button class="btn" id="historyBtn" type="button">Saved weeks</button>
@@ -511,8 +550,8 @@
       <div class="card candidates">
         <div class="candidate-toolbar">
           <div>
-            <h2>3. Set exposure, locks &amp; confidence</h2>
-            <p class="helper">Use the Min/Max buttons, drag to an entry, or tap S1, S2, or Lock both. Drag a row up or down here (or use the ▲▼ arrows) to rank your confidence — entries are ordered by that rank, and the builder favors your top teams for double exposure.</p>
+            <h2>3. Set exposure, locks &amp; tier</h2>
+            <p class="helper">Tap S1, S2, or Lock both to place a team (or drag it to an entry on desktop). Set each team's tier — Lock, Strong, Lean, or Meh — to control who's favored for double exposure: Lock first, then Strong, then Lean. Teams in the same tier are treated as equally good and shuffled build to build. Drag a row or use the ▲▼ arrows to set the order within a tier, which is used to keep your build stable through small edits.</p>
           </div>
           <span class="badge" id="candidateBadge">0 teams</span>
         </div>
@@ -597,386 +636,6 @@
     </div>
   </main>
 
-  <script type="text/plain" id="legacy-v2-script">
-    (() => {
-      'use strict';
-
-      const STORAGE_KEY = 'cfb-splash-pool-builder-v1';
-      const $ = (selector) => document.querySelector(selector);
-      const els = {
-        input: $('#teamInput'), inputCount: $('#inputCount'), load: $('#loadTeamsBtn'),
-        overlap: $('#overlapSelect'), overlapValue: $('#overlapValue'), overlapSentence: $('#overlapSentence'),
-        uniqueNeeded: $('#uniqueNeeded'), differentPicks: $('#differentPicks'), candidateList: $('#candidateList'),
-        candidateEmpty: $('#candidateEmpty'), candidateBadge: $('#candidateBadge'),
-        zones: { 1: $('#entry1Zone'), 2: $('#entry2Zone') },
-        counts: { 1: $('#entry1Count'), 2: $('#entry2Count') },
-        clear: { 1: $('#clearEntry1'), 2: $('#clearEntry2') },
-        copy: { 1: $('#copyEntry1'), 2: $('#copyEntry2') },
-        build: $('#buildBtn'), another: $('#anotherBtn'), status: $('#statusBox'),
-        reset: $('#resetBtn'), print: $('#printBtn')
-      };
-
-      let state = { teams: [], overlap: 3, result: null };
-      let draggedTeamId = null;
-
-      const escapeHtml = (value) => String(value).replace(/[&<>"']/g, char => ({
-        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-      }[char]));
-
-      const uid = () => 't-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
-      const lockMask = (team) => (team.locks.includes(1) ? 1 : 0) | (team.locks.includes(2) ? 2 : 0);
-      const popcount = (mask) => mask === 3 ? 2 : mask === 0 ? 0 : 1;
-      const shuffled = (items) => {
-        const copy = items.slice();
-        for (let i = copy.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [copy[i], copy[j]] = [copy[j], copy[i]];
-        }
-        return copy;
-      };
-
-      function save() {
-        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (_) {}
-      }
-
-      function restore() {
-        try {
-          const raw = localStorage.getItem(STORAGE_KEY);
-          if (!raw) return;
-          const saved = JSON.parse(raw);
-          if (!saved || !Array.isArray(saved.teams)) return;
-          state.teams = saved.teams.map(team => ({
-            id: String(team.id || uid()), name: String(team.name || ''),
-            min: Math.max(0, Math.min(2, Number(team.min) || 0)),
-            max: Math.max(0, Math.min(2, Number.isFinite(Number(team.max)) ? Number(team.max) : 2)),
-            locks: Array.isArray(team.locks) ? team.locks.filter(x => x === 1 || x === 2) : []
-          })).filter(team => team.name);
-          state.overlap = Math.max(0, Math.min(7, Number(saved.overlap) || 0));
-          state.result = saved.result && Array.isArray(saved.result[1]) && Array.isArray(saved.result[2]) ? saved.result : null;
-        } catch (_) {}
-      }
-
-      function setStatus(title, detail, type = '') {
-        els.status.className = 'status' + (type ? ' ' + type : '');
-        els.status.innerHTML = '<strong>' + escapeHtml(title) + '</strong><span>' + escapeHtml(detail) + '</span>';
-      }
-
-      function parseInput() {
-        const seen = new Set();
-        return els.input.value.split(/\n|,/).map(x => x.trim()).filter(Boolean).filter(name => {
-          const key = name.toLowerCase();
-          if (seen.has(key)) return false;
-          seen.add(key);
-          return true;
-        }).slice(0, 40);
-      }
-
-      function updateInputCount() {
-        const count = parseInput().length;
-        els.inputCount.textContent = count + (count === 1 ? ' entered' : ' entered');
-      }
-
-      function updateOverlapUI() {
-        state.overlap = Number(els.overlap.value);
-        els.overlapValue.textContent = state.overlap;
-        els.overlapSentence.textContent = 'Each entry will share exactly ' + state.overlap + ' of its 7 teams.';
-        els.uniqueNeeded.textContent = 14 - state.overlap;
-        els.differentPicks.textContent = (7 - state.overlap) + ' + ' + (7 - state.overlap);
-      }
-
-      function allowedMasks(team) {
-        const required = lockMask(team);
-        return [0, 1, 2, 3].filter(mask => {
-          const exposure = popcount(mask);
-          return (mask & required) === required && exposure >= team.min && exposure <= team.max;
-        });
-      }
-
-      function validate() {
-        if (state.teams.length < 7) return { ok: false, title: 'Add more teams', detail: 'You need at least 7 candidate teams.' };
-        const uniqueRequired = 14 - state.overlap;
-        const usable = state.teams.filter(team => team.max > 0).length;
-        if (usable < uniqueRequired) return { ok: false, title: 'Not enough usable teams', detail: 'A ' + state.overlap + '-pick overlap requires at least ' + uniqueRequired + ' teams with Max above 0.' };
-
-        let locked1 = 0, locked2 = 0, lockedBoth = 0;
-        for (const team of state.teams) {
-          if (team.min > team.max) return { ok: false, title: 'Invalid exposure', detail: team.name + ' has a minimum above its maximum.' };
-          const required = lockMask(team);
-          if (!allowedMasks(team).length) return { ok: false, title: 'Lock conflicts with exposure', detail: team.name + ' is locked more times than its maximum allows.' };
-          if (required & 1) locked1++;
-          if (required & 2) locked2++;
-          if (required === 3) lockedBoth++;
-        }
-        if (locked1 > 7 || locked2 > 7) return { ok: false, title: 'Too many locked picks', detail: 'An entry cannot contain more than 7 locked teams.' };
-        if (lockedBoth > state.overlap) return { ok: false, title: 'Too many shared locks', detail: lockedBoth + ' teams are locked to both entries, above your target of ' + state.overlap + '.' };
-        return { ok: true };
-      }
-
-      function invalidate(message = 'Settings changed. Build again to refresh the entries.') {
-        state.result = null;
-        els.another.disabled = true;
-        setStatus('Ready to build', message);
-        save();
-        renderEntries();
-      }
-
-      function loadTeams() {
-        const names = parseInput();
-        const existing = new Map(state.teams.map(team => [team.name.toLowerCase(), team]));
-        state.teams = names.map(name => {
-          const old = existing.get(name.toLowerCase());
-          return old ? { ...old, name } : { id: uid(), name, min: 0, max: 2, locks: [] };
-        });
-        state.result = null;
-        save();
-        renderAll();
-        setStatus(names.length ? 'Teams loaded' : 'Ready for your teams', names.length ? 'Set exposure limits, drag any locks into place, then build.' : 'Paste one team per line above.');
-      }
-
-      function renderCandidates() {
-        els.candidateEmpty.classList.toggle('hidden', state.teams.length > 0);
-        els.candidateBadge.textContent = state.teams.length + (state.teams.length === 1 ? ' team' : ' teams');
-        els.candidateList.innerHTML = state.teams.map(team => {
-          const locks = team.locks.slice().sort().map(n => 'Entry ' + n).join(' + ');
-          return '<div class="team-row" draggable="true" data-team-id="' + escapeHtml(team.id) + '">' +
-            '<div class="team-name-wrap"><div class="team-name" title="' + escapeHtml(team.name) + '">' + escapeHtml(team.name) + '</div>' +
-            '<div class="lock-line ' + (locks ? 'active' : '') + '">' + (locks ? 'Locked: ' + locks : 'Drag to lock') + '</div></div>' +
-            '<label><span class="field-label">Min</span><select class="min-select" data-team-id="' + escapeHtml(team.id) + '" aria-label="Minimum exposure for ' + escapeHtml(team.name) + '">' + optionList(team.min) + '</select></label>' +
-            '<label><span class="field-label">Max</span><select class="max-select" data-team-id="' + escapeHtml(team.id) + '" aria-label="Maximum exposure for ' + escapeHtml(team.name) + '">' + optionList(team.max) + '</select></label>' +
-            '<div class="quick-locks" aria-label="Entry locks"><button type="button" class="quick-lock ' + (team.locks.includes(1) ? 'on' : '') + '" data-lock="1" data-team-id="' + escapeHtml(team.id) + '" title="Lock to Entry 1">1</button>' +
-            '<button type="button" class="quick-lock ' + (team.locks.includes(2) ? 'on' : '') + '" data-lock="2" data-team-id="' + escapeHtml(team.id) + '" title="Lock to Entry 2">2</button></div></div>';
-        }).join('');
-      }
-
-      function optionList(selected) {
-        return [0, 1, 2].map(value => '<option value="' + value + '"' + (value === selected ? ' selected' : '') + '>' + value + '</option>').join('');
-      }
-
-      function picksForEntry(entry) {
-        if (state.result) return state.result[entry].map(id => ({ team: state.teams.find(t => t.id === id), locked: state.teams.find(t => t.id === id)?.locks.includes(entry) })).filter(x => x.team);
-        return state.teams.filter(team => team.locks.includes(entry)).map(team => ({ team, locked: true }));
-      }
-
-      function renderEntries() {
-        [1, 2].forEach(entry => {
-          const picks = picksForEntry(entry);
-          const zone = els.zones[entry];
-          const otherIds = new Set(picksForEntry(entry === 1 ? 2 : 1).map(x => x.team.id));
-          if (!picks.length) {
-            zone.innerHTML = '<div class="empty-state"><strong>Drop teams here</strong><span>Dragging creates a fixed lock for Entry ' + entry + '.</span></div>';
-          } else {
-            zone.innerHTML = picks.map((item, index) => '<div class="pick-card ' + (item.locked ? 'locked' : '') + '" draggable="true" data-team-id="' + escapeHtml(item.team.id) + '">' +
-              '<span class="pick-num">' + (index + 1) + '</span><div class="pick-main"><div class="pick-name">' + escapeHtml(item.team.name) + '</div><div class="pick-meta">' +
-              (item.locked ? 'Locked to this entry' : 'Builder selection') + (otherIds.has(item.team.id) ? ' <span class="shared-marker">• Shared</span>' : '') + '</div></div>' +
-              (item.locked ? '<button type="button" class="remove-lock" data-entry="' + entry + '" data-team-id="' + escapeHtml(item.team.id) + '">Unlock</button>' : '') + '</div>').join('');
-          }
-          els.counts[entry].textContent = picks.length + ' / 7';
-          els.counts[entry].classList.toggle('complete', picks.length === 7);
-          els.clear[entry].disabled = !state.teams.some(team => team.locks.includes(entry));
-          els.copy[entry].disabled = picks.length !== 7;
-        });
-      }
-
-      function renderButtons() {
-        const check = validate();
-        els.build.disabled = !check.ok;
-        if (!check.ok && state.teams.length) setStatus(check.title, check.detail, 'error');
-      }
-
-      function renderAll() {
-        els.input.value = state.teams.map(team => team.name).join('\n');
-        els.overlap.value = String(state.overlap);
-        updateInputCount();
-        updateOverlapUI();
-        renderCandidates();
-        renderEntries();
-        renderButtons();
-      }
-
-      function toggleLock(teamId, entry, forceOn = null) {
-        const team = state.teams.find(item => item.id === teamId);
-        if (!team) return;
-        const has = team.locks.includes(entry);
-        const turnOn = forceOn === null ? !has : forceOn;
-        if (turnOn && !has) {
-          const currentLocked = state.teams.filter(t => t.locks.includes(entry)).length;
-          if (currentLocked >= 7) return setStatus('Entry ' + entry + ' is full', 'Unlock a team before adding another fixed pick.', 'error');
-          team.locks.push(entry);
-          if (team.max < team.locks.length) team.max = team.locks.length;
-        } else if (!turnOn && has) {
-          team.locks = team.locks.filter(n => n !== entry);
-        }
-        invalidate(team.name + (turnOn ? ' locked to Entry ' + entry + '.' : ' unlocked from Entry ' + entry + '.'));
-        renderCandidates();
-        renderButtons();
-      }
-
-      function solve() {
-        const validation = validate();
-        if (!validation.ok) return null;
-
-        const prepared = state.teams.map(team => ({ team, masks: shuffled(allowedMasks(team)) }));
-        prepared.sort((a, b) => a.masks.length - b.masks.length || Math.random() - .5);
-        const memo = new Set();
-
-        function walk(index, count1, count2, shared) {
-          if (count1 > 7 || count2 > 7 || shared > state.overlap) return null;
-          if (index === prepared.length) return count1 === 7 && count2 === 7 && shared === state.overlap ? [] : null;
-          const remaining = prepared.length - index;
-          if (count1 + remaining < 7 || count2 + remaining < 7 || shared + remaining < state.overlap) return null;
-          const key = index + '|' + count1 + '|' + count2 + '|' + shared;
-          if (memo.has(key)) return null;
-
-          const item = prepared[index];
-          const preferred = shuffled(item.masks).sort((a, b) => {
-            const needShared = state.overlap - shared;
-            if (needShared > 0 && a === 3) return -1;
-            if (needShared > 0 && b === 3) return 1;
-            return Math.random() - .5;
-          });
-
-          for (const mask of preferred) {
-            const next1 = count1 + ((mask & 1) ? 1 : 0);
-            const next2 = count2 + ((mask & 2) ? 1 : 0);
-            const nextShared = shared + (mask === 3 ? 1 : 0);
-            const tail = walk(index + 1, next1, next2, nextShared);
-            if (tail) return [{ id: item.team.id, mask }, ...tail];
-          }
-          memo.add(key);
-          return null;
-        }
-
-        return walk(0, 0, 0, 0);
-      }
-
-      function build() {
-        const solved = solve();
-        if (!solved) {
-          state.result = null;
-          els.another.disabled = true;
-          renderEntries();
-          return setStatus('No valid build found', 'The overlap, locks, and exposure limits conflict. Loosen a Min/Max or remove a lock.', 'error');
-        }
-        const result = { 1: [], 2: [] };
-        solved.forEach(({ id, mask }) => {
-          if (mask & 1) result[1].push(id);
-          if (mask & 2) result[2].push(id);
-        });
-        const orderPicks = (ids, entry) => ids.sort((a, b) => {
-          const ta = state.teams.find(t => t.id === a), tb = state.teams.find(t => t.id === b);
-          return Number(tb.locks.includes(entry)) - Number(ta.locks.includes(entry)) || Math.random() - .5;
-        });
-        result[1] = orderPicks(result[1], 1);
-        result[2] = orderPicks(result[2], 2);
-        state.result = result;
-        save();
-        renderEntries();
-        els.another.disabled = false;
-        setStatus('Valid entries built', 'Both entries have 7 picks and share exactly ' + state.overlap + '. All locks and exposure limits are satisfied.', 'success');
-      }
-
-      async function copyEntry(entry) {
-        const picks = picksForEntry(entry).map((item, index) => (index + 1) + '. ' + item.team.name).join('\n');
-        if (!picks) return;
-        try {
-          await navigator.clipboard.writeText('Splash Entry ' + entry + '\n' + picks);
-          setStatus('Entry ' + entry + ' copied', 'The seven picks are on your clipboard.', 'success');
-        } catch (_) {
-          const temp = document.createElement('textarea');
-          temp.value = picks; document.body.appendChild(temp); temp.select(); document.execCommand('copy'); temp.remove();
-          setStatus('Entry ' + entry + ' copied', 'The seven picks are on your clipboard.', 'success');
-        }
-      }
-
-      els.input.addEventListener('input', updateInputCount);
-      els.load.addEventListener('click', loadTeams);
-      els.overlap.addEventListener('change', () => {
-        updateOverlapUI();
-        invalidate('Exact overlap changed to ' + state.overlap + '.');
-        renderButtons();
-      });
-
-      els.candidateList.addEventListener('change', event => {
-        const id = event.target.dataset.teamId;
-        const team = state.teams.find(item => item.id === id);
-        if (!team) return;
-        if (event.target.classList.contains('min-select')) {
-          team.min = Number(event.target.value);
-          if (team.min > team.max) team.max = team.min;
-        }
-        if (event.target.classList.contains('max-select')) {
-          team.max = Number(event.target.value);
-          if (team.max < team.min) team.min = team.max;
-          if (team.max < team.locks.length) {
-            team.max = team.locks.length;
-            setStatus('Maximum kept at ' + team.max, 'Unlock ' + team.name + ' from an entry before lowering its maximum.', 'error');
-          }
-        }
-        invalidate('Exposure setting updated for ' + team.name + '.');
-        renderCandidates();
-        renderButtons();
-      });
-
-      els.candidateList.addEventListener('click', event => {
-        const button = event.target.closest('.quick-lock');
-        if (!button) return;
-        toggleLock(button.dataset.teamId, Number(button.dataset.lock));
-      });
-
-      document.addEventListener('dragstart', event => {
-        const card = event.target.closest('[data-team-id][draggable="true"]');
-        if (!card) return;
-        draggedTeamId = card.dataset.teamId;
-        card.classList.add('dragging');
-        event.dataTransfer.effectAllowed = 'copy';
-        event.dataTransfer.setData('text/plain', draggedTeamId);
-      });
-      document.addEventListener('dragend', event => {
-        event.target.closest('[data-team-id]')?.classList.remove('dragging');
-        draggedTeamId = null;
-        Object.values(els.zones).forEach(zone => zone.classList.remove('over'));
-      });
-
-      Object.values(els.zones).forEach(zone => {
-        zone.addEventListener('dragover', event => { event.preventDefault(); zone.classList.add('over'); event.dataTransfer.dropEffect = 'copy'; });
-        zone.addEventListener('dragleave', event => { if (!zone.contains(event.relatedTarget)) zone.classList.remove('over'); });
-        zone.addEventListener('drop', event => {
-          event.preventDefault(); zone.classList.remove('over');
-          const id = event.dataTransfer.getData('text/plain') || draggedTeamId;
-          toggleLock(id, Number(zone.dataset.entry), true);
-        });
-        zone.addEventListener('click', event => {
-          const button = event.target.closest('.remove-lock');
-          if (button) toggleLock(button.dataset.teamId, Number(button.dataset.entry), false);
-        });
-      });
-
-      [1, 2].forEach(entry => {
-        els.clear[entry].addEventListener('click', () => {
-          state.teams.forEach(team => { team.locks = team.locks.filter(n => n !== entry); });
-          invalidate('All fixed locks cleared from Entry ' + entry + '.');
-          renderCandidates(); renderButtons();
-        });
-        els.copy[entry].addEventListener('click', () => copyEntry(entry));
-      });
-
-      els.build.addEventListener('click', build);
-      els.another.addEventListener('click', build);
-      els.print.addEventListener('click', () => window.print());
-      els.reset.addEventListener('click', () => {
-        if (!confirm('Clear all teams, locks, and saved settings?')) return;
-        state = { teams: [], overlap: 3, result: null };
-        try { localStorage.removeItem(STORAGE_KEY); } catch (_) {}
-        els.input.value = '';
-        renderAll();
-        setStatus('Reset complete', 'Paste your candidate teams above to start a new build.');
-      });
-
-      restore();
-      renderAll();
-      if (state.teams.length) setStatus('Saved setup restored', 'Your teams, limits, locks, and latest build were loaded from this browser.', 'success');
-    })();
-  </script>
   <script>
     (() => {
       'use strict';
@@ -1148,7 +807,8 @@
             min = Math.min(min, exposure);
             max = Math.max(max, exposure);
           }
-          return { id: String(team.id || uid()), name: String(team.name || ''), min, max, fixedMask };
+          const tier = [0, 1, 2, 3].includes(Number(team.tier)) ? Number(team.tier) : 2;
+          return { id: String(team.id || uid()), name: String(team.name || ''), min, max, fixedMask, tier };
         }).filter(team => team.name);
         const overlap = Math.max(0, Math.min(7, Number(saved.overlap) || 0));
         const result = saved.result && Array.isArray(saved.result[1]) && Array.isArray(saved.result[2]) ? saved.result : null;
@@ -1259,12 +919,12 @@
         const existing = new Map(state.teams.map(team => [team.name.toLowerCase(), team]));
         state.teams = names.map(name => {
           const old = existing.get(name.toLowerCase());
-          return old ? { ...old, name } : { id: uid(), name, min: 0, max: 2, fixedMask: 0 };
+          return old ? { ...old, name } : { id: uid(), name, min: 0, max: 2, fixedMask: 0, tier: 2 };
         });
         state.result = null;
         save();
         renderAll();
-        setStatus(names.length ? 'Teams loaded' : 'Ready for your teams', names.length ? 'Set exposure, drag teams into place, then build.' : 'Paste one team per line above.');
+        setStatus(names.length ? 'Teams loaded' : 'Ready for your teams', names.length ? 'Set exposure, tap S1/S2 to place teams, then build.' : 'Paste one team per line above.');
       }
 
       function exposureButtons(team, field) {
@@ -1279,8 +939,10 @@
         if (mask === 1) return 'Fixed: Splash 1';
         if (mask === 2) return 'Fixed: Splash 2';
         if (mask === 3) return 'Locked in both entries';
-        return 'Drag to place';
+        return 'Tap S1/S2/Lock both to place';
       }
+
+      const TIER_LABELS = ['Lock', 'Strong', 'Lean', 'Meh'];
 
       function renderCandidates() {
         els.candidateEmpty.classList.toggle('hidden', state.teams.length > 0);
@@ -1290,13 +952,16 @@
           '<div class="team-row" draggable="true" data-team-id="' + escapeHtml(team.id) + '" data-source-entry="0">' +
             '<div class="team-name-wrap">' +
               '<div class="team-top-row">' +
-                '<span class="rank-badge" title="Confidence rank">#' + (index + 1) + '</span>' +
+                '<span class="tier-badge tier-' + team.tier + '" title="Tier">' + TIER_LABELS[team.tier] + '</span>' +
                 '<div class="team-name" title="' + escapeHtml(team.name) + '">' + escapeHtml(team.name) + '</div>' +
                 '<div class="rank-arrows">' +
-                  '<button type="button" class="rank-btn" data-dir="up" data-team-id="' + escapeHtml(team.id) + '"' + (index === 0 ? ' disabled' : '') + ' aria-label="More confident in ' + escapeHtml(team.name) + '" title="More confident">▲</button>' +
-                  '<button type="button" class="rank-btn" data-dir="down" data-team-id="' + escapeHtml(team.id) + '"' + (index === total - 1 ? ' disabled' : '') + ' aria-label="Less confident in ' + escapeHtml(team.name) + '" title="Less confident">▼</button>' +
+                  '<button type="button" class="rank-btn" data-dir="up" data-team-id="' + escapeHtml(team.id) + '"' + (index === 0 ? ' disabled' : '') + ' aria-label="Move ' + escapeHtml(team.name) + ' earlier in the list" title="Move up">▲</button>' +
+                  '<button type="button" class="rank-btn" data-dir="down" data-team-id="' + escapeHtml(team.id) + '"' + (index === total - 1 ? ' disabled' : '') + ' aria-label="Move ' + escapeHtml(team.name) + ' later in the list" title="Move down">▼</button>' +
                 '</div>' +
               '</div>' +
+              '<div class="tier-row">' + TIER_LABELS.map((label, t) =>
+                '<button type="button" class="tier-btn tier-' + t + (t === team.tier ? ' active' : '') + '" data-tier="' + t + '" data-team-id="' + escapeHtml(team.id) + '">' + label + '</button>'
+              ).join('') + '</div>' +
               '<div class="lock-line ' + (team.fixedMask ? 'active' : '') + '">' + placementText(team.fixedMask) + '</div>' +
             '</div>' +
             '<div class="setting-group"><span class="field-label">Min</span><div class="segmented">' + exposureButtons(team, 'min') + '</div></div>' +
@@ -1307,6 +972,12 @@
               '<button type="button" class="choice-btn place-btn both ' + (team.fixedMask === 3 ? 'active' : '') + '" data-mask="3" data-team-id="' + escapeHtml(team.id) + '" aria-label="Lock ' + escapeHtml(team.name) + ' in both entries" title="Lock in both entries">🔒</button>' +
             '</div></div></div>'
         ).join('');
+      }
+
+      function setTier(teamId, tier) {
+        const team = state.teams.find(item => item.id === teamId);
+        if (!team || team.tier === tier) return;
+        applyMutation(() => { team.tier = tier; }, team.name + ' set to ' + TIER_LABELS[tier] + '.');
       }
 
       function moveRank(teamId, direction) {
@@ -1354,18 +1025,30 @@
             return aShared - bShared;
           });
           const zone = els.zones[entry];
+          const otherEntry = entry === 1 ? 2 : 1;
           if (!picks.length) {
-            zone.innerHTML = '<div class="empty-state"><strong>Drop teams here</strong><span>Drag from candidates or from the other entry.</span></div>';
+            zone.innerHTML = '<div class="empty-state"><strong>No picks yet</strong><span>Tap S1, S2, or Lock both on a team above to place it here (or drag it, on desktop).</span></div>';
           } else {
             zone.innerHTML = picks.map((item, index) => {
               const both = item.team.fixedMask === 3;
               const shared = otherIds.has(item.team.id);
               const meta = both ? 'Locked in both entries' : item.locked ? 'Fixed to this entry' : 'Builder selection';
               const cardClasses = ['pick-card', item.locked ? 'locked' : '', shared ? 'shared' : ''].filter(Boolean).join(' ');
+              const actions = [];
+              if (both) {
+                actions.push('<button type="button" class="pick-action-btn unlock" data-action="unlock" data-team-id="' + escapeHtml(item.team.id) + '">Unlock both</button>');
+              } else if (!shared) {
+                // Lets you move a pick to the other entry right from this view — no drag needed,
+                // and no trip back up to the candidate list's S1/S2 buttons required either.
+                actions.push('<button type="button" class="pick-action-btn move" data-action="move" data-target-entry="' + otherEntry + '" data-team-id="' + escapeHtml(item.team.id) + '">Move to Entry ' + otherEntry + '</button>');
+                if (item.locked) {
+                  actions.push('<button type="button" class="pick-action-btn unlock" data-action="unlock" data-team-id="' + escapeHtml(item.team.id) + '">Unlock</button>');
+                }
+              }
               return '<div class="' + cardClasses + '" draggable="true" data-team-id="' + escapeHtml(item.team.id) + '" data-source-entry="' + entry + '">' +
-                '<span class="pick-num">' + (index + 1) + '</span><div class="pick-main"><div class="pick-name">' + escapeHtml(item.team.name) + '</div><div class="pick-meta">' +
-                meta + (shared ? ' <span class="shared-marker">Shared</span>' : '') + '</div></div>' +
-                (item.locked ? '<button type="button" class="remove-lock" data-team-id="' + escapeHtml(item.team.id) + '">' + (both ? 'Unlock both' : 'Unlock') + '</button>' : '') + '</div>';
+                '<div class="pick-row"><span class="pick-num">' + (index + 1) + '</span><div class="pick-main"><div class="pick-name">' + escapeHtml(item.team.name) + '</div><div class="pick-meta">' +
+                meta + (shared ? ' <span class="shared-marker">Shared</span>' : '') + '</div></div></div>' +
+                (actions.length ? '<div class="pick-actions">' + actions.join('') + '</div>' : '') + '</div>';
             }).join('');
           }
           els.counts[entry].textContent = picks.length + ' / 7';
@@ -1464,20 +1147,27 @@
         renderHistory();
       }
 
-      // Confidence rank comes from a team's position in state.teams (index 0 = most confident,
-      // set by dragging or the ▲▼ arrows in the candidate list). When building fresh, this greedy
-      // pass walks teams in confidence order and hands out the shared "both entries" slots to the
-      // most confident teams first, then single-entry slots to the next tier, leaving the least
-      // confident teams excluded — while still respecting every lock and min/max. It only decides
-      // team membership; which physical entry (1 vs 2) gets which single-exposure team is randomized
-      // each build for variety. If a fixed lock or exposure limit makes a clean greedy pass
-      // impossible, it returns null and the original random solver below is used instead, so a
-      // valid build is always still found.
+      // Tier (Lock/Strong/Lean/Meh) is the hard priority signal: teams in a higher tier always
+      // get first crack at the shared "both entries" slots, then single-entry slots, leaving the
+      // lowest tier excluded first — while still respecting every lock and min/max. Within a tier,
+      // teams are shuffled fresh on every build, since a tier means "I feel the same about these,"
+      // and the tool shouldn't quietly treat list order as a precise ranking. Dragging or using the
+      // up/down arrows still sets that list order, which matters for two smaller things: it's the
+      // stable tiebreak used when preserving your build across a minor edit (like tweaking one
+      // team's exposure), and it's just how your candidate list is organized on screen. If a fixed
+      // lock or exposure limit makes a clean greedy pass impossible, this returns null and the
+      // original random solver below is used instead, so a valid build is always still found.
+      function tierShuffledOrder() {
+        const byTier = [[], [], [], []];
+        state.teams.forEach(team => byTier[team.tier].push(team));
+        return byTier.flatMap(group => shuffled(group));
+      }
+
       function confidenceGreedyAssign() {
         let need1 = 7, need2 = 7, needShared = state.overlap;
         const assigned = [];
         const free = [];
-        for (const team of state.teams) {
+        for (const team of tierShuffledOrder()) {
           if (team.fixedMask) {
             assigned.push({ id: team.id, mask: team.fixedMask });
             if (includesEntry(team.fixedMask, 1)) need1--;
@@ -1572,7 +1262,9 @@
             const aShared = maskById.get(a) === 3 ? 0 : 1;
             const bShared = maskById.get(b) === 3 ? 0 : 1;
             if (aShared !== bShared) return aShared - bShared;
-            return state.teams.findIndex(t => t.id === a) - state.teams.findIndex(t => t.id === b);
+            const teamA = state.teams.find(t => t.id === a), teamB = state.teams.find(t => t.id === b);
+            if (teamA.tier !== teamB.tier) return teamA.tier - teamB.tier;
+            return state.teams.indexOf(teamA) - state.teams.indexOf(teamB);
           });
         });
         return result;
@@ -1691,6 +1383,8 @@
         if (placement) return setPlacement(placement.dataset.teamId, Number(placement.dataset.mask));
         const rank = event.target.closest('.rank-btn');
         if (rank && !rank.disabled) return moveRank(rank.dataset.teamId, rank.dataset.dir);
+        const tier = event.target.closest('.tier-btn');
+        if (tier) return setTier(tier.dataset.teamId, Number(tier.dataset.tier));
       });
 
       function clearReorderIndicators() {
@@ -1749,8 +1443,10 @@
           setPlacement(teamId, targetEntry, false);
         });
         zone.addEventListener('click', event => {
-          const button = event.target.closest('.remove-lock');
-          if (button) setPlacement(button.dataset.teamId, 0);
+          const button = event.target.closest('.pick-action-btn');
+          if (!button) return;
+          if (button.dataset.action === 'move') setPlacement(button.dataset.teamId, Number(button.dataset.targetEntry), false);
+          else if (button.dataset.action === 'unlock') setPlacement(button.dataset.teamId, 0);
         });
       });
 
