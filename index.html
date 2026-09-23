@@ -1139,7 +1139,11 @@
         state.result = null;
         save();
         renderAll();
-        setStatus(names.length ? 'Teams loaded' : 'Ready for your teams', names.length ? 'Set exposure, tap S1/S2 to place teams, then build.' : 'Paste one team per line above.');
+        // Only show "Teams loaded" when the setup can actually build; otherwise leave the
+        // validation message renderAll() just set (e.g. "Add more teams"), so a disabled Build
+        // button always comes with the reason.
+        if (!names.length) setStatus('Ready for your teams', 'Paste one team per line above.');
+        else if (validate().ok) setStatus('Teams loaded', 'Set exposure, tap S1/S2 to place teams, then build.');
       }
 
       function exposureButtons(team, field) {

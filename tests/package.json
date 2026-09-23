@@ -1,0 +1,14 @@
+{
+  "name": "cfb-pool-builder-tests",
+  "private": true,
+  "description": "Automated tests for index.html and api/setup.js. Kept in this folder so the Vercel deploy is unaffected.",
+  "scripts": {
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "jsdom": "^26.1.0"
+  }
+}
