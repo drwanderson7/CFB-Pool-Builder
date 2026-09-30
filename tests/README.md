@@ -22,6 +22,9 @@ shows `fail 0`. Any failure prints which check broke and why.
 | `candidates.test.js` | Tier groups and dividers, arrow/drag reordering rules, spread parsing |
 | `entries.test.js` | Shared-first ordering, Move to, Copy entry, dog/fav mix |
 | `history.test.js` | Save this week, grading, season and by-tier records, Start new week |
+| `accessibility.test.js` | Compact phone rows (Edit / Expand all), screen-reader names and states, pop-up focus handling, and color-contrast checks against the real CSS |
+| `guidance.test.js` | Overlap fix button, the Benched list, and the Help guide (including a check that Help only names buttons that exist) |
+| `past-weeks.test.js` | Adding past weeks by hand, the add-up check, 2/2 and 1/2 picks records, season totals, sync, and bad-data cleanup |
 | `undo.test.js` | Undo button and Ctrl+Z |
 | `sync.test.js` | Laptop/phone sync, merging saved weeks and grades, offline handling, sync pill |
 | `transfer.test.js` | Copy / Load setup codes |

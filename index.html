@@ -18,12 +18,13 @@
       --panel-2: #f7faf8;
       --panel-3: #eef6f1;
       --text: #17251d;
-      --muted: #68786d;
+      --muted: #57675c;
       --line: #d7e2da;
-      --green: #168a4c;
+      --green: #137a45;
       --green-2: #0f733e;
       --green-soft: rgba(22, 138, 76, .11);
       --amber: #9a6200;
+      --control-line: #7d8e83;
       --amber-soft: rgba(203, 138, 0, .16);
       --amber-line: rgba(203, 138, 0, .45);
       --red: #c83d36;
@@ -137,15 +138,22 @@
       width: 100%;
       min-height: 198px;
       resize: vertical;
-      border: 1px solid var(--line);
+      border: 1px solid var(--control-line);
       border-radius: 13px;
       background: #ffffff;
       color: var(--text);
       padding: 13px 14px;
-      outline: none;
       line-height: 1.5;
     }
-    textarea:focus, select:focus, input:focus { border-color: var(--green); box-shadow: 0 0 0 3px var(--green-soft); outline: none; }
+    textarea:focus, select:focus, input:focus { border-color: var(--green); box-shadow: 0 0 0 3px var(--green-soft); }
+    /* Keyboard focus: a clear ring on everything you can tab to (mouse clicks on buttons don't show it). */
+    button:focus-visible, select:focus-visible, textarea:focus-visible, input:focus-visible, summary:focus-visible {
+      outline: 3px solid #1d4ed8;
+      outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+    }
     .load-row { display: flex; flex-wrap: wrap; gap: 9px; align-items: center; margin-top: 11px; }
     .new-week-btn { margin-left: auto; }
     .count-note { color: var(--muted); font-size: .82rem; }
@@ -166,9 +174,9 @@
     .overlap-number span { color: var(--muted); font-size: .83rem; }
     .overlap-select { min-width: 118px; }
 
-    select, input[type="text"] {
+    select, input[type="text"], input[type="number"] {
       min-height: 40px;
-      border: 1px solid var(--line);
+      border: 1px solid var(--control-line);
       border-radius: 10px;
       background: #ffffff;
       color: var(--text);
@@ -221,7 +229,7 @@
     }
     .candidate-columns[hidden] { display: none; }
     .candidates { min-height: 0; min-width: 0; }
-    .team-row .field-label, .team-row .lock-line { display: none; }
+    .team-row .field-label { display: none; }
     .team-row {
       display: grid;
       grid-template-columns: minmax(0, 1fr) 95px 95px 106px 86px;
@@ -251,8 +259,6 @@
     .spread-fav { border: 1px solid #1e2a3a; background: #1e2a3a; color: #ffffff; }
     .spread-pk { border: 1px solid var(--line); background: #f3f4f6; color: var(--muted); }
     .entry-mix { margin-left: auto; color: var(--muted); font-size: .72rem; font-weight: 700; white-space: nowrap; }
-    .lock-line { display: block; min-height: 17px; margin-top: 3px; color: var(--muted); font-size: .71rem; }
-    .lock-line.active { color: var(--green); }
     .field-label { display: block; margin-bottom: 4px; color: var(--muted); font-size: .65rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
 
     .team-top-row { display: flex; align-items: center; gap: 6px; }
@@ -291,11 +297,15 @@
     .tier-select.tier-0 { border-color: var(--green); color: var(--green-2); }
     .tier-select.tier-1 { border-color: #2563eb; color: #1d4ed8; }
     .tier-select.tier-2 { border-color: #7c3aed; color: #6d28d9; }
-    .tier-select.tier-3 { border-color: #9ca3af; color: var(--muted); }
+    .tier-select.tier-3 { border-color: #6b7280; color: var(--muted); }
     /* Side-by-side rather than stacked: two adjacent tap targets are much harder to mix up on a
        touchscreen than two tiny ones stacked a pixel apart, and this keeps the row from growing
        tall. Sized close to the ~44px touch-target guideline instead of the old 20x15px pair. */
     .rank-arrows { display: flex; gap: 6px; flex: none; }
+    /* Phone-only pieces of a candidate row (see the 620px rules below). */
+    .row-summary, .row-toggle, .expand-all { display: none; }
+    /* On wider screens the details sit in the row's own columns, as before. */
+    .row-details { display: contents; }
     .rank-btn {
       min-width: 32px;
       height: 32px;
@@ -406,12 +416,25 @@
     .status span { color: var(--muted); font-size: .84rem; }
     .status.error strong, .status.error span { color: var(--red); }
     .status.success strong { color: var(--green); }
+    .status-action {
+      display: inline-block;
+      margin-top: 8px;
+      min-height: 34px;
+      padding: 0 14px;
+      border: 1px solid var(--green);
+      border-radius: 9px;
+      background: var(--green);
+      color: #ffffff;
+      font-size: .8rem;
+      font-weight: 800;
+    }
     .build-actions { display: flex; gap: 8px; }
     /* The bar lives inside the workspace grid right after the candidates panel. On wider
        screens it's pushed to a full-width last row (order) and floats at the bottom as before;
        on phones it stays in DOM position — under the candidates, above the entries — and
        doesn't move (see the 760px rule). */
-    .workspace > .buildbar { grid-column: 1 / -1; order: 1; margin-top: 2px; }
+    .workspace > .buildbar { grid-column: 1 / -1; order: 2; margin-top: 2px; }
+    .workspace > .benched { grid-column: 1 / -1; order: 1; padding: 14px 17px; }
 
     .shared-marker {
       display: inline-block;
@@ -477,9 +500,9 @@
     }
     .grade-btn.grade-W { border: 1px solid var(--green); background: var(--green); color: #fff; }
     .grade-btn.grade-L { border: 1px solid var(--red); background: var(--red); color: #fff; }
-    .grade-btn.grade-P { border: 1px solid #9ca3af; background: #9ca3af; color: #fff; }
+    .grade-btn.grade-P { border: 1px solid #6b7280; background: #6b7280; color: #fff; }
     .history-summary { margin-top: 12px; padding: 12px; border: 1px solid var(--line); border-radius: 13px; background: #ffffff; }
-    .summary-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .summary-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px 8px; }
     .summary-stats div { display: flex; flex-direction: column; gap: 1px; }
     .summary-stats span, .summary-tiers > span { color: var(--muted); font-size: .68rem; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; }
     .summary-stats strong { font-size: 1.05rem; }
@@ -489,11 +512,81 @@
     .tier-chip.tier-0 { border-color: var(--green); color: var(--green-2); }
     .tier-chip.tier-1 { border-color: #2563eb; color: #1d4ed8; }
     .tier-chip.tier-2 { border-color: #7c3aed; color: #6d28d9; }
-    .tier-chip.tier-3 { border-color: #9ca3af; color: var(--muted); }
+    .tier-chip.tier-3 { border-color: #6b7280; color: var(--muted); }
     .history-actions { display: flex; gap: 8px; margin-top: 10px; }
     .history-actions .btn { min-height: 34px; padding: 0 12px; font-size: .82rem; }
     @media (max-width: 480px) {
       .history-columns { grid-template-columns: 1fr; }
+    }
+
+    .benched-head { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; }
+    .benched-head h2 { margin: 0; font-size: 1rem; }
+    .benched-head span { color: var(--muted); font-size: .8rem; }
+    .benched-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .bench-chip {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 6px;
+      max-width: 100%;
+      padding: 4px 10px;
+      border: 1.5px solid var(--line);
+      border-radius: 999px;
+      background: #ffffff;
+      font-size: .82rem;
+      font-weight: 800;
+    }
+    .bench-tier { font-size: .62rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+    .bench-note { color: var(--muted); font-size: .68rem; font-weight: 700; }
+    .bench-chip.tier-0 { border-color: var(--green); }
+    .bench-chip.tier-0 .bench-tier { color: var(--green-2); }
+    .bench-chip.tier-1 { border-color: #2563eb; }
+    .bench-chip.tier-1 .bench-tier { color: #1d4ed8; }
+    .bench-chip.tier-2 { border-color: #7c3aed; }
+    .bench-chip.tier-2 .bench-tier { color: #6d28d9; }
+    .bench-chip.tier-3 { border-color: #6b7280; }
+
+    .help-card { width: min(680px, 100%); }
+    .help-h { margin: 20px 0 6px; color: var(--muted); font-size: .74rem; font-weight: 800; text-transform: uppercase; letter-spacing: .07em; }
+    .help-steps, .help-list { margin: 0; padding-left: 20px; font-size: .88rem; line-height: 1.55; }
+    .help-steps li, .help-list li { margin-bottom: 6px; }
+    .help-terms { margin: 0; }
+    .help-terms dt { margin-top: 10px; font-size: .88rem; font-weight: 800; }
+    .help-terms dd { margin: 2px 0 0; color: var(--muted); font-size: .86rem; line-height: 1.5; }
+    .faq { margin-top: 6px; border: 1px solid var(--line); border-radius: 10px; background: #ffffff; }
+    .faq summary { padding: 10px 12px; font-size: .88rem; font-weight: 750; cursor: pointer; }
+    .faq p { margin: 0; padding: 0 12px 12px; color: var(--muted); font-size: .86rem; line-height: 1.5; }
+
+    .past-toolbar { margin-top: 12px; }
+    .past-form { margin-top: 12px; padding: 14px; border: 1px solid var(--line); border-radius: 13px; background: #ffffff; }
+    .past-form h3 { margin: 0 0 2px; font-size: .95rem; }
+    .past-week { display: flex; align-items: center; gap: 10px; margin: 12px 0 4px; font-size: .86rem; font-weight: 800; }
+    .past-week input { width: 84px; height: 42px; text-align: center; font-size: 1rem; }
+    .past-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 6px 12px; padding: 9px 0; border-top: 1px solid var(--line); }
+    .past-row:first-of-type { border-top: 0; }
+    .past-row .row-label { font-size: .88rem; font-weight: 800; }
+    .past-row .row-label small { display: block; color: var(--muted); font-size: .7rem; font-weight: 600; }
+    .wlp { display: flex; gap: 8px; }
+    .wlp label { display: flex; align-items: center; gap: 4px; color: var(--muted); font-size: .72rem; font-weight: 800; }
+    .past-input { width: 52px; height: 42px; padding: 0 4px; text-align: center; font-size: 1rem; -moz-appearance: textfield; }
+    .past-input::-webkit-outer-spin-button, .past-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    .past-check { min-height: 1.3em; margin-top: 8px; font-size: .8rem; font-weight: 700; }
+    .past-check.ok { color: var(--green-2); }
+    .past-check.warn { color: #9a3412; }
+    .past-error { margin-top: 6px; color: var(--red); font-size: .82rem; font-weight: 700; }
+    .history-section { margin: 18px 0 0; color: var(--muted); font-size: .72rem; font-weight: 800; text-transform: uppercase; letter-spacing: .07em; }
+    .history-mix { margin: -4px 0 8px; color: var(--muted); font-size: .76rem; font-weight: 700; }
+    .manual-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px 14px; }
+    .manual-grid div { display: flex; flex-direction: column; gap: 1px; }
+    .manual-grid span { color: var(--muted); font-size: .68rem; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; }
+    .manual-grid strong { font-size: 1.05rem; }
+    .manual-grid em { color: var(--muted); font-size: .74rem; font-style: normal; }
+    @media (max-width: 480px) {
+      .past-row { grid-template-columns: 1fr; }
+      .wlp { justify-content: space-between; }
+      .past-input { width: 58px; }
+    }
+    @media (max-width: 360px) {
+      .past-input { width: 48px; }
     }
 
     #transferOut, #transferIn {
@@ -532,6 +625,7 @@
         padding: 12px 14px;
       }
       .workspace > .buildbar { order: 0; margin-top: 0; }
+      .workspace > .benched { order: 0; }
       .build-actions { display: grid; grid-template-columns: auto 1fr 1fr; gap: 8px; }
       #buildBtn { grid-column: 1 / -1; }
       .overlap-explainer { grid-template-columns: 1fr; }
@@ -539,20 +633,72 @@
 
     @media (max-width: 620px) {
       .candidate-columns { display: none; }
-      .team-row .field-label { display: block; }
-      .team-row { grid-template-columns: 1fr 1fr; align-items: end; }
-      .team-name-wrap { grid-column: 1 / -1; }
+      /* Compact candidate rows: each team is one line (name, tier, Edit). Tapping Edit opens its
+         Min / Max / Place settings, so a 14-team list isn't ~3000px of scrolling. */
+      .team-row { grid-template-columns: minmax(0, 1fr) 92px 58px; align-items: center; }
+      .team-name-wrap { grid-column: 1; grid-row: 1; }
+      .tier-group { grid-column: 2; grid-row: 1; }
+      .tier-group .field-label { display: none; }
+      .tier-select { padding: 0 4px; font-size: .72rem; }
+      .row-toggle {
+        display: inline-flex;
+        grid-column: 3;
+        grid-row: 1;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        padding: 0 8px;
+        border: 1px solid var(--control-line);
+        border-radius: 8px;
+        background: #ffffff;
+        color: var(--text);
+        font-size: .74rem;
+        font-weight: 800;
+      }
+      .team-row.expanded .row-toggle { background: var(--green-soft); border-color: var(--green); color: var(--green-2); }
+      .row-summary { display: block; margin-top: 2px; color: var(--muted); font-size: .7rem; font-weight: 700; }
+      .row-summary:empty, .team-row.expanded .row-summary { display: none; }
+      .team-row:not(.expanded) .rank-arrows { display: none; }
+      .row-details { display: none; }
+      .team-row.expanded .row-details {
+        display: grid;
+        grid-column: 1 / -1;
+        grid-row: 2;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        align-items: end;
+        padding-top: 6px;
+        border-top: 1px dashed var(--line);
+      }
+      .team-row.expanded .row-details .field-label { display: block; }
+      .team-row.expanded .row-details .placement-group { grid-column: 1 / -1; }
+      .expand-all {
+        display: inline-block;
+        margin-top: 6px;
+        padding: 6px 0;
+        border: 0;
+        background: none;
+        color: var(--green-2);
+        font-size: .8rem;
+        font-weight: 800;
+        text-decoration: underline;
+      }
       .choice-btn { min-width: 36px; }
       .rank-btn { min-width: 38px; height: 38px; }
-      .placement-group { grid-column: 1; }
-      .tier-group { grid-column: 2; }
       .overlap-wrap { grid-template-columns: 1fr; }
+    }
+    /* Very narrow phones: tier drops to its own line so the team name keeps its room. */
+    @media (max-width: 340px) {
+      .team-row { grid-template-columns: minmax(0, 1fr) 58px; }
+      .tier-group { grid-column: 1; grid-row: 2; }
+      .row-toggle { grid-column: 2; }
+      .team-row.expanded .row-details { grid-row: 3; }
     }
 
     @media print {
       body { background: #fff; color: #111; }
       .app { width: 100%; padding: 0; }
-      .top-actions, .setup, .candidates, .buildbar, .entry-footer, .pick-actions, .modal-overlay { display: none !important; }
+      .top-actions, .setup, .candidates, .buildbar, .benched, .entry-footer, .pick-actions, .modal-overlay { display: none !important; }
       .workspace { grid-template-columns: 1fr 1fr; }
       .card, .dropzone, .pick-card { box-shadow: none; background: #fff; color: #111; border-color: #bbb; }
       .entry { min-height: 0; }
@@ -571,6 +717,7 @@
       </div>
       <div class="top-actions">
         <button class="sync-pill sync-pending" id="syncStatus" type="button" title="Sync status between your devices. Tap to sync now.">Checking sync…</button>
+        <button class="btn" id="helpBtn" type="button">Help</button>
         <button class="btn" id="historyBtn" type="button">Saved weeks</button>
         <button class="btn" id="transferBtn" type="button">Copy / Load setup</button>
         <button class="btn" id="printBtn" type="button">Print / Save PDF</button>
@@ -585,7 +732,7 @@
             <p class="helper">One per line. Add the spread after the name (e.g. Purdue +14.5) to see favorites and underdogs at a glance.</p>
           </div>
         </div>
-        <textarea id="teamInput" placeholder="Georgia -6.5&#10;Alabama +3&#10;Texas -7&#10;Penn State -4.5"></textarea>
+        <textarea id="teamInput" aria-label="Candidate teams, one per line" placeholder="Georgia -6.5&#10;Alabama +3&#10;Texas -7&#10;Penn State -4.5"></textarea>
         <div class="load-row">
           <button class="btn primary" id="loadTeamsBtn" type="button">Load / update teams</button>
           <span class="count-note" id="inputCount">0 entered</span>
@@ -627,7 +774,8 @@
         <div class="candidate-toolbar">
           <div>
             <h2>3. Set exposure, locks &amp; tier</h2>
-            <p class="helper">Tap S1, S2, or Lock both to place a team (or drag it to an entry on desktop). Set each team's tier — Lock, Strong, Lean, or Meh — to control who's favored for double exposure: Lock first, then Strong, then Lean. Teams in the same tier are treated as equally good and shuffled build to build. Drag a row or use the ▲▼ arrows to set the order within a tier, which is used to keep your build stable through small edits.</p>
+            <p class="helper">Set each team's tier (Lock, Strong, Lean, Meh) to control who gets the shared slots first. Tap S1, S2, or the lock to place a team. Full details are in Help at the top.</p>
+            <button type="button" class="expand-all" id="expandAllBtn">Expand all</button>
           </div>
           <span class="badge" id="candidateBadge">0 teams</span>
         </div>
@@ -673,8 +821,94 @@
           <button class="btn" id="clearEntry2" type="button" disabled>Clear locks</button>
         </div>
       </div>
+
+      <section class="card benched hidden" id="benchedBox" aria-label="Benched teams">
+        <div class="benched-head"><h2>Benched</h2><span id="benchedCount"></span><span>Left out of both entries this build.</span></div>
+        <div class="benched-list" id="benchedList"></div>
+      </section>
     </section>
 
+    <div class="modal-overlay hidden" id="helpOverlay" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+      <div class="card modal-card help-card">
+        <div class="modal-head">
+          <h2 id="helpTitle">How to use this tool</h2>
+          <button class="btn" id="helpCloseBtn" type="button" aria-label="Close">✕</button>
+        </div>
+        <p class="helper">Builds two 7-pick Splash entries that share exactly the number of picks you choose, favoring the teams you feel best about.</p>
+
+        <h3 class="help-h">Quick start</h3>
+        <ol class="help-steps">
+          <li><strong>Add teams.</strong> In section 1, paste this week's candidates, one per line, with the spread after the name (for example <em>Purdue +14.5</em>). Tap <strong>Load / update teams</strong>.</li>
+          <li><strong>Set the overlap.</strong> In section 2, choose how many picks must appear in both entries (the <strong>Shared</strong> menu).</li>
+          <li><strong>Set each team's tier.</strong> In section 3, use the Tier menu: Lock, Strong, Lean, or Meh. Every team starts at Lean.</li>
+          <li><strong>Optional: fine-tune.</strong> Use Min and Max to limit how many entries a team can be in. Use S1, S2, or the lock to force a team into Entry 1, Entry 2, or both. On a phone these settings are tucked behind each team's <strong>Edit</strong> button.</li>
+          <li><strong>Build.</strong> Tap <strong>Build 2 entries</strong>. Tap <strong>Another valid build</strong> for a different arrangement.</li>
+          <li><strong>Adjust.</strong> On any pick, <strong>Move to</strong> sends it to the other entry and <strong>Unlock</strong> releases a locked pick. <strong>Undo</strong> reverses your last change.</li>
+          <li><strong>Submit and record.</strong> Tap <strong>Copy entry</strong> under each entry to copy its list, then tap <strong>Save this week</strong>.</li>
+          <li><strong>Grade it.</strong> After the games, open <strong>Saved weeks</strong> and tap the dash beside each pick to mark it W, L, or Push. For weeks you didn't save here, tap <strong>Add a past week</strong> and enter the records by hand.</li>
+          <li><strong>Next week.</strong> Tap <strong>Start new week</strong> in section 1. Your overlap setting and saved weeks are kept.</li>
+        </ol>
+
+        <h3 class="help-h">What you get</h3>
+        <ul class="help-list">
+          <li>Two entries of 7 picks. Shared picks are listed first, highlighted amber with a Shared badge.</li>
+          <li>Each pick shows its spread as a chip: dark for favorites, light for underdogs. Each entry header shows the mix, like "5 dogs · 2 favs".</li>
+          <li>A <strong>Benched</strong> list under the entries with every team left out of both, color-coded by tier.</li>
+          <li><strong>Copy entry</strong> gives a numbered list in on-screen order, using your original team names.</li>
+          <li><strong>Saved weeks</strong> keeps each build you save, with your record per entry, your season record, and your record by tier.</li>
+        </ul>
+
+        <h3 class="help-h">Key features</h3>
+        <dl class="help-terms">
+          <dt>Tiers</dt>
+          <dd>Lock teams get the shared slots first, then Strong, then Lean. Meh teams are benched first. Teams in the same tier are treated as equally good and shuffled each build, so rebuilding only varies teams you feel the same about. If the pool needs a lower tier to fill the entries, it's used.</dd>
+          <dt>Order within a tier</dt>
+          <dd>The ▲▼ arrows (or dragging on desktop) reorder teams within their own tier. That order keeps your build stable when you make small edits. To change a team's tier, use its Tier menu.</dd>
+          <dt>Min and Max</dt>
+          <dd>How many entries a team may be in (0, 1, or 2). Max 0 benches a team. Min 2 puts it in both entries.</dd>
+          <dt>Place (S1, S2, lock)</dt>
+          <dd>S1 or S2 locks a team into that entry. The lock puts it in both, which counts toward your shared picks.</dd>
+          <dt>Shared picks (overlap)</dt>
+          <dd>The number of teams that appear in both entries. You need at least 14 minus that many teams. If you don't have enough, the message in the build bar offers a button to fix it.</dd>
+          <dt>Undo</dt>
+          <dd>The Undo button or Ctrl/Cmd+Z reverses your last 30 changes. It resets when the page reloads or when changes arrive from your other device. Saving and grading weeks aren't part of Undo.</dd>
+          <dt>Past weeks</dt>
+          <dd>In Saved weeks, <strong>Add a past week</strong> lets you enter a week's records without the individual picks: Entry 1, Entry 2, your 2/2 picks (in both entries), and your 1/2 picks (in just one). Entry 1 + Entry 2 always equals 2 × (2/2 picks) + (1/2 picks), so the 1/2 row fills itself in and you're warned if the numbers don't add up. These weeks count toward your season record.</dd>
+          <dt>Sync</dt>
+          <dd>The pill at the top shows whether your laptop and phone are in step. Tap it to sync now.</dd>
+          <dt>Copy / Load setup</dt>
+          <dd>Makes a backup code (or file) of your current setup that you can load on another device.</dd>
+        </dl>
+
+        <h3 class="help-h">Common questions</h3>
+        <details class="faq"><summary>Build 2 entries is greyed out.</summary>
+          <p>Read the message in the build bar; it says what's wrong. The most common cause is too few teams for your overlap. If so, tap the button in the message (for example "Set overlap to 4"). You need at least 7 teams with Max above 0.</p></details>
+        <details class="faq"><summary>My Lock team isn't in both entries.</summary>
+          <p>Only as many teams can be in both entries as your shared-picks number. With 3 shared picks, extra Lock teams land in a single entry. Raise the overlap if you want more teams in both.</p></details>
+        <details class="faq"><summary>A Meh team got picked.</summary>
+          <p>Two 7-pick entries need a certain number of different teams. When your higher tiers can't cover them, the builder reaches down into lower tiers.</p></details>
+        <details class="faq"><summary>Another valid build gave me different teams.</summary>
+          <p>That's expected. Teams in the same tier are shuffled each time. If you want a team favored, move it to a higher tier.</p></details>
+        <details class="faq"><summary>I can't drag a team into another tier.</summary>
+          <p>Tiers change only through the Tier menu. Dragging and the arrows reorder teams within their own tier.</p></details>
+        <details class="faq"><summary>Dragging doesn't work on my phone.</summary>
+          <p>Touch screens don't support dragging here. Use the ▲▼ arrows, the Move to buttons, and S1/S2/lock instead.</p></details>
+        <details class="faq"><summary>A team's spread doesn't show as a chip.</summary>
+          <p>The line needs a space and a sign after the name, like <em>Purdue +14.5</em>, <em>Rice -3</em>, or <em>Kansas St PK</em>.</p></details>
+        <details class="faq"><summary>My other device isn't showing my changes.</summary>
+          <p>Check the sync pill at the top. "Synced" means you're up to date; tap it to fetch the latest. "Offline" means changes are saved on this device and will sync when it's back online. "Sync not set up" means the sync route isn't connected on your site, so changes stay on this device.</p></details>
+        <details class="faq"><summary>I made a mistake.</summary>
+          <p>Tap Undo (or press Ctrl/Cmd+Z). If you tapped Start new week by accident, Undo brings back your teams and build.</p></details>
+        <details class="faq"><summary>How do I add weeks from before I started using the tool?</summary>
+          <p>Open Saved weeks and tap <strong>Add a past week</strong>. Enter the week number and each record as wins, losses, and pushes. Use <strong>Edit</strong> on a saved week to fix a typo. By-tier records only include builds you saved here, since tiers aren't known for weeks entered by hand.</p></details>
+        <details class="faq"><summary>Can I use it with a keyboard?</summary>
+          <p>Yes. Tab moves between controls, Enter or Space presses a button, and Escape closes any pop-up. Ctrl/Cmd+Z undoes your last change. While a pop-up is open, Tab stays inside it.</p></details>
+        <details class="faq"><summary>The team list is very long on my phone.</summary>
+          <p>Each team shows as one line. Tap <strong>Edit</strong> on a team to open its Min, Max, and Place settings, or tap <strong>Expand all</strong> above the list to open every team at once.</p></details>
+        <details class="faq"><summary>I pasted more than 40 teams.</summary>
+          <p>The list holds up to 40 teams. Anything after the 40th is ignored.</p></details>
+      </div>
+    </div>
 
     <div class="modal-overlay hidden" id="transferOverlay" role="dialog" aria-modal="true" aria-labelledby="transferTitle">
       <div class="card modal-card">
@@ -705,10 +939,26 @@
           <h2 id="historyTitle">Saved weeks</h2>
           <button class="btn" id="historyCloseBtn" type="button" aria-label="Close">✕</button>
         </div>
-        <p class="helper">A record of builds you've saved, so you can check back later on what you actually picked. Saving here doesn't happen automatically — use "Save this week" once you're happy with a build. Tap the dash next to a pick to grade it (W, then L, then Push, then clear); your season record builds from those grades.</p>
+        <p class="helper">Builds you've saved, with your results. Tap the dash next to a pick to grade it (W, then L, then Push, then clear). For weeks you didn't save here, use Add a past week to enter the records by hand. Your season record combines both.</p>
+        <div class="past-toolbar"><button class="btn" id="addPastWeekBtn" type="button">Add a past week</button></div>
+        <div class="past-form hidden" id="pastForm">
+          <h3 id="pastTitle">Add a past week</h3>
+          <p class="helper">Enter each record as wins, losses, and pushes. You don't need the individual picks. The 1/2 picks row fills itself in (Entry 1 + Entry 2 − 2 × the 2/2 picks), and you can overwrite it.</p>
+          <label class="past-week">Week <input type="number" id="pastWeek" min="0" max="30" inputmode="numeric" aria-label="Week number"></label>
+          <div class="past-row"><div class="row-label">Entry 1</div><div class="wlp"><label><span>W</span><input type="number" class="past-input" id="past-e1-W" data-row="e1" data-col="W" min="0" max="14" inputmode="numeric" placeholder="0" aria-label="Entry 1 wins"></label><label><span>L</span><input type="number" class="past-input" id="past-e1-L" data-row="e1" data-col="L" min="0" max="14" inputmode="numeric" placeholder="0" aria-label="Entry 1 losses"></label><label><span>P</span><input type="number" class="past-input" id="past-e1-P" data-row="e1" data-col="P" min="0" max="14" inputmode="numeric" placeholder="0" aria-label="Entry 1 pushes"></label></div></div>
+          <div class="past-row"><div class="row-label">Entry 2</div><div class="wlp"><label><span>W</span><input type="number" class="past-input" id="past-e2-W" data-row="e2" data-col="W" min="0" max="14" inputmode="numeric" placeholder="0" aria-label="Entry 2 wins"></label><label><span>L</span><input type="number" class="past-input" id="past-e2-L" data-row="e2" data-col="L" min="0" max="14" inputmode="numeric" placeholder="0" aria-label="Entry 2 losses"></label><label><span>P</span><input type="number" class="past-input" id="past-e2-P" data-row="e2" data-col="P" min="0" max="14" inputmode="numeric" placeholder="0" aria-label="Entry 2 pushes"></label></div></div>
+          <div class="past-row"><div class="row-label">2/2 picks<small>in both entries</small></div><div class="wlp"><label><span>W</span><input type="number" class="past-input" id="past-shared-W" data-row="shared" data-col="W" min="0" max="14" inputmode="numeric" placeholder="0" aria-label="2/2 picks wins"></label><label><span>L</span><input type="number" class="past-input" id="past-shared-L" data-row="shared" data-col="L" min="0" max="14" inputmode="numeric" placeholder="0" aria-label="2/2 picks losses"></label><label><span>P</span><input type="number" class="past-input" id="past-shared-P" data-row="shared" data-col="P" min="0" max="14" inputmode="numeric" placeholder="0" aria-label="2/2 picks pushes"></label></div></div>
+          <div class="past-row"><div class="row-label">1/2 picks<small>in one entry only</small></div><div class="wlp"><label><span>W</span><input type="number" class="past-input" id="past-singles-W" data-row="singles" data-col="W" min="0" max="14" inputmode="numeric" placeholder="0" aria-label="1/2 picks wins"></label><label><span>L</span><input type="number" class="past-input" id="past-singles-L" data-row="singles" data-col="L" min="0" max="14" inputmode="numeric" placeholder="0" aria-label="1/2 picks losses"></label><label><span>P</span><input type="number" class="past-input" id="past-singles-P" data-row="singles" data-col="P" min="0" max="14" inputmode="numeric" placeholder="0" aria-label="1/2 picks pushes"></label></div></div>
+          <div class="past-check" id="pastCheck" aria-live="polite"></div>
+          <div class="past-error" id="pastError" role="alert"></div>
+          <div class="modal-actions">
+            <button class="btn primary" id="pastSaveBtn" type="button">Save week</button>
+            <button class="btn" id="pastCancelBtn" type="button">Cancel</button>
+          </div>
+        </div>
         <div id="historySummary"></div>
         <div id="historyList"></div>
-        <div class="empty-state" id="historyEmpty"><strong>No saved weeks yet</strong><span>Build your two entries, then tap "Save this week."</span></div>
+        <div class="empty-state" id="historyEmpty"><strong>No saved weeks yet</strong><span>Build your two entries and tap "Save this week," or add a past week above.</span></div>
         <div class="modal-actions" id="historyClearRow" hidden>
           <button class="btn danger" id="clearHistoryBtn" type="button">Clear all saved weeks</button>
         </div>
@@ -740,8 +990,12 @@
         saveWeek: $('#saveWeekBtn'), historyBtn: $('#historyBtn'), historyOverlay: $('#historyOverlay'),
         undo: $('#undoBtn'), historySummary: $('#historySummary'), syncStatus: $('#syncStatus'),
         mix: { 1: $('#entry1Mix'), 2: $('#entry2Mix') },
+        benched: $('#benchedBox'), benchedList: $('#benchedList'), benchedCount: $('#benchedCount'),
+        expandAll: $('#expandAllBtn'), help: $('#helpBtn'), helpOverlay: $('#helpOverlay'), helpClose: $('#helpCloseBtn'),
         historyClose: $('#historyCloseBtn'), historyList: $('#historyList'), historyEmpty: $('#historyEmpty'),
-        historyClearRow: $('#historyClearRow'), clearHistory: $('#clearHistoryBtn')
+        historyClearRow: $('#historyClearRow'), clearHistory: $('#clearHistoryBtn'),
+        addPastWeek: $('#addPastWeekBtn'), pastForm: $('#pastForm'), pastTitle: $('#pastTitle'), pastWeek: $('#pastWeek'),
+        pastCheck: $('#pastCheck'), pastError: $('#pastError'), pastSave: $('#pastSaveBtn'), pastCancel: $('#pastCancelBtn')
       };
 
       let state = { teams: [], overlap: 3, result: null, history: [] };
@@ -952,7 +1206,7 @@
 
       // Shared by restore() (reading localStorage) and importSetup() (reading a pasted/uploaded
       // setup code), so both paths validate and migrate data identically.
-      const MAX_HISTORY = 30;
+      const MAX_HISTORY = 60;
 
       const validIso = value => typeof value === 'string' && !isNaN(Date.parse(value));
 
@@ -979,6 +1233,18 @@
                 if ([0, 1, 2, 3].includes(t)) tiers[name] = t;
               });
             }
+            // manual: a week entered by hand as records only — { week, e1, e2, shared, singles },
+            // each [wins, losses, pushes] — for weeks whose individual picks weren't saved here.
+            let manual = null;
+            if (entry.manual && typeof entry.manual === 'object') {
+              const record = value => [0, 1, 2].map(i => Math.max(0, Math.min(14, parseInt(Array.isArray(value) ? value[i] : 0, 10) || 0)));
+              const week = parseInt(entry.manual.week, 10);
+              manual = {
+                week: Number.isFinite(week) ? Math.max(0, Math.min(30, week)) : 0,
+                e1: record(entry.manual.e1), e2: record(entry.manual.e2),
+                shared: record(entry.manual.shared), singles: record(entry.manual.singles)
+              };
+            }
             return {
               id: String(entry.id || uid()),
               savedAt: savedAt,
@@ -987,7 +1253,8 @@
               entry1: entry.entry1.map(String).slice(0, 7),
               entry2: entry.entry2.map(String).slice(0, 7),
               results: results,
-              tiers: tiers
+              tiers: tiers,
+              manual: manual
             };
           });
       }
@@ -1062,13 +1329,30 @@
         state.history = mergeHistory(state.history, sanitized.history);
         save();
         renderAll();
-        els.transferOverlay.classList.add('hidden');
+        closeOverlay(els.transferOverlay);
         setStatus('Setup loaded', 'Teams, exposure, locks, confidence order, and the latest build were loaded from the code.', 'success');
       }
 
-      function setStatus(title, detail, type = '') {
+      // Pop-ups: focus moves inside when one opens, returns to the button that opened it when it
+      // closes, and Tab / Shift+Tab cycle within it instead of wandering into the page behind.
+      let overlayOpener = null;
+      function openOverlay(overlay) {
+        overlayOpener = document.activeElement;
+        overlay.classList.remove('hidden');
+        const first = overlay.querySelector('.modal-head .btn');
+        if (first) first.focus();
+      }
+      function closeOverlay(overlay) {
+        if (overlay.classList.contains('hidden')) return;
+        overlay.classList.add('hidden');
+        if (overlayOpener && document.contains(overlayOpener)) overlayOpener.focus();
+        overlayOpener = null;
+      }
+
+      function setStatus(title, detail, type = '', action = null) {
         els.status.className = 'status' + (type ? ' ' + type : '');
-        els.status.innerHTML = '<strong>' + escapeHtml(title) + '</strong><span>' + escapeHtml(detail) + '</span>';
+        els.status.innerHTML = '<strong>' + escapeHtml(title) + '</strong><span>' + escapeHtml(detail) + '</span>' +
+          (action ? '<div><button type="button" class="status-action" data-fix="' + action.fix + '" data-value="' + action.value + '">' + escapeHtml(action.label) + '</button></div>' : '');
       }
 
       function parseInput() {
@@ -1114,7 +1398,7 @@
         if (state.teams.length < 7) return { ok: false, title: 'Add more teams', detail: 'You need at least 7 candidate teams.' };
         const uniqueRequired = 14 - state.overlap;
         const usable = state.teams.filter(team => team.max > 0).length;
-        if (usable < uniqueRequired) return { ok: false, title: 'Not enough usable teams', detail: 'A ' + state.overlap + '-pick overlap requires at least ' + uniqueRequired + ' teams with Max above 0.' };
+        if (usable < uniqueRequired) return { ok: false, title: 'Not enough usable teams', detail: 'A ' + state.overlap + '-pick overlap needs at least ' + uniqueRequired + ' teams with Max above 0, and you have ' + usable + '.' };
 
         let fixed1 = 0, fixed2 = 0, fixedBoth = 0;
         for (const team of state.teams) {
@@ -1127,6 +1411,25 @@
         if (fixed1 > 7 || fixed2 > 7) return { ok: false, title: 'Too many fixed picks', detail: 'An entry cannot contain more than 7 fixed teams.' };
         if (fixedBoth > state.overlap) return { ok: false, title: 'Too many teams locked in both', detail: fixedBoth + ' teams are locked in both entries, above your shared-pick target of ' + state.overlap + '.' };
         return { ok: true };
+      }
+
+      // When the setup is unbuildable only because the overlap is too low for the pool (or fewer
+      // than the locked-in-both count), find the smallest higher overlap that works, so the
+      // message can offer a one-tap fix instead of leaving you to work it out.
+      function findOverlapFix() {
+        const original = state.overlap;
+        for (let n = original + 1; n <= 7; n++) {
+          state.overlap = n;
+          const ok = validate().ok;
+          state.overlap = original;
+          if (ok) return n;
+        }
+        return null;
+      }
+      function validationAction(check) {
+        if (check.ok || (check.title !== 'Not enough usable teams' && check.title !== 'Too many teams locked in both')) return null;
+        const n = findOverlapFix();
+        return n === null ? null : { fix: 'overlap', value: n, label: 'Set overlap to ' + n };
       }
 
       function loadTeams() {
@@ -1150,15 +1453,8 @@
         const fixedExposure = popcount(team.fixedMask);
         return [0, 1, 2].map(value => {
           const disabled = team.fixedMask && ((field === 'min' && value > fixedExposure) || (field === 'max' && value < fixedExposure));
-          return '<button type="button" class="choice-btn exposure-btn ' + (team[field] === value ? 'active' : '') + '" data-field="' + field + '" data-value="' + value + '" data-team-id="' + escapeHtml(team.id) + '"' + (disabled ? ' disabled' : '') + ' aria-label="Set ' + field + 'imum exposure for ' + escapeHtml(team.name) + ' to ' + value + '">' + value + '</button>';
+          return '<button type="button" class="choice-btn exposure-btn ' + (team[field] === value ? 'active' : '') + '" data-field="' + field + '" data-value="' + value + '" data-team-id="' + escapeHtml(team.id) + '"' + (disabled ? ' disabled' : '') + ' aria-pressed="' + (team[field] === value) + '" aria-label="Set ' + field + 'imum exposure for ' + escapeHtml(team.name) + ' to ' + value + '">' + value + '</button>';
         }).join('');
-      }
-
-      function placementText(mask) {
-        if (mask === 1) return 'Fixed: Splash 1';
-        if (mask === 2) return 'Fixed: Splash 2';
-        if (mask === 3) return 'Locked in both entries';
-        return 'Tap S1/S2/Lock both to place';
       }
 
       const TIER_LABELS = ['Lock', 'Strong', 'Lean', 'Meh'];
@@ -1201,10 +1497,11 @@
         const rowsHtml = [];
         groups.forEach((group, tierIdx) => {
           if (!group.length) return;
-          rowsHtml.push('<div class="tier-divider tier-' + tierIdx + '"><span>' + TIER_LABELS[tierIdx] + '</span></div>');
+          rowsHtml.push('<div class="tier-divider tier-' + tierIdx + '" role="heading" aria-level="3"><span>' + TIER_LABELS[tierIdx] + '</span></div>');
           group.forEach((team, i) => {
+            const expanded = expandedRows.has(team.id);
             rowsHtml.push(
-              '<div class="team-row" draggable="true" data-team-id="' + escapeHtml(team.id) + '" data-source-entry="0" data-tier="' + team.tier + '">' +
+              '<div class="team-row' + (expanded ? ' expanded' : '') + '" draggable="true" data-team-id="' + escapeHtml(team.id) + '" data-source-entry="0" data-tier="' + team.tier + '">' +
                 '<div class="team-name-wrap">' +
                   '<div class="team-top-row">' +
                     '<div class="team-name" title="' + escapeHtml(team.name) + '">' + nameHtml(team.name) + '</div>' +
@@ -1213,23 +1510,61 @@
                       '<button type="button" class="rank-btn" data-dir="down" data-team-id="' + escapeHtml(team.id) + '"' + (i === group.length - 1 ? ' disabled' : '') + ' aria-label="Move ' + escapeHtml(team.name) + ' later within its tier" title="Move down within tier">▼</button>' +
                     '</div>' +
                   '</div>' +
-                  '<div class="lock-line ' + (team.fixedMask ? 'active' : '') + '">' + placementText(team.fixedMask) + '</div>' +
+                  '<div class="row-summary">' + escapeHtml(rowSummary(team)) + '</div>' +
                 '</div>' +
+                '<div class="row-details">' +
                 '<div class="setting-group"><span class="field-label">Min</span><div class="segmented">' + exposureButtons(team, 'min') + '</div></div>' +
                 '<div class="setting-group"><span class="field-label">Max</span><div class="segmented">' + exposureButtons(team, 'max') + '</div></div>' +
                 '<div class="placement-group"><span class="field-label">Place</span><div class="placement-buttons">' +
-                  '<button type="button" class="choice-btn place-btn ' + (team.fixedMask === 1 ? 'active' : '') + '" data-mask="1" data-team-id="' + escapeHtml(team.id) + '">S1</button>' +
-                  '<button type="button" class="choice-btn place-btn ' + (team.fixedMask === 2 ? 'active' : '') + '" data-mask="2" data-team-id="' + escapeHtml(team.id) + '">S2</button>' +
-                  '<button type="button" class="choice-btn place-btn both ' + (team.fixedMask === 3 ? 'active' : '') + '" data-mask="3" data-team-id="' + escapeHtml(team.id) + '" aria-label="Lock ' + escapeHtml(team.name) + ' in both entries" title="Lock in both entries">🔒</button>' +
+                  '<button type="button" class="choice-btn place-btn ' + (team.fixedMask === 1 ? 'active' : '') + '" data-mask="1" data-team-id="' + escapeHtml(team.id) + '" aria-pressed="' + (team.fixedMask === 1) + '" aria-label="Put ' + escapeHtml(team.name) + ' in Entry 1 only">S1</button>' +
+                  '<button type="button" class="choice-btn place-btn ' + (team.fixedMask === 2 ? 'active' : '') + '" data-mask="2" data-team-id="' + escapeHtml(team.id) + '" aria-pressed="' + (team.fixedMask === 2) + '" aria-label="Put ' + escapeHtml(team.name) + ' in Entry 2 only">S2</button>' +
+                  '<button type="button" class="choice-btn place-btn both ' + (team.fixedMask === 3 ? 'active' : '') + '" data-mask="3" data-team-id="' + escapeHtml(team.id) + '" aria-pressed="' + (team.fixedMask === 3) + '" aria-label="Lock ' + escapeHtml(team.name) + ' in both entries" title="Lock in both entries">🔒</button>' +
                 '</div></div>' +
+                '</div>' +
                 '<label class="tier-group"><span class="field-label">Tier</span><select class="tier-select tier-' + team.tier + '" data-team-id="' + escapeHtml(team.id) + '" aria-label="Tier for ' + escapeHtml(team.name) + '">' +
                   TIER_LABELS.map((label, t) => '<option value="' + t + '"' + (t === team.tier ? ' selected' : '') + '>' + label + '</option>').join('') +
                 '</select></label>' +
+                '<button type="button" class="row-toggle" data-team-id="' + escapeHtml(team.id) + '" aria-expanded="' + expanded + '" aria-label="' + (expanded ? 'Hide' : 'Show') + ' settings for ' + escapeHtml(team.name) + '">' + (expanded ? 'Done' : 'Edit') + '</button>' +
                 '</div>'
             );
           });
         });
         els.candidateList.innerHTML = rowsHtml.join('');
+        syncExpandAll();
+      }
+
+      // Which candidate rows are open on phones. Kept here (not in the DOM) because the list is
+      // rebuilt after every change and the row you're editing must stay open.
+      const expandedRows = new Set();
+
+      function rowSummary(team) {
+        const parts = [];
+        if (team.fixedMask === 1) parts.push('In Entry 1');
+        else if (team.fixedMask === 2) parts.push('In Entry 2');
+        else if (team.fixedMask === 3) parts.push('Locked in both');
+        else {
+          if (team.min > 0) parts.push('Min ' + team.min);
+          if (team.max < 2) parts.push('Max ' + team.max);
+        }
+        return parts.join(' \u00b7 ');
+      }
+
+      function setRowExpanded(row, open) {
+        const id = row.dataset.teamId;
+        if (open) expandedRows.add(id); else expandedRows.delete(id);
+        row.classList.toggle('expanded', open);
+        const button = row.querySelector('.row-toggle');
+        const name = row.querySelector('.team-name').title;
+        button.setAttribute('aria-expanded', String(open));
+        button.setAttribute('aria-label', (open ? 'Hide' : 'Show') + ' settings for ' + name);
+        button.textContent = open ? 'Done' : 'Edit';
+      }
+
+      function syncExpandAll() {
+        const rows = els.candidateList.querySelectorAll('.team-row');
+        const allOpen = rows.length > 0 && Array.from(rows).every(row => row.classList.contains('expanded'));
+        els.expandAll.textContent = allOpen ? 'Collapse all' : 'Expand all';
+        els.expandAll.classList.toggle('hidden', rows.length === 0);
       }
 
       function setTier(teamId, tier) {
@@ -1303,13 +1638,13 @@
               const cardClasses = ['pick-card', item.locked ? 'locked' : '', shared ? 'shared' : ''].filter(Boolean).join(' ');
               const actions = [];
               if (both) {
-                actions.push('<button type="button" class="pick-action-btn unlock" data-action="unlock" data-team-id="' + escapeHtml(item.team.id) + '">Unlock both</button>');
+                actions.push('<button type="button" class="pick-action-btn unlock" data-action="unlock" data-team-id="' + escapeHtml(item.team.id) + '" aria-label="Unlock ' + escapeHtml(item.team.name) + ' from both entries">Unlock both</button>');
               } else if (!shared) {
                 // Lets you move a pick to the other entry right from this view — no drag needed,
                 // and no trip back up to the candidate list's S1/S2 buttons required either.
                 actions.push('<button type="button" class="pick-action-btn move" data-action="move" data-target-entry="' + otherEntry + '" data-team-id="' + escapeHtml(item.team.id) + '" aria-label="Move ' + escapeHtml(item.team.name) + ' to Entry ' + otherEntry + '">Move to ' + otherEntry + '</button>');
                 if (item.locked) {
-                  actions.push('<button type="button" class="pick-action-btn unlock" data-action="unlock" data-team-id="' + escapeHtml(item.team.id) + '">Unlock</button>');
+                  actions.push('<button type="button" class="pick-action-btn unlock" data-action="unlock" data-team-id="' + escapeHtml(item.team.id) + '" aria-label="Unlock ' + escapeHtml(item.team.name) + '">Unlock</button>');
                 }
               }
               return '<div class="' + cardClasses + '" draggable="true" data-team-id="' + escapeHtml(item.team.id) + '" data-source-entry="' + entry + '">' +
@@ -1325,12 +1660,30 @@
           els.copy[entry].disabled = picks.length !== 7;
         });
         els.saveWeek.disabled = picksForEntry(1).length !== 7 || picksForEntry(2).length !== 7;
+        renderBenched();
+      }
+
+      // Teams left out of both entries after a build, so you can confirm the tiers did what you
+      // expected without scanning the whole candidate list.
+      function renderBenched() {
+        if (!state.result) return els.benched.classList.add('hidden');
+        const used = new Set(picksForEntry(1).concat(picksForEntry(2)).map(item => item.team.id));
+        const benched = state.teams.filter(team => !used.has(team.id))
+          .sort((a, b) => a.tier - b.tier || state.teams.indexOf(a) - state.teams.indexOf(b));
+        els.benched.classList.toggle('hidden', benched.length === 0);
+        if (!benched.length) return;
+        els.benchedCount.textContent = benched.length + (benched.length === 1 ? ' team' : ' teams');
+        els.benchedList.innerHTML = benched.map(team =>
+          '<span class="bench-chip tier-' + team.tier + '" title="' + escapeHtml(team.name + ' \u2014 ' + TIER_LABELS[team.tier] + (team.max === 0 ? ', Max 0' : '')) + '">' +
+            '<span class="bench-tier">' + TIER_LABELS[team.tier] + '</span>' + nameHtml(team.name) +
+            (team.max === 0 ? '<span class="bench-note">Max 0</span>' : '') + '</span>'
+        ).join('');
       }
 
       function renderButtons() {
         const check = validate();
         els.build.disabled = !check.ok;
-        if (!check.ok && state.teams.length) setStatus(check.title, check.detail, 'error');
+        if (!check.ok && state.teams.length) setStatus(check.title, check.detail, 'error', validationAction(check));
       }
 
       function formatSavedAt(iso) {
@@ -1354,35 +1707,65 @@
         return t.W + t.L ? Math.round(100 * t.W / (t.W + t.L)) + '%' : '\u2014';
       }
 
+      const toTally = record => ({ W: record[0], L: record[1], P: record[2] });
+      const addTally = (target, t) => { target.W += t.W; target.L += t.L; target.P += t.P; };
+      const tallyTotal = t => t.W + t.L + t.P;
+      const newTally = () => ({ W: 0, L: 0, P: 0 });
+
+      // The newest week saved from a real build (weeks entered by hand have no picks to compare).
+      function latestTrackedWeek() {
+        return state.history.find(week => !week.manual) || null;
+      }
+
+      // Records for one week, the same four ways whether its picks were tracked here or the
+      // week was entered by hand: each entry, the 2/2 picks (in both entries, counted once), and
+      // the 1/2 picks (in just one entry).
+      function weekStats(week) {
+        if (week.manual) {
+          return { e1: toTally(week.manual.e1), e2: toTally(week.manual.e2), shared: toTally(week.manual.shared), singles: toTally(week.manual.singles) };
+        }
+        const in1 = new Set(week.entry1), in2 = new Set(week.entry2);
+        return {
+          e1: tally(week.entry1, week.results),
+          e2: tally(week.entry2, week.results),
+          shared: tally(week.entry1.filter(name => in2.has(name)), week.results),
+          singles: tally(week.entry1.filter(name => !in2.has(name)).concat(week.entry2.filter(name => !in1.has(name))), week.results)
+        };
+      }
+
       function renderSeasonSummary() {
-        const season = { e1: { W: 0, L: 0, P: 0 }, e2: { W: 0, L: 0, P: 0 }, all: { W: 0, L: 0, P: 0 } };
-        const byTier = [0, 1, 2, 3].map(() => ({ W: 0, L: 0, P: 0 }));
-        let graded = 0;
+        const season = { e1: newTally(), e2: newTally(), shared: newTally(), singles: newTally(), all: newTally() };
+        const byTier = [0, 1, 2, 3].map(newTally);
+        let weeks = 0, handEntered = 0;
         state.history.forEach(week => {
-          const add = (target, t) => { target.W += t.W; target.L += t.L; target.P += t.P; };
-          add(season.e1, tally(week.entry1, week.results));
-          add(season.e2, tally(week.entry2, week.results));
-          // Each team counted once per week for the overall and by-tier numbers, even if shared.
-          const unique = Array.from(new Set(week.entry1.concat(week.entry2)));
-          add(season.all, tally(unique, week.results));
-          unique.forEach(name => {
+          const stats = weekStats(week);
+          if (![stats.e1, stats.e2, stats.shared, stats.singles].some(t => tallyTotal(t) > 0)) return;
+          weeks++;
+          addTally(season.e1, stats.e1);
+          addTally(season.e2, stats.e2);
+          addTally(season.shared, stats.shared);
+          addTally(season.singles, stats.singles);
+          // Each team once per week: the 2/2 picks plus the 1/2 picks.
+          addTally(season.all, stats.shared);
+          addTally(season.all, stats.singles);
+          if (week.manual) { handEntered++; return; }
+          Array.from(new Set(week.entry1.concat(week.entry2))).forEach(name => {
             const g = week.results[name];
-            if (!g) return;
-            graded++;
-            if (week.tiers && week.tiers[name] !== undefined) byTier[week.tiers[name]][g]++;
+            if (g && week.tiers && week.tiers[name] !== undefined) byTier[week.tiers[name]][g]++;
           });
         });
-        if (!graded) { els.historySummary.innerHTML = ''; return; }
-        const tierChips = byTier.map((t, i) => (t.W + t.L + t.P)
+        if (!weeks) { els.historySummary.innerHTML = ''; return; }
+        const tierChips = byTier.map((t, i) => tallyTotal(t)
           ? '<span class="tier-chip tier-' + i + '">' + TIER_LABELS[i] + ' ' + recordText(t) + ' \u00b7 ' + winPct(t) + '</span>' : '').join('');
+        const cell = (label, t) => '<div><span>' + label + '</span><strong>' + recordText(t) + '</strong><em>' + winPct(t) + '</em></div>';
         els.historySummary.innerHTML =
           '<div class="history-summary">' +
             '<div class="summary-stats">' +
-              '<div><span>Entry 1</span><strong>' + recordText(season.e1) + '</strong><em>' + winPct(season.e1) + '</em></div>' +
-              '<div><span>Entry 2</span><strong>' + recordText(season.e2) + '</strong><em>' + winPct(season.e2) + '</em></div>' +
-              '<div><span>All picks</span><strong>' + recordText(season.all) + '</strong><em>' + winPct(season.all) + '</em></div>' +
+              cell('Entry 1', season.e1) + cell('Entry 2', season.e2) + cell('All picks', season.all) +
+              cell('2/2 picks', season.shared) + cell('1/2 picks', season.singles) +
+              '<div><span>Weeks</span><strong>' + weeks + '</strong></div>' +
             '</div>' +
-            (tierChips ? '<div class="summary-tiers"><span>By tier</span>' + tierChips + '</div>' : '') +
+            (tierChips ? '<div class="summary-tiers"><span>By tier' + (handEntered ? ' (saved builds only)' : '') + '</span>' + tierChips + '</div>' : '') +
           '</div>';
       }
 
@@ -1396,21 +1779,123 @@
           return '<li><span class="h-pick"><span class="h-name" title="' + escapeHtml(name) + '">' + nameHtml(name) + '</span>' +
             '<button type="button" class="grade-btn' + (g ? ' grade-' + g : '') + '" data-history-id="' + escapeHtml(entry.id) + '" data-team="' + escapeHtml(name) + '" aria-label="Grade ' + escapeHtml(name) + ' (currently ' + (g ? GRADE_LABEL[g] : 'ungraded') + ')">' + (g ? GRADE_LABEL[g] : '\u2013') + '</button></span></li>';
         }).join('') + '</ol>';
-        els.historyList.innerHTML = entries.map(entry => {
-          const t1 = tally(entry.entry1, entry.results), t2 = tally(entry.entry2, entry.results);
-          const rec = t => (t.W + t.L + t.P) ? ' <span class="h-record">' + recordText(t) + '</span>' : '';
+        const trackedCard = entry => {
+          const stats = weekStats(entry);
+          const rec = t => tallyTotal(t) ? ' <span class="h-record">' + recordText(t) + '</span>' : '';
+          const mix = tallyTotal(stats.shared) + tallyTotal(stats.singles)
+            ? '<div class="history-mix">2/2 picks ' + recordText(stats.shared) + ' \u00b7 1/2 picks ' + recordText(stats.singles) + '</div>' : '';
           return '<div class="history-entry" data-history-id="' + escapeHtml(entry.id) + '">' +
-            '<div class="history-head"><strong>' + escapeHtml(formatSavedAt(entry.savedAt)) + '</strong><span>Shared ' + entry.overlap + '</span></div>' +
+            '<div class="history-head"><strong>' + escapeHtml(formatSavedAt(entry.savedAt)) + '</strong><span>Shared ' + entry.overlap + '</span></div>' + mix +
             '<div class="history-columns">' +
-              '<div><h4>Splash Entry 1' + rec(t1) + '</h4>' + pickList(entry, entry.entry1) + '</div>' +
-              '<div><h4>Splash Entry 2' + rec(t2) + '</h4>' + pickList(entry, entry.entry2) + '</div>' +
+              '<div><h4>Splash Entry 1' + rec(stats.e1) + '</h4>' + pickList(entry, entry.entry1) + '</div>' +
+              '<div><h4>Splash Entry 2' + rec(stats.e2) + '</h4>' + pickList(entry, entry.entry2) + '</div>' +
             '</div>' +
             '<div class="history-actions">' +
               '<button type="button" class="btn history-copy-btn" data-history-id="' + escapeHtml(entry.id) + '">Copy</button>' +
               '<button type="button" class="btn danger history-delete-btn" data-history-id="' + escapeHtml(entry.id) + '">Delete</button>' +
             '</div>' +
           '</div>';
-        }).join('');
+        };
+        const manualCard = entry => {
+          const m = entry.manual;
+          const cell = (label, record) => '<div><span>' + label + '</span><strong>' + recordText(toTally(record)) + '</strong><em>' + winPct(toTally(record)) + '</em></div>';
+          return '<div class="history-entry manual" data-history-id="' + escapeHtml(entry.id) + '">' +
+            '<div class="history-head"><strong>Week ' + m.week + '</strong><span>Entered by hand</span></div>' +
+            '<div class="manual-grid">' + cell('Entry 1', m.e1) + cell('Entry 2', m.e2) + cell('2/2 picks', m.shared) + cell('1/2 picks', m.singles) + '</div>' +
+            '<div class="history-actions">' +
+              '<button type="button" class="btn history-edit-btn" data-history-id="' + escapeHtml(entry.id) + '">Edit</button>' +
+              '<button type="button" class="btn danger history-delete-btn" data-history-id="' + escapeHtml(entry.id) + '">Delete</button>' +
+            '</div>' +
+          '</div>';
+        };
+        const tracked = entries.filter(entry => !entry.manual);
+        const manual = entries.filter(entry => entry.manual).sort((a, b) => b.manual.week - a.manual.week);
+        els.historyList.innerHTML =
+          (tracked.length && manual.length ? '<h3 class="history-section">Saved builds</h3>' : '') +
+          tracked.map(trackedCard).join('') +
+          (manual.length ? '<h3 class="history-section">Weeks entered by hand</h3>' : '') +
+          manual.map(manualCard).join('');
+      }
+
+      // --- Adding a past week by hand ---
+      // Entry 1 + Entry 2 always equals 2 x (2/2 picks) + (1/2 picks), since each 2/2 pick sits in
+      // both entries and each 1/2 pick in one. That lets the form fill in the 1/2 row and flag
+      // numbers that can't all be right.
+      const PAST_COLS = ['W', 'L', 'P'];
+      let pastEditingId = null;
+      let pastSinglesEdited = false;
+
+      const pastInput = (row, col) => document.getElementById('past-' + row + '-' + col);
+      function readPast() {
+        const record = row => PAST_COLS.map(col => Math.max(0, Math.min(14, parseInt(pastInput(row, col).value, 10) || 0)));
+        return { week: parseInt(els.pastWeek.value, 10), e1: record('e1'), e2: record('e2'), shared: record('shared'), singles: record('singles') };
+      }
+      function writePast(row, record) {
+        PAST_COLS.forEach((col, i) => { pastInput(row, col).value = record ? String(record[i]) : ''; });
+      }
+      function pastFillSingles() {
+        const v = readPast();
+        writePast('singles', [0, 1, 2].map(i => Math.max(0, v.e1[i] + v.e2[i] - 2 * v.shared[i])));
+      }
+      function pastCheck() {
+        const v = readPast();
+        const total = record => record[0] + record[1] + record[2];
+        const anything = [v.e1, v.e2, v.shared, v.singles].some(record => total(record) > 0);
+        const warnings = [];
+        ['wins', 'losses', 'pushes'].forEach((word, i) => {
+          const entries = v.e1[i] + v.e2[i], picks = 2 * v.shared[i] + v.singles[i];
+          if (entries !== picks) warnings.push(word + ' don\u2019t add up: Entry 1 + Entry 2 = ' + entries + ', but 2 \u00d7 (2/2 picks) + (1/2 picks) = ' + picks);
+        });
+        if (total(v.e1) > 7) warnings.push('Entry 1 adds up to ' + total(v.e1) + ' picks, but an entry has 7');
+        if (total(v.e2) > 7) warnings.push('Entry 2 adds up to ' + total(v.e2) + ' picks, but an entry has 7');
+        if (!anything) { els.pastCheck.textContent = ''; els.pastCheck.className = 'past-check'; return; }
+        if (warnings.length) {
+          els.pastCheck.className = 'past-check warn';
+          els.pastCheck.textContent = warnings.join('. ') + '. You can still save it, but your season totals may be off.';
+        } else {
+          els.pastCheck.className = 'past-check ok';
+          els.pastCheck.textContent = '\u2713 Adds up: Entry 1 + Entry 2 = 2 \u00d7 (2/2 picks) + (1/2 picks).';
+        }
+      }
+      function openPastForm(entry) {
+        pastEditingId = entry ? entry.id : null;
+        els.pastTitle.textContent = entry ? 'Edit Week ' + entry.manual.week : 'Add a past week';
+        const highest = state.history.reduce((max, week) => week.manual ? Math.max(max, week.manual.week) : max, 0);
+        els.pastWeek.value = entry ? String(entry.manual.week) : String(highest + 1);
+        ['e1', 'e2', 'shared', 'singles'].forEach(row => writePast(row, entry ? entry.manual[row] : null));
+        pastSinglesEdited = Boolean(entry);
+        els.pastError.textContent = '';
+        pastCheck();
+        els.pastForm.classList.remove('hidden');
+        if (els.pastForm.scrollIntoView) els.pastForm.scrollIntoView({ block: 'nearest' });
+        els.pastWeek.focus();
+      }
+      function closePastForm() {
+        els.pastForm.classList.add('hidden');
+        pastEditingId = null;
+        els.addPastWeek.focus();
+      }
+      function savePastWeek() {
+        const v = readPast();
+        const fail = message => { els.pastError.textContent = message; };
+        if (!Number.isInteger(v.week) || v.week < 0 || v.week > 30) return fail('Enter the week number (0 to 30).');
+        if (![v.e1, v.e2, v.shared, v.singles].some(record => record.some(n => n > 0))) return fail('Enter at least one record.');
+        if (state.history.some(week => week.manual && week.manual.week === v.week && week.id !== pastEditingId)) {
+          return fail('Week ' + v.week + ' already has a record. Use Edit on that one instead.');
+        }
+        const manual = { week: v.week, e1: v.e1, e2: v.e2, shared: v.shared, singles: v.singles };
+        const now = new Date().toISOString();
+        const existing = pastEditingId && state.history.find(week => week.id === pastEditingId);
+        if (existing) {
+          existing.manual = manual;
+          existing.updatedAt = now;
+        } else {
+          state.history = mergeHistory(state.history, [{ id: uid(), savedAt: now, updatedAt: now, overlap: 0, entry1: [], entry2: [], results: {}, tiers: null, manual: manual }]);
+        }
+        save();
+        closePastForm();
+        renderHistory();
+        setStatus('Week ' + v.week + ' saved', 'Added to your saved weeks and season record.', 'success');
       }
 
       function gradePick(id, name) {
@@ -1431,7 +1916,7 @@
         if (entry1.length !== 7 || entry2.length !== 7) {
           return setStatus('Nothing to save yet', 'Build both entries to 7 picks first.', 'error');
         }
-        const last = state.history[0];
+        const last = latestTrackedWeek();
         if (last && JSON.stringify(last.entry1) === JSON.stringify(entry1) && JSON.stringify(last.entry2) === JSON.stringify(entry2)) {
           return setStatus('Already saved', 'This exact build is already your most recent saved week.', 'error');
         }
@@ -1624,9 +2109,14 @@
       function applyMutation(change, detail) {
         const before = clone(state);
         const preferred = state.result ? clone(state.result) : null;
+        const wasValid = validate();
         change();
         const validation = validate();
-        if (!validation.ok) {
+        // A setup that's already unbuildable for one reason (too few teams for the overlap, say)
+        // shouldn't refuse every unrelated edit, like setting a tier. Only a change that
+        // introduces a *different* problem is rolled back.
+        const newProblem = !validation.ok && (wasValid.ok || wasValid.title !== validation.title);
+        if (newProblem) {
           state = before;
           renderAll();
           setStatus(validation.title, validation.detail, 'error');
@@ -1647,7 +2137,7 @@
           renderCandidates();
           renderEntries();
           renderButtons();
-          setStatus('Placement updated', detail);
+          if (validation.ok) setStatus('Placement updated', detail);
         }
         return true;
       }
@@ -1724,6 +2214,18 @@
         if (placement) return setPlacement(placement.dataset.teamId, Number(placement.dataset.mask));
         const rank = event.target.closest('.rank-btn');
         if (rank && !rank.disabled) return moveRank(rank.dataset.teamId, rank.dataset.dir);
+        const toggle = event.target.closest('.row-toggle');
+        if (toggle) {
+          const row = toggle.closest('.team-row');
+          setRowExpanded(row, !row.classList.contains('expanded'));
+          syncExpandAll();
+        }
+      });
+      els.expandAll.addEventListener('click', () => {
+        const rows = Array.from(els.candidateList.querySelectorAll('.team-row'));
+        const open = !rows.every(row => row.classList.contains('expanded'));
+        rows.forEach(row => setRowExpanded(row, open));
+        syncExpandAll();
       });
       els.candidateList.addEventListener('change', event => {
         const select = event.target.closest('.tier-select');
@@ -1815,7 +2317,7 @@
       els.reset.addEventListener('click', () => {
         const entry1 = picksForEntry(1).map(item => item.team.name);
         const entry2 = picksForEntry(2).map(item => item.team.name);
-        const last = state.history[0];
+        const last = latestTrackedWeek();
         const unsaved = entry1.length === 7 && entry2.length === 7 &&
           !(last && JSON.stringify(last.entry1) === JSON.stringify(entry1) && JSON.stringify(last.entry2) === JSON.stringify(entry2));
         const message = 'Start a new week? This clears your teams, tiers, exposure, locks, and current build on both devices. Your overlap setting and saved weeks are kept.' +
@@ -1832,11 +2334,11 @@
       els.transferBtn.addEventListener('click', () => {
         els.transferOut.value = JSON.stringify(state);
         els.transferIn.value = '';
-        els.transferOverlay.classList.remove('hidden');
+        openOverlay(els.transferOverlay);
       });
-      els.transferClose.addEventListener('click', () => els.transferOverlay.classList.add('hidden'));
+      els.transferClose.addEventListener('click', () => closeOverlay(els.transferOverlay));
       els.transferOverlay.addEventListener('click', event => {
-        if (event.target === els.transferOverlay) els.transferOverlay.classList.add('hidden');
+        if (event.target === els.transferOverlay) closeOverlay(els.transferOverlay);
       });
 
       els.copySetup.addEventListener('click', async () => {
@@ -1880,10 +2382,40 @@
 
       els.saveWeek.addEventListener('click', saveWeek);
 
-      els.historyBtn.addEventListener('click', () => els.historyOverlay.classList.remove('hidden'));
-      els.historyClose.addEventListener('click', () => els.historyOverlay.classList.add('hidden'));
+      els.status.addEventListener('click', event => {
+        const button = event.target.closest('.status-action');
+        if (!button || button.dataset.fix !== 'overlap') return;
+        els.overlap.value = button.dataset.value;
+        els.overlap.dispatchEvent(new Event('change'));
+      });
+
+      els.help.addEventListener('click', () => openOverlay(els.helpOverlay));
+      els.helpClose.addEventListener('click', () => closeOverlay(els.helpOverlay));
+      els.helpOverlay.addEventListener('click', event => {
+        if (event.target === els.helpOverlay) closeOverlay(els.helpOverlay);
+      });
+      document.addEventListener('keydown', event => {
+        if (event.key !== 'Escape') return;
+        document.querySelectorAll('.modal-overlay:not(.hidden)').forEach(closeOverlay);
+      });
+      document.addEventListener('keydown', event => {
+        if (event.key !== 'Tab') return;
+        const overlay = document.querySelector('.modal-overlay:not(.hidden)');
+        if (!overlay) return;
+        const focusable = Array.from(overlay.querySelectorAll('button, select, textarea, input, summary'))
+          .filter(el => !el.disabled && !el.closest('[hidden], .hidden') && el.type !== 'file');
+        if (!focusable.length) return;
+        const first = focusable[0], last = focusable[focusable.length - 1];
+        const active = document.activeElement;
+        if (!overlay.contains(active)) { event.preventDefault(); first.focus(); }
+        else if (event.shiftKey && active === first) { event.preventDefault(); last.focus(); }
+        else if (!event.shiftKey && active === last) { event.preventDefault(); first.focus(); }
+      });
+
+      els.historyBtn.addEventListener('click', () => openOverlay(els.historyOverlay));
+      els.historyClose.addEventListener('click', () => closeOverlay(els.historyOverlay));
       els.historyOverlay.addEventListener('click', event => {
-        if (event.target === els.historyOverlay) els.historyOverlay.classList.add('hidden');
+        if (event.target === els.historyOverlay) closeOverlay(els.historyOverlay);
       });
       els.historyList.addEventListener('click', event => {
         const grade = event.target.closest('.grade-btn');
@@ -1892,9 +2424,24 @@
         if (copyBtn) return copyHistoryEntry(copyBtn.dataset.historyId);
         const deleteBtn = event.target.closest('.history-delete-btn');
         if (deleteBtn) return deleteHistoryEntry(deleteBtn.dataset.historyId);
+        const editBtn = event.target.closest('.history-edit-btn');
+        if (editBtn) return openPastForm(state.history.find(week => week.id === editBtn.dataset.historyId));
+      });
+      els.addPastWeek.addEventListener('click', () => openPastForm(null));
+      els.pastCancel.addEventListener('click', closePastForm);
+      els.pastSave.addEventListener('click', savePastWeek);
+      els.pastForm.addEventListener('input', event => {
+        const row = event.target.dataset && event.target.dataset.row;
+        els.pastError.textContent = '';
+        if (row === 'singles') pastSinglesEdited = true;
+        else if (row && !pastSinglesEdited) pastFillSingles();
+        pastCheck();
+      });
+      els.pastForm.addEventListener('keydown', event => {
+        if (event.key === 'Enter' && event.target.tagName === 'INPUT') { event.preventDefault(); savePastWeek(); }
       });
       els.clearHistory.addEventListener('click', () => {
-        if (!confirm('Delete all saved weeks? This cannot be undone.')) return;
+        if (!confirm('Delete all saved weeks, including any entered by hand? This cannot be undone.')) return;
         state.history = [];
         save();
         renderHistory();
