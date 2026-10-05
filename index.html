@@ -840,6 +840,36 @@
       .bt-sumcard { padding: 14px; }
     }
     .past-toolbar { display: flex; flex-wrap: wrap; gap: 8px; }
+
+    /* ---------- Compact setup (steps 1 and 2) + Hide setup ---------- */
+    .page-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin: -8px 0 14px; }
+    .page-row .page-tabs { margin: 0; }
+    .page-tab { min-height: 36px; }
+    .setup-collapsed { flex: 1; min-width: 280px; display: flex; align-items: center; gap: 12px; padding: 5px 5px 5px 16px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); box-shadow: var(--shadow); }
+    .setup-collapsed strong { font-size: .95rem; }
+    .setup-collapsed .btn { min-height: 36px; margin-left: auto; }
+    .setup { gap: 14px; margin-bottom: 14px; }
+    .setup-panel { padding: 14px 16px; }
+    .setup .section-head { margin-bottom: 9px; }
+    .setup .section-head h2 { margin-bottom: 2px; }
+    .setup .helper { font-size: .84rem; line-height: 1.4; }
+    .section-toggle { flex: none; min-height: 32px; padding: 0 11px; border-radius: 9px; font-size: .8rem; }
+    #teamInput { min-height: 126px; height: 126px; padding: 9px 12px; line-height: 1.45; }
+    .setup .load-row { margin-top: 9px; }
+    .setup .load-row .btn { min-height: 38px; }
+    .setup .overlap-wrap { gap: 12px; padding: 9px 12px; margin-bottom: 9px; }
+    .setup .overlap-number strong { font-size: 1.6rem; }
+    .setup .overlap-explainer { gap: 8px; }
+    .setup .mini-stat { display: flex; align-items: baseline; gap: 7px; padding: 8px 11px; }
+    .setup .mini-stat strong { margin: 0; font-size: 1.02rem; }
+    @media (max-width: 760px) {
+      .page-row { margin-top: 0; }
+      .setup-collapsed { min-width: 0; width: 100%; padding-left: 12px; }
+      .setup-collapsed strong { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+      .wide-only { display: none; }
+      .setup .overlap-explainer { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .setup .mini-stat { flex-direction: column; gap: 1px; padding: 7px 9px; }
+    }
   </style>
 </head>
 <body>
@@ -860,19 +890,26 @@
       </div>
     </header>
 
+    <div class="page-row">
     <nav class="page-tabs" id="pageTabs" role="tablist" aria-label="Pages">
       <button class="page-tab" id="tabPool" type="button" role="tab" aria-selected="true" aria-controls="poolPage">Pool Builder</button>
       <button class="page-tab" id="tabBets" type="button" role="tab" aria-selected="false" aria-controls="betsPage" tabindex="-1">Bet Tracker</button>
     </nav>
+    <div class="setup-collapsed pool-only hidden" id="setupSummary" role="region" aria-label="Setup summary">
+      <strong id="setupSummaryText">No teams loaded</strong>
+      <button class="btn" id="setupShowBtn" type="button" aria-controls="setupSection" aria-expanded="false" aria-label="Edit teams and overlap">Edit<span class="wide-only"> teams &amp; overlap</span></button>
+    </div>
+    </div>
 
     <div id="poolPage" role="tabpanel" aria-labelledby="tabPool">
-    <section class="setup">
+    <section class="setup" id="setupSection">
       <div class="card setup-panel">
         <div class="section-head">
           <div>
             <h2>1. Add candidate teams</h2>
             <p class="helper">One per line. Add the spread after the name (e.g. Purdue +14.5) to see favorites and underdogs at a glance.</p>
           </div>
+          <button class="btn section-toggle" id="setupHideBtn" type="button" aria-controls="setupSection" aria-expanded="true" title="Collapse steps 1 and 2 into one line">Hide setup</button>
         </div>
         <textarea id="teamInput" aria-label="Candidate teams, one per line" placeholder="Georgia -6.5&#10;Alabama +3&#10;Texas -7&#10;Penn State -4.5"></textarea>
         <div class="load-row">
@@ -1101,6 +1138,8 @@
           <dd>S1 or S2 locks a team into that entry. The lock puts it in both, which counts toward your shared picks.</dd>
           <dt>Shared picks (overlap)</dt>
           <dd>The number of teams that appear in both entries. You need at least 14 minus that many teams. If you don't have enough, the message in the build bar offers a button to fix it.</dd>
+          <dt>Hide setup</dt>
+          <dd>Once your teams are loaded, Hide setup (top right of section 1) folds sections 1 and 2 into one line next to the page tabs. Tap Edit teams &amp; overlap to open them again. It reopens on its own when you start a new week.</dd>
           <dt>Undo</dt>
           <dd>The Undo button or Ctrl/Cmd+Z reverses your last 30 changes. It resets when the page reloads or when changes arrive from your other device. Saving and grading weeks aren't part of Undo.</dd>
           <dt>Past weeks</dt>
@@ -1400,7 +1439,9 @@
         historyClearRow: $('#historyClearRow'), clearHistory: $('#clearHistoryBtn'),
         addPastWeek: $('#addPastWeekBtn'), pastForm: $('#pastForm'), pastTitle: $('#pastTitle'), pastWeek: $('#pastWeek'),
         pastCheck: $('#pastCheck'), pastError: $('#pastError'), pastSave: $('#pastSaveBtn'), pastCancel: $('#pastCancelBtn'),
-        autoGrade: $('#autoGradeBtn'), autoGradeNote: $('#autoGradeNote')
+        autoGrade: $('#autoGradeBtn'), autoGradeNote: $('#autoGradeNote'),
+        setupSection: $('#setupSection'), setupSummary: $('#setupSummary'), setupSummaryText: $('#setupSummaryText'),
+        setupHide: $('#setupHideBtn'), setupShow: $('#setupShowBtn')
       };
 
       let state = { teams: [], overlap: 3, result: null, history: [] };
@@ -1781,6 +1822,30 @@
         els.overlapSentence.textContent = 'Each entry will share exactly ' + state.overlap + ' of its 7 teams.';
         els.uniqueNeeded.textContent = 14 - state.overlap;
         els.differentPicks.textContent = (7 - state.overlap) + ' + ' + (7 - state.overlap);
+        renderSetupSummary();
+      }
+
+      // --- Hide setup ---
+      // Once teams are in, steps 1 and 2 can fold into a one-line summary next to the page tabs.
+      // Remembered on this device; reopens on its own whenever there are no teams (new week).
+      const SETUP_KEY = 'cfb-pool-setup-collapsed';
+      let setupCollapsed = false;
+      try { setupCollapsed = localStorage.getItem(SETUP_KEY) === '1'; } catch (_) {}
+      function renderSetupSummary() {
+        const n = state.teams.length;
+        const collapsed = setupCollapsed && n > 0;
+        els.setupSection.classList.toggle('hidden', collapsed);
+        els.setupSummary.classList.toggle('hidden', !collapsed);
+        els.setupHide.disabled = n === 0;
+        els.setupHide.setAttribute('aria-expanded', String(!collapsed));
+        els.setupShow.setAttribute('aria-expanded', String(!collapsed));
+        els.setupSummaryText.textContent = n + ' team' + (n === 1 ? '' : 's') + ' \u00b7 ' + state.overlap + ' shared pick' + (state.overlap === 1 ? '' : 's');
+      }
+      function setSetupCollapsed(value) {
+        setupCollapsed = value;
+        try { localStorage.setItem(SETUP_KEY, value ? '1' : '0'); } catch (_) {}
+        renderSetupSummary();
+        (value ? els.setupShow : els.setupHide).focus();
       }
 
       function maskFromResult(teamId, result) {
@@ -2881,6 +2946,8 @@
         const editBtn = event.target.closest('.history-edit-btn');
         if (editBtn) return openPastForm(state.history.find(week => week.id === editBtn.dataset.historyId));
       });
+      els.setupHide.addEventListener('click', () => setSetupCollapsed(true));
+      els.setupShow.addEventListener('click', () => setSetupCollapsed(false));
       els.addPastWeek.addEventListener('click', () => openPastForm(null));
       els.autoGrade.addEventListener('click', autoGradeWeeks);
       els.pastCancel.addEventListener('click', closePastForm);
