@@ -289,3 +289,59 @@ test('a sync that arrives while you are typing keeps your cursor and unfinished 
   assert.equal(active.closest('tr').querySelector('[data-f="bet"]').value, 'Army -2');
   assert.equal(active.value, 'half-typed');
 });
+
+// ---------- Closing line value ----------
+const T1 = day(1);
+const clvGames = state => [
+  { date: T1, home: ['Temple', 'TEM', state === 'post' ? 14 : 0], away: ['Navy', 'NAVY', state === 'post' ? 17 : 0], final: state === 'post', state, odds: { details: 'NAVY -4.5', total: 47.5, homeML: 160, awayML: -190 } },
+  { date: T1, home: ['Kansas', 'KU', state === 'post' ? 30 : 0], away: ['Iowa State', 'ISU', state === 'post' ? 20 : 0], final: state === 'post', state, odds: { details: 'ISU -1', total: 51, homeML: 120, awayML: -140 } }
+];
+async function placeClvBets(t) {
+  const app = await open(t, { espn: { feed: espnFeed(clvGames('pre')), calls: [] } });
+  tabTo(app, 'bets');
+  addBet(app, 'Temple +6.5', T1);                        // close +4.5 -> CLV +2.0
+  addBet(app, 'Kansas Under 53.5', T1);                  // close 51 -> CLV +2.5
+  const ml = addBet(app, 'Kansas ML', T1); edit(app, ml, 'odds', '+140'); // close +120 -> beat by ~3.8%
+  app.$('#btGradeBtn').click();
+  await wait(300);
+  return app;
+}
+const clvText = (app, bet) => rowFor(app, bet).querySelector('.bt-clv').textContent;
+
+test('before kickoff the tracker shows the current line as "now"', async t => {
+  const app = await placeClvBets(t);
+  assert.equal(clvText(app, 'Temple +6.5'), 'now +4.5 +2.0');
+  assert.ok(rowFor(app, 'Temple +6.5').querySelector('.bt-clv').classList.contains('live'));
+  assert.match(rowFor(app, 'Temple +6.5').querySelector('.bt-fin').textContent, /Not started/);
+  assert.equal(app.$('#btClv').textContent, '\u2014', 'nothing has closed yet');
+});
+
+test('once the game starts the line locks in as the close, and CLV is scored', async t => {
+  const first = await placeClvBets(t);
+  const saved = stored(first);
+  // A later visit (fresh page, new scores feed): the games are final.
+  const app = await open(t, { bets: saved, espn: { feed: espnFeed(clvGames('post')), calls: [] } });
+  await wait(300); // auto-grade on open
+  tabTo(app, 'bets');
+  assert.equal(clvText(app, 'Temple +6.5'), '+4.5 +2.0');
+  assert.equal(clvText(app, 'Kansas Under 53.5'), 'u51 +2.5');
+  assert.equal(clvText(app, 'Kansas ML'), '+120 +3.8%');
+  assert.ok(rowFor(app, 'Temple +6.5').querySelector('.bt-clv').classList.contains('pos'));
+  assert.equal(val(rowFor(app, 'Temple +6.5'), 'result'), 'W', 'graded too');
+  assert.equal(app.$('#btClv').textContent, '100%');
+  assert.match(app.$('#btClvSub').textContent, /avg \+2\.3 pts \u00b7 3 bets/);
+  const b = stored(app).bets.find(x => x.bet === 'Temple +6.5');
+  assert.equal(b.closeLocked, true);
+  assert.equal(b.close.spread, 4.5);
+});
+
+test('a hand-graded bet still picks up its closing line', async t => {
+  const app = await open(t, { espn: { feed: espnFeed(clvGames('post')), calls: [] } });
+  tabTo(app, 'bets');
+  const tr = addBet(app, 'Temple +6.5', T1);
+  edit(app, tr, 'result', 'W');
+  app.$('#btGradeBtn').click();
+  await wait(300);
+  assert.equal(clvText(app, 'Temple +6.5'), '+4.5 +2.0');
+  assert.match(app.$('#btMsgText').textContent, /Nothing to grade/);
+});

@@ -29,8 +29,9 @@ shows `fail 0`. Any failure prints which check broke and why.
 | `sync.test.js` | Laptop/phone sync, merging saved weeks and grades, offline handling, sync pill |
 | `transfer.test.js` | Copy / Load setup codes |
 | `api.test.js` | `/api/setup` GET/POST, validation, missing-Redis error |
-| `bets.test.js` | Bet Tracker: page tabs and `#bets` links, odds/risk/win/units, paste import, auto-grading (W/L/Push, not final, not found, no connection), hand results kept, delete + Undo, Ctrl+Z isolation, laptop/phone bet sync incl. deletes and typing during a sync, standalone backup import, Help buttons |
+| `bets.test.js` | Bet Tracker: page tabs and `#bets` links, odds/risk/win/units, paste import, auto-grading (W/L/Push, not final, not found, no connection), hand results kept, delete + Undo, Ctrl+Z isolation, closing line capture and CLV (spread, total, moneyline), laptop/phone bet sync incl. deletes and typing during a sync, standalone backup import, Help buttons |
 | `autograde.test.js` | Saved weeks > Auto-grade from scores: grades spread picks, keeps hand grades, skips hand-entered weeks, no-connection message |
+| `lines.test.js` | Check lines: quiet check on load, moved/started/missing report, badges on teams and picks, Use current lines + Undo, no-connection message |
 | `layout.test.js` | Hide setup: summary text, focus, remembered choice, reopens on Start new week |
 | `api-bets.test.js` | `/api/bets` GET/POST, separate Redis key, validation and size limit, missing-Redis error |
 

@@ -718,7 +718,7 @@
     body.on-bets .subtitle-pool { display: none; }
     body.on-bets .subtitle-bets { display: block; }
 
-    .bt-stats { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; margin-bottom: 16px; }
+    .bt-stats { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 12px; margin-bottom: 16px; }
     .bt-stat { min-width: 0; padding: 13px 15px; border: 1px solid var(--line); border-left: 4px solid var(--green); border-radius: 14px; background: var(--panel); box-shadow: var(--shadow); }
     .bt-stat.pending { border-left-color: var(--amber); }
     .bt-stat span { display: block; color: var(--muted); font-size: .68rem; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; }
@@ -756,7 +756,7 @@
     .bt-msg .btn { min-height: 34px; margin-left: auto; }
 
     .bt-tablecard { min-height: 160px; max-height: calc(100vh - 280px); overflow: auto; padding: 0; }
-    .bt-table { width: 100%; min-width: 1120px; border-collapse: collapse; }
+    .bt-table { width: 100%; min-width: 1230px; border-collapse: collapse; }
     .bt-table th { position: sticky; top: 0; z-index: 2; padding: 10px 6px; border-bottom: 1px solid var(--line); background: var(--panel-2); color: var(--muted); font-size: .66rem; font-weight: 800; letter-spacing: .07em; text-align: left; text-transform: uppercase; white-space: nowrap; }
     .bt-table th.r { text-align: right; }
     .bt-table td { padding: 3px 5px; border-bottom: 1px solid var(--line); vertical-align: middle; }
@@ -799,7 +799,7 @@
     .auto-grade-note { margin-top: 8px; }
 
     @media (max-width: 1100px) {
-      .bt-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .bt-stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
       .bt-sumgrid { grid-template-columns: 1fr; }
     }
     @media (max-width: 760px) {
@@ -823,7 +823,7 @@
       .bt-table { display: block; min-width: 0; }
       .bt-table thead { display: none; }
       .bt-table tbody { display: block; }
-      .bt-table tbody tr { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-areas: "bet bet bet res" "date date book book" "odds risk win units" "pl fin fin x" "notes notes notes notes"; gap: 7px; margin-bottom: 10px; padding: 11px; border: 1px solid var(--line); border-left: 5px solid var(--line); border-radius: 14px; background: var(--panel); box-shadow: var(--shadow); }
+      .bt-table tbody tr { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-areas: "bet bet bet res" "date date book book" "odds risk win units" "pl clv fin fin" "notes notes notes x"; gap: 7px; margin-bottom: 10px; padding: 11px; border: 1px solid var(--line); border-left: 5px solid var(--line); border-radius: 14px; background: var(--panel); box-shadow: var(--shadow); }
       .bt-table tbody tr.W { border-left-color: var(--green); }
       .bt-table tbody tr.L { border-left-color: var(--red); }
       .bt-table tbody tr.P { border-left-color: #6b7280; }
@@ -831,7 +831,7 @@
       .bt-table td.bt-n { display: none; }
       .bt-bet { grid-area: bet; } .bt-res { grid-area: res; } .bt-date { grid-area: date; } .bt-book { grid-area: book; }
       .bt-odds { grid-area: odds; } .bt-risk { grid-area: risk; } .bt-win { grid-area: win; } .bt-units { grid-area: units; }
-      .bt-pl { grid-area: pl; text-align: left; font-size: 1.02rem; } .bt-fin { grid-area: fin; white-space: normal; font-size: .8rem; }
+      .bt-pl { grid-area: pl; text-align: left; font-size: 1.02rem; } .bt-clv { grid-area: clv; white-space: normal; } .bt-fin { grid-area: fin; white-space: normal; font-size: .8rem; }
       .bt-x { grid-area: x; align-self: end; text-align: right; } .bt-notes { grid-area: notes; }
       .bt-table td[data-label]::before { content: attr(data-label); display: block; margin-bottom: 2px; color: var(--muted); font-size: .62rem; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; }
       .bt-table td input, .bt-table td select { min-height: 40px; border-color: var(--control-line); background: #ffffff; font-size: 16px; }
@@ -870,23 +870,67 @@
       .setup .overlap-explainer { grid-template-columns: repeat(3, minmax(0, 1fr)); }
       .setup .mini-stat { flex-direction: column; gap: 1px; padding: 7px 9px; }
     }
+
+    /* ---------- CLV column ---------- */
+    .bt-clv { min-width: 112px; padding: 0 8px !important; white-space: nowrap; font-size: .8rem; font-variant-numeric: tabular-nums; }
+    .bt-clv .bt-close { color: var(--muted); }
+    .bt-clv strong { font-weight: 800; }
+    .bt-clv.pos strong { color: var(--green); }
+    .bt-clv.neg strong { color: var(--red); }
+    .bt-clv.live strong { color: var(--text); font-weight: 600; }
+
+    /* ---------- Line check badges (Pool Builder) ---------- */
+    .candidate-tools { display: flex; align-items: center; gap: 8px; flex: none; }
+    .line-check-btn { min-height: 34px; padding: 0 12px; border-radius: 9px; font-size: .82rem; }
+    .line-move { display: inline-flex; align-items: center; gap: 3px; margin-top: 2px; padding: 1px 7px; border-radius: 999px; font-size: .68rem; font-weight: 800; white-space: nowrap; }
+    .line-move.worse { border: 1px solid var(--amber-line); background: var(--amber-soft); color: #7a4d00; }
+    .line-move.better { border: 1px solid rgba(19, 122, 69, .35); background: var(--green-soft); color: var(--green-2); }
+    .team-name-wrap .line-move { margin-left: 2px; }
+
+    /* ---------- Slimmer header ---------- */
+    .topbar { align-items: center; gap: 16px; margin-bottom: 14px; }
+    .topbar h1 { font-size: clamp(1.45rem, 2.6vw, 2.15rem); letter-spacing: -.035em; }
+    .topbar .subtitle { margin-top: 4px; font-size: .92rem; line-height: 1.4; }
+    .help-version { margin-top: 18px; font-size: .78rem; }
+
+    /* ---------- Layout fixes ---------- */
+    .setup { grid-template-columns: minmax(0, 1fr) minmax(330px, 430px); }
+    .setup .mini-stat { flex-direction: column; align-items: flex-start; gap: 1px; }
+    .workspace { grid-template-columns: minmax(620px, 1.65fr) repeat(2, minmax(280px, .68fr)); }
+    .entry-head h2, .entry-count, .entry-footer .btn { white-space: nowrap; }
+    html { scroll-padding-bottom: 90px; }
+    .buildbar { gap: 12px; padding: 8px 10px 8px 16px; }
+    .buildbar .status strong { margin-bottom: 1px; font-size: .95rem; }
+    .buildbar .status span { font-size: .8rem; }
+    .buildbar .btn { min-height: 38px; }
+    @media (max-width: 1400px) {
+      .workspace { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 760px) {
+      .topbar .subtitle, body.on-bets .topbar .subtitle-bets { display: none; }
+      .bt-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .top-actions { gap: 6px; margin-top: 10px; }
+      .top-actions .btn { min-height: 38px; padding: 0 11px; font-size: .9rem; }
+      .setup, .workspace { grid-template-columns: 1fr; }
+      .build-actions .btn { padding: 0 8px; font-size: .9rem; white-space: nowrap; }
+      .candidate-toolbar { flex-wrap: wrap; }
+    }
   </style>
 </head>
 <body>
   <main class="app">
     <header class="topbar">
       <div>
-        <p class="eyebrow">Standalone tool • Light v8</p>
         <h1>CFB Splash Pool Builder</h1>
-        <p class="subtitle subtitle-pool">Build two 7-pick entries, control every team's exposure, and place any team with a tap — S1, S2, or Lock both for both entries (drag works too on desktop).</p>
-        <p class="subtitle subtitle-bets">Track every bet you place. Results fill in automatically from final scores, and your bets sync between your laptop and phone.</p>
+        <p class="subtitle subtitle-pool">Two 7-pick Splash entries with exact overlap, tiers, and full exposure control.</p>
+        <p class="subtitle subtitle-bets">Every bet, graded from final scores and checked against the closing line.</p>
       </div>
       <div class="top-actions">
         <button class="sync-pill sync-pending" id="syncStatus" type="button" title="Sync status between your devices. Tap to sync now.">Checking sync…</button>
         <button class="btn" id="helpBtn" type="button">Help</button>
         <button class="btn pool-only" id="historyBtn" type="button">Saved weeks</button>
-        <button class="btn pool-only" id="transferBtn" type="button">Copy / Load setup</button>
-        <button class="btn pool-only" id="printBtn" type="button">Print / Save PDF</button>
+        <button class="btn pool-only" id="transferBtn" type="button" aria-label="Copy / Load setup">Copy / Load<span class="wide-only"> setup</span></button>
+        <button class="btn pool-only" id="printBtn" type="button" aria-label="Print / Save PDF">Print<span class="wide-only"> / Save PDF</span></button>
       </div>
     </header>
 
@@ -956,7 +1000,7 @@
             <p class="helper">Set each team's tier (Lock, Strong, Lean, Meh) to control who gets the shared slots first. Tap S1, S2, or the lock to place a team. Full details are in Help at the top.</p>
             <button type="button" class="expand-all" id="expandAllBtn">Expand all</button>
           </div>
-          <span class="badge" id="candidateBadge">0 teams</span>
+          <div class="candidate-tools"><button class="btn line-check-btn" id="checkLinesBtn" type="button" disabled title="Compare your spreads with the current lines">Check lines</button><span class="badge" id="candidateBadge">0 teams</span></div>
         </div>
         <div class="candidate-columns" id="candidateColumns" aria-hidden="true"><span>Team</span><span>Min</span><span>Max</span><span>Place</span><span>Tier</span></div>
         <div class="candidate-list" id="candidateList"></div>
@@ -970,8 +1014,8 @@
         </div>
         <div class="build-actions">
           <button class="btn" id="undoBtn" type="button" disabled title="Undo last change (Ctrl+Z / Cmd+Z)">Undo</button>
-          <button class="btn" id="saveWeekBtn" type="button" disabled>Save this week</button>
-          <button class="btn" id="anotherBtn" type="button" disabled>Another valid build</button>
+          <button class="btn" id="saveWeekBtn" type="button" disabled aria-label="Save this week">Save<span class="wide-only"> this</span> week</button>
+          <button class="btn" id="anotherBtn" type="button" disabled aria-label="Another valid build">Another<span class="wide-only"> valid</span> build</button>
           <button class="btn primary" id="buildBtn" type="button" disabled>Build 2 entries</button>
         </div>
       </section>
@@ -1015,6 +1059,7 @@
         <div class="bt-stat"><span>Units</span><strong id="btUnits">+0.00u</strong><em>at your unit size</em></div>
         <div class="bt-stat"><span>ROI</span><strong id="btRoi">0.0%</strong><em>profit &divide; risked</em></div>
         <div class="bt-stat"><span>Win %</span><strong id="btWinPct">0.0%</strong><em>pushes excluded</em></div>
+        <div class="bt-stat"><span>Beat the close</span><strong id="btClv">&mdash;</strong><em id="btClvSub">no closing lines yet</em></div>
         <div class="bt-stat pending"><span>Pending</span><strong id="btPending">0</strong><em id="btPendingRisk">none open</em></div>
       </div>
 
@@ -1061,7 +1106,7 @@
           <thead><tr>
             <th scope="col"><span class="sr-only">Row</span>#</th><th scope="col">Date</th><th scope="col">Bet</th><th scope="col" class="r">Odds</th>
             <th scope="col" class="r">Risk ($)</th><th scope="col" class="r">Win ($)</th><th scope="col" class="r">Units</th><th scope="col">Where placed</th>
-            <th scope="col">Result</th><th scope="col" class="r">Profit/Loss</th><th scope="col">Final score</th><th scope="col">Notes</th><th scope="col"><span class="sr-only">Delete</span></th>
+            <th scope="col">Result</th><th scope="col" class="r">Profit/Loss</th><th scope="col" title="Closing line and closing line value">Close &middot; CLV</th><th scope="col">Final score</th><th scope="col">Notes</th><th scope="col"><span class="sr-only">Delete</span></th>
           </tr></thead>
           <tbody id="btBody"></tbody>
         </table>
@@ -1112,7 +1157,7 @@
           <li><strong>Optional: fine-tune.</strong> Use Min and Max to limit how many entries a team can be in. Use S1, S2, or the lock to force a team into Entry 1, Entry 2, or both. On a phone these settings are tucked behind each team's <strong>Edit</strong> button.</li>
           <li><strong>Build.</strong> Tap <strong>Build 2 entries</strong>. Tap <strong>Another valid build</strong> for a different arrangement.</li>
           <li><strong>Adjust.</strong> On any pick, <strong>Move to</strong> sends it to the other entry and <strong>Unlock</strong> releases a locked pick. <strong>Undo</strong> reverses your last change.</li>
-          <li><strong>Submit and record.</strong> Tap <strong>Copy entry</strong> under each entry to copy its list, then tap <strong>Save this week</strong>.</li>
+          <li><strong>Submit and record.</strong> Tap <strong>Check lines</strong> (top of section 3) to see whether any spread has moved since you entered it, then tap <strong>Copy entry</strong> under each entry to copy its list, then tap <strong>Save this week</strong>.</li>
           <li><strong>Grade it.</strong> After the games, open <strong>Saved weeks</strong> and tap <strong>Auto-grade from scores</strong>. It fills in W, L, or Push for every pick with a spread. You can also tap the dash beside a pick to grade it yourself. For weeks you didn't save here, tap <strong>Add a past week</strong> and enter the records by hand.</li>
           <li><strong>Next week.</strong> Tap <strong>Start new week</strong> in section 1. Your overlap setting and saved weeks are kept.</li>
         </ol>
@@ -1138,6 +1183,8 @@
           <dd>S1 or S2 locks a team into that entry. The lock puts it in both, which counts toward your shared picks.</dd>
           <dt>Shared picks (overlap)</dt>
           <dd>The number of teams that appear in both entries. You need at least 14 minus that many teams. If you don't have enough, the message in the build bar offers a button to fix it.</dd>
+          <dt>Line check</dt>
+          <dd>Check lines compares each team's spread with the line ESPN lists now (games in the next 7 days). A moved line gets a badge on the team and its pick: green &#9650; means the number is better for your side now, amber &#9660; means worse. Use current lines in the message updates the spreads and keeps everything else; Undo reverses it. It also runs quietly when teams load.</dd>
           <dt>Hide setup</dt>
           <dd>Once your teams are loaded, Hide setup (top right of section 1) folds sections 1 and 2 into one line next to the page tabs. Tap Edit teams &amp; overlap to open them again. It reopens on its own when you start a new week.</dd>
           <dt>Undo</dt>
@@ -1169,6 +1216,8 @@
           <dd>Shows the score the grader used so you can check it. Orange text means it couldn't grade that bet and says why. Results you set by hand are never overwritten.</dd>
           <dt>Color bar</dt>
           <dd>Green is a win, red a loss, gray a push. No bar means it's still pending.</dd>
+          <dt>Close and CLV</dt>
+          <dd>Close is the last line the tracker saw before kickoff; until kickoff it shows the current line as <em>now</em>. CLV (closing line value) is how much better your number was: betting +6.5 when it closed +4.5 is +2.0. Totals work the same way, and moneylines show the difference in win chance. Beating the close regularly is a strong sign of good betting, even over a small sample. Open the tracker on game day for the most accurate close.</dd>
           <dt>Sync and backups</dt>
           <dd>Bets save in this browser and sync between your devices automatically. The line under the buttons shows sync status (tap it to sync now). A full backup is still a good idea now and then.</dd>
         </dl>
@@ -1204,12 +1253,17 @@
           <p>Tap <strong>Undo</strong> in the message right after deleting. Ctrl/Cmd+Z only undoes Pool Builder changes.</p></details>
         <details class="faq"><summary>My bets aren't on my other device.</summary>
           <p>Check the bet sync line under the Bet Tracker buttons and tap it to sync now. If it says sync isn't set up, the <code>/api/bets</code> route isn't deployed yet. Until then, use Data &gt; Download full backup on one device and Data &gt; Import on the other.</p></details>
+        <details class="faq"><summary>Check lines says "No line found" for some teams.</summary>
+          <p>ESPN didn't list a line for that game yet, the game is more than 7 days out, or the team name didn't match. Try the full school name.</p></details>
+        <details class="faq"><summary>The Close column is blank or says "now."</summary>
+          <p>"now" means the game hasn't kicked off, so that's the current line. It locks in as the close once the game starts. It stays blank if the tracker never saw a line for the game, for example a bet added after the game with no line in ESPN's feed.</p></details>
         <details class="faq"><summary>Can I use it with a keyboard?</summary>
           <p>Yes. Tab moves between controls, Enter or Space presses a button, and Escape closes any pop-up. Ctrl/Cmd+Z undoes your last change. While a pop-up is open, Tab stays inside it.</p></details>
         <details class="faq"><summary>The team list is very long on my phone.</summary>
           <p>Each team shows as one line. Tap <strong>Edit</strong> on a team to open its Min, Max, and Place settings, or tap <strong>Expand all</strong> above the list to open every team at once.</p></details>
         <details class="faq"><summary>I pasted more than 40 teams.</summary>
           <p>The list holds up to 40 teams. Anything after the 40th is ignored.</p></details>
+        <p class="helper help-version">CFB Splash Pool Builder &middot; Light v9 &middot; Standalone tool</p>
       </div>
     </div>
 
@@ -1372,16 +1426,42 @@
       }
       const groupsFor = league => league === 'nfl' ? [null] : [80, 81]; // 80 = FBS, 81 = FCS
 
-      // Returns { result: 'W'|'L'|'P', final } | { skip: true, final } | { err }.
-      // Network failures throw, so callers can stop and report "can't reach ESPN" once.
-      async function grade(text, opts) {
+      // The betting line ESPN lists for a game, from the picked team's side: spread (+6.5 means
+      // that team gets 6.5), total, and that team's moneyline. Null when no line is listed.
+      function marketFor(found) {
+        const comp = (found.ev.competitions || [])[0] || {};
+        const o = (comp.odds || [])[0];
+        if (!o) return null;
+        const me = found.me, opp = found.opp || { team: {} };
+        const isHome = me.homeAway === 'home';
+        const mine = isHome ? o.homeTeamOdds : o.awayTeamOdds;
+        let spread = null;
+        const details = String(o.details || '').trim();
+        const m = details.match(/^(.+?)\s+([+-]?\d+(?:\.\d+)?)$/);
+        if (/^(even|pk|pick)/i.test(details)) spread = 0;
+        else if (m) {
+          const fav = m[1].toUpperCase(), n = Math.abs(parseFloat(m[2]));
+          if (fav === String(me.team.abbreviation || '').toUpperCase()) spread = -n;
+          else if (fav === String(opp.team.abbreviation || '').toUpperCase()) spread = n;
+        }
+        if (spread === null && typeof o.spread === 'number' && (o.homeTeamOdds || o.awayTeamOdds)) {
+          const homeFav = Boolean(o.homeTeamOdds && o.homeTeamOdds.favorite);
+          spread = (homeFav === isHome ? -1 : 1) * Math.abs(o.spread);
+        }
+        const total = typeof o.overUnder === 'number' ? o.overUnder : null;
+        const ml = mine && typeof mine.moneyLine === 'number' ? mine.moneyLine : null;
+        if (spread === null && total === null && ml === null) return null;
+        return { spread, total, ml };
+      }
+
+      async function locate(text, opts) {
         const league = (opts && opts.league) || 'cfb';
         const date = opts && opts.date;
         const p = parseBet(text);
         if (!p) return { err: 'needs a spread, ML, or total' };
         if (!p.team) return { err: 'add a team name' };
         if (!date) return { err: 'needs a date' };
-        if (date > ymd(new Date())) return { skip: true, final: 'Game not played yet' };
+        if (date > addDays(ymd(new Date()), 14)) return { p, skip: true, final: 'Game not played yet' };
         const end = (opts && opts.endDate) || addDays(date, 1);
         const wanted = norm(p.team);
         let found = null;
@@ -1389,10 +1469,32 @@
           found = findGame(await boardRange(league, date, end, group), wanted);
           if (found) break;
         }
-        if (!found) return { err: 'game not found' };
+        if (!found) return { p, err: 'game not found' };
         const status = (found.ev.status && found.ev.status.type) || {};
+        return { p, found, status, state: status.state || (status.completed ? 'post' : 'pre'), kickoff: found.ev.date || '', market: marketFor(found) };
+      }
+
+      // Current line for a pick, without grading it (Pool Builder line check, Bet Tracker close).
+      async function lookup(text, opts) {
+        const r = await locate(text, opts);
+        if (r.err || r.skip) return r;
+        return { p: r.p, state: r.state, kickoff: r.kickoff, market: r.market };
+      }
+
+      // Returns { result: 'W'|'L'|'P', final } | { skip: true, final } | { err }, plus the game's
+      // state and listed line when the game was found. Network failures throw, so callers can
+      // stop and report "can't reach ESPN" once.
+      async function grade(text, opts) {
+        const loc = await locate(text, opts);
+        if (loc.err) return { err: loc.err };
+        if (loc.skip) return { skip: true, final: loc.final };
+        const extra = { state: loc.state, kickoff: loc.kickoff, market: loc.market };
+        const r = gradeFound(loc.p, loc.found, loc.status);
+        return Object.assign(r, extra);
+      }
+      function gradeFound(p, found, status) {
         if (/CANCEL|POSTPON|SUSPEND|FORFEIT/i.test(status.name || '')) return { err: (status.description || 'postponed/canceled').toLowerCase() + ', set by hand' };
-        if (!status.completed) return { skip: true, final: 'Not final yet' };
+        if (!status.completed) return { skip: true, final: (status.state === 'pre' ? 'Not started' : 'Not final yet') };
         const ms = parseInt(found.me.score, 10), os = parseInt(found.opp.score, 10);
         if (isNaN(ms) || isNaN(os)) return { err: 'score unavailable' };
         const abbr = side => (side.team.abbreviation || side.team.shortDisplayName || '');
@@ -1406,7 +1508,7 @@
       }
       const prefetch = (league, start, end) => boardRange(league, start, end, groupsFor(league)[0]).catch(() => null);
 
-      return { parseBet, betType, norm, grade, prefetch, ymd, addDays };
+      return { parseBet, betType, norm, grade, lookup, prefetch, ymd, addDays };
     })();
   </script>
   <script>
@@ -1441,7 +1543,7 @@
         pastCheck: $('#pastCheck'), pastError: $('#pastError'), pastSave: $('#pastSaveBtn'), pastCancel: $('#pastCancelBtn'),
         autoGrade: $('#autoGradeBtn'), autoGradeNote: $('#autoGradeNote'),
         setupSection: $('#setupSection'), setupSummary: $('#setupSummary'), setupSummaryText: $('#setupSummaryText'),
-        setupHide: $('#setupHideBtn'), setupShow: $('#setupShowBtn')
+        setupHide: $('#setupHideBtn'), setupShow: $('#setupShowBtn'), checkLines: $('#checkLinesBtn')
       };
 
       let state = { teams: [], overlap: 3, result: null, history: [] };
@@ -1917,6 +2019,7 @@
         // button always comes with the reason.
         if (!names.length) setStatus('Ready for your teams', 'Paste one team per line above.');
         else if (validate().ok) setStatus('Teams loaded', 'Set exposure, tap S1/S2 to place teams, then build.');
+        if (names.length) checkLines(true);
       }
 
       function exposureButtons(team, field) {
@@ -2001,6 +2104,7 @@
         });
         els.candidateList.innerHTML = rowsHtml.join('');
         syncExpandAll();
+        decorateLines();
       }
 
       // Which candidate rows are open on phones. Kept here (not in the DOM) because the list is
@@ -2131,6 +2235,7 @@
         });
         els.saveWeek.disabled = picksForEntry(1).length !== 7 || picksForEntry(2).length !== 7;
         renderBenched();
+        decorateLines();
       }
 
       // Teams left out of both entries after a build, so you can confirm the tiers did what you
@@ -2427,6 +2532,108 @@
         if (waiting) parts.push(waiting + ' game' + (waiting === 1 ? ' isn\u2019t' : 's aren\u2019t') + ' final yet.');
         if (problems.length) parts.push('Grade by hand: ' + problems.slice(0, 6).join(', ') + (problems.length > 6 ? ', and ' + (problems.length - 6) + ' more' : '') + '.');
         els.autoGradeNote.textContent = parts.join(' ');
+      }
+
+      // --- Line check ---
+      // Compares each candidate's spread (the number after its name) with the line ESPN lists
+      // now, for games in the next 7 days. Moved lines get a badge on the team and its pick card,
+      // and "Use current lines" rewrites the spreads in place (tiers, exposure, locks, and the
+      // build are kept, and Undo reverses it). Runs quietly when teams load; the button reports.
+      let lineInfo = new Map();
+      let linesChecking = false;
+      let linesCheckedAt = 0;
+      const fmtLine = n => n === 0 ? 'PK' : (n > 0 ? '+' : '') + n;
+      function movedLines() {
+        const moved = [];
+        lineInfo.forEach((r, name) => {
+          if (r.state === 'pre' && r.market && r.market.spread != null && r.market.spread !== r.saved) moved.push({ name, saved: r.saved, now: r.market.spread, team: r.p.team });
+        });
+        return moved;
+      }
+      function decorateLines() {
+        if (!document) return; // page already closed (only happens in the tests)
+        if (els.checkLines) els.checkLines.disabled = linesChecking || !state.teams.some(team => window.ScoreGrader && window.ScoreGrader.parseBet(team.name));
+        document.querySelectorAll('.line-move').forEach(el => el.remove());
+        if (!lineInfo.size) return;
+        const byName = new Map(movedLines().map(m => [m.name, m]));
+        const badge = name => {
+          const m = byName.get(name);
+          if (!m) return '';
+          const better = m.now > m.saved;
+          return '<span class="line-move ' + (better ? 'better' : 'worse') + '" title="You entered ' + escapeHtml(fmtLine(m.saved)) + '. ESPN lists ' + escapeHtml(fmtLine(m.now)) + ' now.">' +
+            (better ? '\u25b2' : '\u25bc') + ' now ' + escapeHtml(fmtLine(m.now)) + '</span>';
+        };
+        document.querySelectorAll('.team-row').forEach(row => {
+          const name = row.querySelector('.team-name'), wrap = row.querySelector('.team-name-wrap');
+          const html = name && badge(name.title);
+          if (html && wrap) wrap.insertAdjacentHTML('beforeend', html);
+        });
+        document.querySelectorAll('.pick-card').forEach(card => {
+          const name = card.querySelector('.pick-name'), sub = card.querySelector('.pick-sub');
+          const html = name && badge(name.title);
+          if (html && sub) sub.insertAdjacentHTML('beforeend', html);
+        });
+      }
+      async function checkLines(silent) {
+        const grader = window.ScoreGrader;
+        if (!grader || linesChecking) return;
+        const picks = state.teams.map(team => ({ name: team.name, p: grader.parseBet(team.name) })).filter(x => x.p && x.p.kind === 'Spread');
+        if (!picks.length) {
+          if (!silent) setStatus('No spreads to check', 'Add the spread after each team name (for example Purdue +14.5) to compare it with the current line.', 'error');
+          return;
+        }
+        linesChecking = true;
+        els.checkLines.disabled = true;
+        els.checkLines.textContent = 'Checking\u2026';
+        const start = grader.ymd(new Date()), end = grader.addDays(start, 7);
+        const info = new Map();
+        let netErr = false;
+        for (const x of picks) {
+          try { info.set(x.name, Object.assign({ saved: x.p.line }, await grader.lookup(x.name, { league: 'cfb', date: start, endDate: end }))); }
+          catch (_) { netErr = true; break; }
+        }
+        linesChecking = false;
+        if (!document) return;
+        els.checkLines.textContent = 'Check lines';
+        if (netErr) {
+          decorateLines();
+          if (!silent) setStatus('Couldn\u2019t check lines', 'Couldn\u2019t reach ESPN. Check your connection and try again.', 'error');
+          return;
+        }
+        lineInfo = info;
+        linesCheckedAt = Date.now();
+        decorateLines();
+        if (silent) return;
+        const moved = movedLines();
+        const notListed = [], started = [];
+        info.forEach((r, name) => {
+          if (r.err || r.skip || (r.state === 'pre' && (!r.market || r.market.spread == null))) notListed.push(name);
+          else if (r.state !== 'pre') started.push(name);
+        });
+        const extra = (started.length ? ' Already started: ' + started.join(', ') + '.' : '') +
+          (notListed.length ? ' No line found for ' + notListed.length + ' team' + (notListed.length === 1 ? '' : 's') + '.' : '');
+        if (moved.length) {
+          setStatus(moved.length + ' line' + (moved.length === 1 ? ' has' : 's have') + ' moved',
+            moved.map(m => m.team + ' ' + fmtLine(m.saved) + ' \u2192 ' + fmtLine(m.now)).join(', ') + '.' + extra, 'error',
+            { fix: 'lines', value: '', label: 'Use current lines' });
+        } else {
+          setStatus('Lines checked', 'Every spread matches ESPN\u2019s current line.' + extra, 'success');
+        }
+      }
+      function useCurrentLines() {
+        const moved = movedLines();
+        if (!moved.length) return;
+        moved.forEach(m => {
+          const team = state.teams.find(t => t.name === m.name);
+          if (!team) return;
+          team.name = m.team + ' ' + fmtLine(m.now);
+          const r = lineInfo.get(m.name);
+          lineInfo.delete(m.name);
+          lineInfo.set(team.name, Object.assign({}, r, { saved: m.now }));
+        });
+        save();
+        renderAll();
+        setStatus('Spreads updated', moved.length + ' team' + (moved.length === 1 ? '' : 's') + ' now use' + (moved.length === 1 ? 's' : '') + ' the current line. Tap Undo to go back.', 'success');
       }
 
       function saveWeek() {
@@ -2903,6 +3110,7 @@
 
       els.status.addEventListener('click', event => {
         const button = event.target.closest('.status-action');
+        if (button && button.dataset.fix === 'lines') return useCurrentLines();
         if (!button || button.dataset.fix !== 'overlap') return;
         els.overlap.value = button.dataset.value;
         els.overlap.dispatchEvent(new Event('change'));
@@ -2946,6 +3154,7 @@
         const editBtn = event.target.closest('.history-edit-btn');
         if (editBtn) return openPastForm(state.history.find(week => week.id === editBtn.dataset.historyId));
       });
+      els.checkLines.addEventListener('click', () => checkLines(false));
       els.setupHide.addEventListener('click', () => setSetupCollapsed(true));
       els.setupShow.addEventListener('click', () => setSetupCollapsed(false));
       els.addPastWeek.addEventListener('click', () => openPastForm(null));
@@ -2986,8 +3195,11 @@
       renderAll();
       if (state.teams.length) setStatus('Saved setup restored', 'Your teams, exposure settings, placements, and latest build were loaded.', 'success');
       pullFromServer();
+      if (state.teams.length) checkLines(true);
       document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible') pullFromServer();
+        if (document.visibilityState !== 'visible') return;
+        pullFromServer();
+        if (state.teams.length && Date.now() - linesCheckedAt > 600000) checkLines(true);
       });
       window.addEventListener('online', () => pullFromServer());
       els.syncStatus.addEventListener('click', () => pullFromServer());
@@ -3045,9 +3257,35 @@
           auto: Boolean(x.auto),
           final: String(x.final || '').slice(0, 140),
           notes: String(x.notes || '').slice(0, 500),
+          close: cleanMarket(x.close),
+          closeAt: Number(x.closeAt) || 0,
+          closeLocked: Boolean(x.closeLocked),
           updatedAt: Number(x.updatedAt) || 0
         };
       }
+      function cleanMarket(m) {
+        if (!m || typeof m !== 'object') return null;
+        const n = v => (typeof v === 'number' && isFinite(v)) ? v : null;
+        const out = { spread: n(m.spread), total: n(m.total), ml: n(m.ml) };
+        return out.spread === null && out.total === null && out.ml === null ? null : out;
+      }
+
+      // ---------- closing line value ----------
+      // close = the last line seen before kickoff (closeLocked once the game starts). CLV is how
+      // much better your number was than that close: points for spreads and totals, win-chance
+      // percentage points for moneylines. Positive = you beat the close.
+      const fmtLine = n => n === 0 ? 'PK' : (n > 0 ? '+' : '') + n;
+      const implied = o => o > 0 ? 100 / (o + 100) : -o / (-o + 100);
+      function clvOf(b) {
+        if (!b.close) return null;
+        const p = SG.parseBet(b.bet);
+        if (!p) return null;
+        if (p.kind === 'Spread' && b.close.spread != null) return { value: Math.round((p.line - b.close.spread) * 10) / 10, unit: 'pts', close: fmtLine(b.close.spread) };
+        if (p.kind === 'Total' && b.close.total != null) return { value: Math.round((p.side === 'over' ? b.close.total - p.line : p.line - b.close.total) * 10) / 10, unit: 'pts', close: (p.side === 'over' ? 'o' : 'u') + b.close.total };
+        if (p.kind === 'Moneyline' && b.close.ml != null && isOdds(b.odds) && isOdds(b.close.ml)) return { value: Math.round((implied(b.close.ml) - implied(b.odds)) * 1000) / 10, unit: '%', close: fmtOdds(b.close.ml) };
+        return null;
+      }
+      const fmtClv = c => (c.value > 0 ? '+' : '') + (c.unit === '%' ? c.value.toFixed(1) + '%' : c.value.toFixed(1));
       function cleanSettings(x) {
         const d = defaultSettings();
         if (!x || typeof x !== 'object') return d;
@@ -3178,6 +3416,7 @@
           cell('bt-book', 'Where placed', '<input class="book" data-f="book" aria-label="Where placed" list="btBooks" value="' + esc(b.book) + '" autocomplete="off">') +
           cell('bt-res', 'Result', '<select data-f="result" aria-label="Result"><option value="">\u2014</option><option value="W">W</option><option value="L">L</option><option value="P">Push</option></select>') +
           cell('bt-pl', 'Profit/Loss', '') +
+          cell('bt-clv', 'Close \u00b7 CLV', '') +
           cell('bt-fin', 'Final score', '') +
           cell('bt-notes', 'Notes', '<input class="notes" data-f="notes" aria-label="Notes" value="' + esc(b.notes) + '" autocomplete="off">') +
           cell('bt-x', '', '<button type="button" class="bt-del" data-del aria-label="Delete bet ' + esc(b.bet || '') + '">\u2715</button>') +
@@ -3196,6 +3435,13 @@
         const p = profit(b), pl = tr.querySelector('.bt-pl');
         pl.textContent = p == null ? '' : money(p);
         pl.className = 'bt-pl' + (p > 0 ? ' pos' : p < 0 ? ' neg' : '');
+        const cl = tr.querySelector('.bt-clv'), c = clvOf(b);
+        if (c) {
+          cl.innerHTML = '<span class="bt-close">' + (b.closeLocked ? '' : 'now ') + esc(c.close) + '</span> <strong>' + esc(fmtClv(c)) + '</strong>';
+          cl.className = 'bt-clv ' + (c.value > 0 ? 'pos' : c.value < 0 ? 'neg' : '') + (b.closeLocked ? '' : ' live');
+          cl.title = (b.closeLocked ? 'Closing line ' : 'Current line (not closed yet) ') + c.close + '. ' +
+            (c.value === 0 ? 'Same as your number.' : 'Your number was ' + Math.abs(c.value).toFixed(1) + (c.unit === '%' ? ' percentage points of win chance ' : ' points ') + (c.value > 0 ? 'better.' : 'worse.'));
+        } else { cl.textContent = ''; cl.className = 'bt-clv'; cl.title = ''; }
         const fin = tr.querySelector('.bt-fin');
         fin.textContent = b.final || '';
         fin.className = 'bt-fin' + ((b.final || '').startsWith('!') ? ' bad' : '');
@@ -3284,6 +3530,12 @@
         $('btUnits').textContent = (u >= 0 ? '+' : '') + u.toFixed(2) + 'u'; tone($('btUnits'), a.net);
         $('btRoi').textContent = (a.roi * 100).toFixed(1) + '%'; tone($('btRoi'), a.net);
         $('btWinPct').textContent = (a.w + a.l ? a.w / (a.w + a.l) * 100 : 0).toFixed(1) + '%';
+        const clvs = S.bets.filter(b => b.closeLocked).map(clvOf).filter(Boolean);
+        const pts = clvs.filter(c => c.unit === 'pts');
+        const beat = clvs.filter(c => c.value > 0).length, decided = clvs.filter(c => c.value !== 0).length;
+        $('btClv').textContent = decided ? Math.round(beat / decided * 100) + '%' : '\u2014';
+        tone($('btClv'), decided ? beat / decided - 0.5 : 0);
+        $('btClvSub').textContent = clvs.length ? (pts.length ? 'avg ' + fmtClv({ value: Math.round(pts.reduce((s, c) => s + c.value, 0) / pts.length * 10) / 10, unit: 'pts' }) + ' pts \u00b7 ' : '') + clvs.length + ' bet' + (clvs.length === 1 ? '' : 's') : 'no closing lines yet';
         const pending = S.bets.filter(b => b.bet && !b.result);
         $('btPending').textContent = pending.length;
         $('btPendingRisk').textContent = pending.length ? money(pending.reduce((s, b) => s + (b.risk || 0), 0)) + ' at risk' : 'none open';
@@ -3377,14 +3629,25 @@
         const btn = $('btGradeBtn');
         btn.disabled = true; btn.textContent = 'Grading\u2026';
         const league = S.settings.league, t = today();
-        const rows = S.bets.filter(b => b.bet && !b.result);
-        await Promise.all(Array.from(new Set(rows.filter(b => b.date && b.date <= t).map(b => b.date))).map(d => SG.prefetch(league, d, SG.addDays(d, 1))));
+        const recent = SG.addDays(t, -14), horizon = SG.addDays(t, 14);
+        // Ungraded bets, plus recent graded ones still waiting on a closing line.
+        const rows = S.bets.filter(b => b.bet && (!b.result || (!b.closeLocked && b.date && b.date >= recent)));
+        const pendingCount = rows.filter(b => !b.result).length;
+        await Promise.all(Array.from(new Set(rows.filter(b => b.date && b.date <= horizon).map(b => b.date))).map(d => SG.prefetch(league, d, SG.addDays(d, 1))));
         let done = 0, waiting = 0, bad = 0, netErr = false, changed = false;
         for (const b of rows) {
           let r;
           try { r = await SG.grade(b.bet, { league, date: b.date }); } catch (_) { netErr = true; break; }
           const live = IDX.get(b.id);
-          if (!live || live.result) continue; // deleted or graded by hand while we waited
+          if (!live) continue; // deleted while we waited
+          if (r.state && !live.closeLocked) {
+            // Keep refreshing the line until kickoff; once the game starts, that's the close.
+            const before = JSON.stringify([live.close, live.closeLocked]);
+            if (r.state === 'pre') { if (r.market) { live.close = cleanMarket(r.market); live.closeAt = Date.now(); } }
+            else { if (!live.close && r.market) { live.close = cleanMarket(r.market); live.closeAt = Date.now(); } live.closeLocked = true; }
+            if (JSON.stringify([live.close, live.closeLocked]) !== before) { touch(live); changed = true; }
+          }
+          if (live.result) { const tr = rowEl(live.id); if (tr) refreshRow(tr, live); continue; } // graded already (by hand or earlier)
           const final = r.result ? r.final : r.skip ? r.final : '! ' + r.err.charAt(0).toUpperCase() + r.err.slice(1);
           if (r.result) { live.result = r.result; live.auto = true; done++; } else if (r.skip) waiting++; else bad++;
           if (r.result || live.final !== final) { live.final = final; touch(live); changed = true; }
@@ -3395,8 +3658,8 @@
         if (changed) { save(); stats(); applyFilters(); renderSummary(); }
         if (netErr) showMsg('Couldn\u2019t reach ESPN for scores. Check your connection and try again, or set results by hand.', 'err');
         else if (!silent || done || bad) {
-          if (!rows.length) showMsg('Nothing to grade. Every bet already has a result.', 'ok');
-          else showMsg('Graded ' + done + ' bet' + (done === 1 ? '' : 's') + (waiting ? ' \u00b7 ' + waiting + ' not final yet' : '') + (bad ? ' \u00b7 ' + bad + ' need attention (see Final score)' : ''), bad ? 'warn' : 'ok');
+          if (!pendingCount) showMsg('Nothing to grade. Every bet already has a result.', 'ok');
+          else showMsg('Graded ' + done + ' bet' + (done === 1 ? '' : 's') + (waiting ? ' \u00b7 ' + waiting + ' not finished yet' : '') + (bad ? ' \u00b7 ' + bad + ' need attention (see Final score)' : ''), bad ? 'warn' : 'ok');
         }
       }
 
@@ -3487,10 +3750,11 @@
       }
       function exportCSV() {
         const q = s => '"' + String(s == null ? '' : s).replace(/"/g, '""') + '"', unit = S.settings.unit;
-        let out = 'Date,Bet,Odds (American),Risk ($),Win ($),Units,Where placed,Result,Profit/Loss ($),Notes\n';
+        let out = 'Date,Bet,Odds (American),Risk ($),Win ($),Units,Where placed,Result,Profit/Loss ($),Close,CLV,Notes\n';
         S.bets.forEach(b => {
           const p = profit(b);
-          out += [q(b.date), q(b.bet), q(fmtOdds(b.odds)), fmt2(b.risk), fmt2(b.win), b.risk > 0 ? (b.risk / unit).toFixed(2) : '', q(b.book), q(b.result), p == null ? '' : p.toFixed(2), q(b.notes)].join(',') + '\n';
+          const c = b.closeLocked ? clvOf(b) : null;
+          out += [q(b.date), q(b.bet), q(fmtOdds(b.odds)), fmt2(b.risk), fmt2(b.win), b.risk > 0 ? (b.risk / unit).toFixed(2) : '', q(b.book), q(b.result), p == null ? '' : p.toFixed(2), q(c ? c.close : ''), q(c ? fmtClv(c) : ''), q(b.notes)].join(',') + '\n';
         });
         download('bets_' + today() + '.csv', out, 'text/csv');
       }

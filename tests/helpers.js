@@ -19,7 +19,8 @@ function createBackend() {
   return { data: null, bets: null, mode: 'up' };
 }
 
-// Fake ESPN scoreboard. games: [{ date: 'YYYY-MM-DD', home: [name, abbr, score], away: [...], final }]
+// Fake ESPN scoreboard. games: [{ date: 'YYYY-MM-DD', home: [name, abbr, score], away: [...], final, state,
+//   odds: { details: 'TEM -4.5', total, homeML, awayML } }]  (state: 'pre' | 'in' | 'post')
 // Each team name also serves as its location/shortDisplayName, like ESPN's feed.
 function espnFeed(games) {
   const team = ([name, abbr]) => ({ location: name, shortDisplayName: name, displayName: name + ' Team', name: 'Team', abbreviation: abbr });
@@ -32,8 +33,8 @@ function espnFeed(games) {
       .filter(g => { const d = g.date.replace(/-/g, ''); return d >= from && d <= to; })
       .map(g => ({
         date: g.date + 'T19:00Z',
-        status: { type: { completed: g.final !== false, name: g.status || (g.final === false ? 'STATUS_SCHEDULED' : 'STATUS_FINAL'), description: g.description || '' } },
-        competitions: [{ competitors: [
+        status: { type: { completed: g.final !== false, state: g.state, name: g.status || (g.final === false ? 'STATUS_SCHEDULED' : 'STATUS_FINAL'), description: g.description || '' } },
+        competitions: [{ odds: g.odds ? [{ details: g.odds.details, overUnder: g.odds.total, homeTeamOdds: { moneyLine: g.odds.homeML }, awayTeamOdds: { moneyLine: g.odds.awayML } }] : undefined, competitors: [
           { homeAway: 'home', team: team(g.home), score: String(g.home[2]) },
           { homeAway: 'away', team: team(g.away), score: String(g.away[2]) }
         ] }]
