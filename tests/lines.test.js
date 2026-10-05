@@ -87,3 +87,55 @@ test('Check lines is off until a team has a spread', async t => {
   await wait(50);
   assert.equal(app.$('#checkLinesBtn').disabled, true);
 });
+
+// ---------- Matching the right game ----------
+const final = (date, home, away, details, hs, as) => ({ date, home: [home[0], home[1], hs], away: [away[0], away[1], as], state: 'post', odds: { details } });
+const lastWeek = [
+  final(day(-2), ['Temple', 'TEM'], ['Army', 'ARMY'], 'ARMY -6.5', 20, 24),
+  final(day(-2), ['North Texas', 'UNT'], ['Rice', 'RICE'], 'RICE -1.5', 30, 27),
+  final(day(-2), ['Hawaii', 'HAW'], ['UNLV', 'UNLV'], 'HAW -2.5', 31, 17),
+  final(day(-2), ['USC', 'USC'], ['Oregon', 'ORE'], 'ORE -9.5', 21, 28)
+];
+const nextWeek = [
+  upcoming(['Temple', 'TEM'], ['Navy', 'NAVY'], 'TEM -4.5'),            // a different game entirely
+  upcoming(['North Texas', 'UNT'], ['Tulane', 'TULN'], 'UNT -27.5'),
+  upcoming(['Hawaii', 'HAW'], ['Boise State', 'BSU'], 'BSU -20.5'),
+  upcoming(['USC', 'USC'], ['Michigan State', 'MSU'], 'USC -8.5')
+];
+const LAST_WEEK_TEAMS = ['Temple +6.5', 'North Texas +1.5', 'Hawaii -2.5', 'USC +9.5', 'Purdue +14.5', 'Iowa -3', 'Utah -1'];
+
+test('last week\u2019s slate is recognized as finished: no badges from next week\u2019s games', async t => {
+  const app = openApp({ espn: { feed: espnFeed(lastWeek.concat(nextWeek)), calls: [] } });
+  t.after(app.close);
+  await wait(20);
+  app.loadTeams(LAST_WEEK_TEAMS);
+  await wait(250);
+  assert.equal(app.$$('.line-move').length, 0, 'no misleading badges');
+  app.$('#checkLinesBtn').click();
+  await wait(200);
+  assert.match(app.status(), /look finished/);
+});
+
+test('with last week\u2019s game also in view, an upcoming pick matches this week\u2019s game', async t => {
+  const thisWeek = [upcoming(['Temple', 'TEM'], ['Navy', 'NAVY'], 'NAVY -5.5'), upcoming(['USC', 'USC'], ['Michigan State', 'MSU'], 'USC -8.5')];
+  const app = openApp({ espn: { feed: espnFeed(lastWeek.concat(thisWeek)), calls: [] } });
+  t.after(app.close);
+  await wait(20);
+  app.loadTeams(['Temple +6.5', 'USC -9.5', 'Purdue +14.5', 'Iowa -3', 'Utah -1', 'Rice +2', 'Army -3']);
+  await wait(250);
+  assert.equal(badge(app, 'Temple +6.5'), 'worse \u25bc now +5.5', 'compared with this week, not last week\u2019s +6.5 close');
+  assert.equal(badge(app, 'USC -9.5'), 'better \u25b2 now -8.5');
+});
+
+test('a line more than 7 points off is flagged to check by hand, not badged', async t => {
+  const app = openApp({ espn: { feed: espnFeed([upcoming(['Temple', 'TEM'], ['Navy', 'NAVY'], 'TEM -4.5'), upcoming(['USC', 'USC'], ['Michigan State', 'MSU'], 'USC -8.5')]), calls: [] } });
+  t.after(app.close);
+  await wait(20);
+  app.loadTeams(['Temple +6.5', 'USC -9.5', 'Purdue +14.5', 'Iowa -3', 'Utah -1', 'Rice +2', 'Army -3']);
+  await wait(250);
+  assert.equal(badge(app, 'Temple +6.5'), '');
+  app.$('#checkLinesBtn').click();
+  await wait(200);
+  assert.match(app.status(), /Check by hand .*Temple \+6\.5 vs -4\.5/);
+  assert.match(app.status(), /USC -9\.5 \u2192 -8\.5/);
+});

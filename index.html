@@ -894,9 +894,9 @@
     .help-version { margin-top: 18px; font-size: .78rem; }
 
     /* ---------- Layout fixes ---------- */
-    .setup { grid-template-columns: minmax(0, 1fr) minmax(330px, 430px); }
+    .setup { grid-template-columns: minmax(600px, 1.5fr) repeat(2, minmax(260px, .75fr)); gap: 16px; }
+    .setup > .setup-panel:nth-child(2) { grid-column: 2 / -1; }
     .setup .mini-stat { flex-direction: column; align-items: flex-start; gap: 1px; }
-    .workspace { grid-template-columns: minmax(620px, 1.65fr) repeat(2, minmax(280px, .68fr)); }
     .entry-head h2, .entry-count, .entry-footer .btn { white-space: nowrap; }
     html { scroll-padding-bottom: 90px; }
     .buildbar { gap: 12px; padding: 8px 10px 8px 16px; }
@@ -904,7 +904,8 @@
     .buildbar .status span { font-size: .8rem; }
     .buildbar .btn { min-height: 38px; }
     @media (max-width: 1400px) {
-      .workspace { grid-template-columns: 1fr 1fr; }
+      .setup { grid-template-columns: 1fr 1fr; }
+      .setup > .setup-panel:nth-child(2) { grid-column: auto; }
     }
     @media (max-width: 760px) {
       .topbar .subtitle, body.on-bets .topbar .subtitle-bets { display: none; }
@@ -1392,6 +1393,23 @@
         return best;
       }
 
+      // Every game in the list for that team (a 2-week window can hold two of its games).
+      function findGames(events, wanted) {
+        let bestScore = 49;
+        const hits = [];
+        events.forEach(ev => {
+          const comp = (ev.competitions || [])[0];
+          if (!comp) return;
+          const sides = comp.competitors || [];
+          sides.forEach(side => {
+            const score = matchScore(wanted, side.team || {});
+            if (score > bestScore) { bestScore = score; hits.length = 0; }
+            if (score === bestScore && score > 49) hits.push({ ev, me: side, opp: sides.find(x => x !== side) });
+          });
+        });
+        return hits;
+      }
+
       const cache = new Map();
       class HttpError extends Error {}
       function board(league, datesParam, group) {
@@ -1474,7 +1492,25 @@
         return { p, found, status, state: status.state || (status.completed ? 'post' : 'pre'), kickoff: found.ev.date || '', market: marketFor(found) };
       }
 
-      // Current line for a pick, without grading it (Pool Builder line check, Bet Tracker close).
+      // All of a team's games in a date range, each with its state and listed line.
+      async function lookupAll(text, opts) {
+        const league = (opts && opts.league) || 'cfb';
+        const p = parseBet(text);
+        if (!p || !p.team) return { err: 'needs a spread, ML, or total' };
+        const wanted = norm(p.team);
+        let hits = [];
+        for (const group of groupsFor(league)) {
+          hits = findGames(await boardRange(league, opts.date, opts.endDate, group), wanted);
+          if (hits.length) break;
+        }
+        if (!hits.length) return { p, err: 'game not found' };
+        return { p, games: hits.map(found => {
+          const status = (found.ev.status && found.ev.status.type) || {};
+          return { state: status.state || (status.completed ? 'post' : 'pre'), kickoff: found.ev.date || '', market: marketFor(found) };
+        }) };
+      }
+
+      // Current line for a pick, without grading it (Bet Tracker close).
       async function lookup(text, opts) {
         const r = await locate(text, opts);
         if (r.err || r.skip) return r;
@@ -1508,7 +1544,7 @@
       }
       const prefetch = (league, start, end) => boardRange(league, start, end, groupsFor(league)[0]).catch(() => null);
 
-      return { parseBet, betType, norm, grade, lookup, prefetch, ymd, addDays };
+      return { parseBet, betType, norm, grade, lookup, lookupAll, prefetch, ymd, addDays };
     })();
   </script>
   <script>
@@ -2536,17 +2572,23 @@
 
       // --- Line check ---
       // Compares each candidate's spread (the number after its name) with the line ESPN lists
-      // now, for games in the next 7 days. Moved lines get a badge on the team and its pick card,
+      // now. It looks a week back and a week ahead, and matches each pick to the game whose line
+      // is nearest your number, preferring games that haven't started; a gap over 7 points is
+      // flagged to check by hand instead of badged. If most picks matched games already played,
+      // the list is treated as a finished slate and nothing is badged. Moved lines get a badge on the team and its pick card,
       // and "Use current lines" rewrites the spreads in place (tiers, exposure, locks, and the
       // build are kept, and Undo reverses it). Runs quietly when teams load; the button reports.
       let lineInfo = new Map();
       let linesChecking = false;
       let linesCheckedAt = 0;
+      let slateFinished = false;
+      const FAR = 7;
       const fmtLine = n => n === 0 ? 'PK' : (n > 0 ? '+' : '') + n;
       function movedLines() {
         const moved = [];
+        if (slateFinished) return moved;
         lineInfo.forEach((r, name) => {
-          if (r.state === 'pre' && r.market && r.market.spread != null && r.market.spread !== r.saved) moved.push({ name, saved: r.saved, now: r.market.spread, team: r.p.team });
+          if (!r.far && r.state === 'pre' && r.market && r.market.spread != null && r.market.spread !== r.saved) moved.push({ name, saved: r.saved, now: r.market.spread, team: r.p.team });
         });
         return moved;
       }
@@ -2585,12 +2627,15 @@
         linesChecking = true;
         els.checkLines.disabled = true;
         els.checkLines.textContent = 'Checking\u2026';
-        const start = grader.ymd(new Date()), end = grader.addDays(start, 7);
+        const today = grader.ymd(new Date());
+        const start = grader.addDays(today, -7), end = grader.addDays(today, 7);
         const info = new Map();
         let netErr = false;
         for (const x of picks) {
-          try { info.set(x.name, Object.assign({ saved: x.p.line }, await grader.lookup(x.name, { league: 'cfb', date: start, endDate: end }))); }
+          let r;
+          try { r = await grader.lookupAll(x.name, { league: 'cfb', date: start, endDate: end }); }
           catch (_) { netErr = true; break; }
+          info.set(x.name, pickGame(x.p, r));
         }
         linesChecking = false;
         if (!document) return;
@@ -2602,23 +2647,51 @@
         }
         lineInfo = info;
         linesCheckedAt = Date.now();
+        const resolved = Array.from(info.values()).filter(r => !r.err);
+        slateFinished = resolved.length > 0 && resolved.filter(r => r.state !== 'pre').length > resolved.length / 2;
         decorateLines();
         if (silent) return;
+        if (slateFinished) {
+          setStatus('These games look finished', 'Most of your teams matched games that have already been played, so there are no lines to compare. Paste this week\u2019s teams and spreads, then tap Check lines.', 'error');
+          return;
+        }
         const moved = movedLines();
-        const notListed = [], started = [];
+        const notListed = [], started = [], far = [];
         info.forEach((r, name) => {
-          if (r.err || r.skip || (r.state === 'pre' && (!r.market || r.market.spread == null))) notListed.push(name);
+          if (r.err || (r.state === 'pre' && (!r.market || r.market.spread == null))) notListed.push(name);
           else if (r.state !== 'pre') started.push(name);
+          else if (r.far) far.push(r.p.team + ' ' + fmtLine(r.saved) + ' vs ' + fmtLine(r.market.spread));
         });
         const extra = (started.length ? ' Already started: ' + started.join(', ') + '.' : '') +
+          (far.length ? ' Check by hand (more than ' + FAR + ' points apart, may be a different game): ' + far.join(', ') + '.' : '') +
           (notListed.length ? ' No line found for ' + notListed.length + ' team' + (notListed.length === 1 ? '' : 's') + '.' : '');
         if (moved.length) {
           setStatus(moved.length + ' line' + (moved.length === 1 ? ' has' : 's have') + ' moved',
             moved.map(m => m.team + ' ' + fmtLine(m.saved) + ' \u2192 ' + fmtLine(m.now)).join(', ') + '.' + extra, 'error',
             { fix: 'lines', value: '', label: 'Use current lines' });
         } else {
-          setStatus('Lines checked', 'Every spread matches ESPN\u2019s current line.' + extra, 'success');
+          setStatus('Lines checked', (far.length ? 'No lines moved within ' + FAR + ' points.' : 'Every spread matches ESPN\u2019s current line.') + extra, far.length ? 'error' : 'success');
         }
+      }
+      // Which of a team's games this pick means: the one whose line is nearest your number,
+      // preferring games not yet started; a finished game only wins when nothing upcoming is close.
+      function pickGame(p, r) {
+        const base = { saved: p.line, p };
+        if (!r || r.err) return Object.assign(base, { err: (r && r.err) || 'game not found' });
+        const near = list => {
+          let best = null;
+          list.forEach(g => { if (g.market && g.market.spread != null) { const d = Math.abs(g.market.spread - p.line); if (!best || d < best.d) best = { g, d }; } });
+          return best;
+        };
+        const upcoming = r.games.filter(g => g.state === 'pre'), done = r.games.filter(g => g.state !== 'pre');
+        const up = near(upcoming), past = near(done);
+        let pick;
+        if (up && up.d <= FAR) pick = up.g;
+        else if (past && past.d <= FAR) pick = past.g;
+        else if (done.length) pick = done[0];
+        else if (up) return Object.assign(base, up.g, { far: true });
+        else pick = upcoming[0];
+        return Object.assign(base, pick);
       }
       function useCurrentLines() {
         const moved = movedLines();
