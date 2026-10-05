@@ -14,33 +14,64 @@ const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 const teamNames = count => Array.from({ length: count }, (_, i) => 'Team' + i);
 
 // Fake sync server. mode: 'up' | 'offline' | '404' | 'notconnected' | '500'
+// data = the pool setup (/api/setup); bets = the Bet Tracker store (/api/bets).
 function createBackend() {
-  return { data: null, mode: 'up' };
+  return { data: null, bets: null, mode: 'up' };
 }
 
-function mockFetch(backend) {
+// Fake ESPN scoreboard. games: [{ date: 'YYYY-MM-DD', home: [name, abbr, score], away: [...], final }]
+// Each team name also serves as its location/shortDisplayName, like ESPN's feed.
+function espnFeed(games) {
+  const team = ([name, abbr]) => ({ location: name, shortDisplayName: name, displayName: name + ' Team', name: 'Team', abbreviation: abbr });
+  return url => {
+    const m = String(url).match(/dates=(\d{8})(?:-(\d{8}))?/);
+    const group = (String(url).match(/groups=(\d+)/) || [])[1];
+    const from = m[1], to = m[2] || m[1];
+    return games
+      .filter(g => (g.group || '80') === (group || '80'))
+      .filter(g => { const d = g.date.replace(/-/g, ''); return d >= from && d <= to; })
+      .map(g => ({
+        date: g.date + 'T19:00Z',
+        status: { type: { completed: g.final !== false, name: g.status || (g.final === false ? 'STATUS_SCHEDULED' : 'STATUS_FINAL'), description: g.description || '' } },
+        competitions: [{ competitors: [
+          { homeAway: 'home', team: team(g.home), score: String(g.home[2]) },
+          { homeAway: 'away', team: team(g.away), score: String(g.away[2]) }
+        ] }]
+      }));
+  };
+}
+
+function mockFetch(backend, espn) {
   return (url, opts) => new Promise((resolve, reject) => setTimeout(() => {
+    url = String(url);
+    if (url.includes('site.api.espn.com')) {
+      if (!espn) return reject(new TypeError('network down'));
+      if (espn.calls) espn.calls.push(url);
+      return resolve({ ok: true, status: 200, json: async () => ({ events: espn.feed(url) }) });
+    }
+    const field = url.includes('/api/bets') ? 'bets' : 'data';
     if (!backend || backend.mode === 'offline') return reject(new Error('network down'));
     if (backend.mode === '404') return resolve({ ok: false, status: 404, json: async () => ({}) });
     if (backend.mode === 'notconnected') return resolve({ ok: false, status: 500, json: async () => ({ error: 'Redis is not connected to this project yet.' }) });
     if (backend.mode === '500') return resolve({ ok: false, status: 500, json: async () => ({ error: 'Could not save the setup.' }) });
     if (opts && opts.method === 'POST') {
-      backend.data = JSON.parse(opts.body);
+      backend[field] = JSON.parse(opts.body);
       return resolve({ ok: true, status: 200, json: async () => ({ ok: true }) });
     }
-    resolve({ ok: true, status: 200, json: async () => ({ data: backend.data }) });
+    resolve({ ok: true, status: 200, json: async () => ({ data: backend[field] }) });
   }, 5));
 }
 
 // Opens a fresh "device". Pass the same backend to two apps to simulate laptop + phone.
 // backend: null means no sync server at all (e.g. opened as a local file).
-function openApp({ backend = null, confirm = true, storage = null } = {}) {
+function openApp({ backend = null, confirm = true, storage = null, espn = null, bets = null, url = 'https://pool.test/', now = null } = {}) {
   const dom = new JSDOM(HTML, {
     runScripts: 'dangerously',
     pretendToBeVisual: true,
-    url: 'https://pool.test/',
+    url,
     beforeParse(w) {
-      w.fetch = mockFetch(backend);
+      if (now) { const RealDate = w.Date; const fixed = new RealDate(now).getTime(); w.Date = class extends RealDate { constructor(...a) { super(...(a.length ? a : [fixed])); } static now() { return fixed; } }; }
+      w.fetch = mockFetch(backend, espn);
       w.confirm = typeof confirm === 'function' ? confirm : () => confirm;
       w.__clipboard = '';
       Object.defineProperty(w.navigator, 'clipboard', {
@@ -48,6 +79,7 @@ function openApp({ backend = null, confirm = true, storage = null } = {}) {
         configurable: true
       });
       if (storage) w.localStorage.setItem(STORAGE_KEY, JSON.stringify(storage));
+      if (bets) w.localStorage.setItem('cfb-pool-bets-v1', JSON.stringify(bets));
     }
   });
   return makeApi(dom);
@@ -138,4 +170,4 @@ function makeApi(dom) {
 // Waits long enough for a debounced push (600ms) plus the fake network round trip.
 const SYNC_WAIT = 800;
 
-module.exports = { openApp, createBackend, teamNames, wait, SYNC_WAIT, STORAGE_KEY };
+module.exports = { openApp, createBackend, espnFeed, teamNames, wait, SYNC_WAIT, STORAGE_KEY };

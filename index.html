@@ -705,25 +705,167 @@
       .dropzone { min-height: 0; }
       .pick-meta, .entry-count, .subtitle { color: #555; }
     }
+  
+    /* ---------- Page tabs + Bet Tracker ---------- */
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+    #poolPage[hidden], #betsPage[hidden], .bets-page [hidden] { display: none !important; }
+    .page-tabs { display: inline-flex; gap: 4px; margin: -6px 0 18px; padding: 4px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); box-shadow: var(--shadow); max-width: 100%; }
+    .page-tab { min-height: 40px; padding: 0 18px; border: 0; border-radius: 10px; background: transparent; color: var(--muted); font-weight: 800; white-space: nowrap; }
+    .page-tab:hover { color: var(--text); background: var(--panel-3); }
+    .page-tab[aria-selected="true"] { background: var(--green); color: #ffffff; }
+    body.on-bets .pool-only { display: none !important; }
+    .subtitle-bets { display: none; }
+    body.on-bets .subtitle-pool { display: none; }
+    body.on-bets .subtitle-bets { display: block; }
+
+    .bt-stats { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; margin-bottom: 16px; }
+    .bt-stat { min-width: 0; padding: 13px 15px; border: 1px solid var(--line); border-left: 4px solid var(--green); border-radius: 14px; background: var(--panel); box-shadow: var(--shadow); }
+    .bt-stat.pending { border-left-color: var(--amber); }
+    .bt-stat span { display: block; color: var(--muted); font-size: .68rem; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; }
+    .bt-stat strong { display: block; margin-top: 3px; overflow: hidden; font-size: 1.55rem; line-height: 1.15; letter-spacing: -.02em; text-overflow: ellipsis; white-space: nowrap; }
+    .bt-stat em { display: block; color: var(--muted); font-size: .74rem; font-style: normal; }
+    .bets-page .pos { color: var(--green); }
+    .bets-page .neg { color: var(--red); }
+
+    .bt-toolbar { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; padding: 14px 16px; margin-bottom: 12px; }
+    .bt-toolbar label { display: flex; flex-direction: column; }
+    .bt-toolbar .field-label { margin-bottom: 4px; }
+    .bt-settings summary { display: none; }
+    .bt-settings-inner, .bt-filters, .bt-actions { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px; }
+    .bt-unit { width: 96px; }
+    .bt-toolbar .bt-check { flex-direction: row; align-items: center; gap: 8px; min-height: 42px; font-size: .88rem; font-weight: 700; }
+    .bt-check input { width: 18px; height: 18px; accent-color: var(--green); }
+    .bt-spacer { flex: 1; }
+    .bt-foot { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 14px; width: 100%; color: var(--muted); font-size: .78rem; }
+    .bt-foot .due { color: #9a3412; font-weight: 700; }
+    .bt-sync { display: inline-flex; align-items: center; gap: 7px; padding: 4px 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel-2); color: var(--muted); font-size: .76rem; font-weight: 700; }
+    .bt-sync::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #9ca3af; }
+    .bt-sync.sync-ok::before { background: var(--green); }
+    .bt-sync.sync-warn { color: #9a3412; border-color: rgba(234, 88, 12, .45); }
+    .bt-sync.sync-warn::before { background: #ea580c; }
+    .bt-sync.sync-error { color: var(--red); border-color: rgba(220, 38, 38, .45); }
+    .bt-sync.sync-error::before { background: var(--red); }
+    .bt-menu { position: relative; }
+    .bt-menu-pop { position: absolute; right: 0; top: calc(100% + 6px); z-index: 20; min-width: 260px; padding: 5px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); box-shadow: var(--shadow); }
+    .bt-menu-pop button { display: block; width: 100%; padding: 10px 11px; border: 0; border-radius: 8px; background: none; color: var(--text); font-weight: 700; text-align: left; }
+    .bt-menu-pop button:hover { background: var(--panel-3); }
+
+    .bt-msg { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; padding: 10px 14px; border: 1px solid var(--line); border-left: 4px solid var(--green); border-radius: 12px; background: var(--panel); font-size: .9rem; }
+    .bt-msg.warn { border-left-color: var(--amber); }
+    .bt-msg.err { border-left-color: var(--red); }
+    .bt-msg .btn { min-height: 34px; margin-left: auto; }
+
+    .bt-tablecard { min-height: 160px; max-height: calc(100vh - 280px); overflow: auto; padding: 0; }
+    .bt-table { width: 100%; min-width: 1120px; border-collapse: collapse; }
+    .bt-table th { position: sticky; top: 0; z-index: 2; padding: 10px 6px; border-bottom: 1px solid var(--line); background: var(--panel-2); color: var(--muted); font-size: .66rem; font-weight: 800; letter-spacing: .07em; text-align: left; text-transform: uppercase; white-space: nowrap; }
+    .bt-table th.r { text-align: right; }
+    .bt-table td { padding: 3px 5px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+    .bt-table td input, .bt-table td select { width: 100%; min-height: 36px; padding: 5px 8px; border: 1px solid transparent; border-radius: 8px; background: transparent; color: var(--text); }
+    .bt-table td input:hover, .bt-table td select:hover { border-color: var(--control-line); background: #ffffff; }
+    .bt-table td input.bad { border-color: var(--red); }
+    .bt-table input.num { width: 88px; text-align: right; font-variant-numeric: tabular-nums; }
+    .bt-table input.bet { min-width: 230px; font-weight: 800; }
+    .bt-table input.book { width: 108px; }
+    .bt-table input[type="date"] { width: 142px; }
+    .bt-table input.notes { min-width: 150px; }
+    .bt-table select { min-width: 84px; }
+    .bt-n { width: 42px; padding-right: 10px !important; color: var(--muted); font-size: .78rem; text-align: right; box-shadow: inset 4px 0 0 transparent; }
+    .bt-table tr.W .bt-n { box-shadow: inset 4px 0 0 var(--green); }
+    .bt-table tr.L .bt-n { box-shadow: inset 4px 0 0 var(--red); }
+    .bt-table tr.P .bt-n { box-shadow: inset 4px 0 0 #6b7280; }
+    .bt-pl { padding-right: 10px !important; font-weight: 800; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .bt-fin { min-width: 150px; padding: 0 8px !important; color: var(--muted); font-size: .76rem; white-space: nowrap; }
+    .bt-fin.bad { color: #9a3412; }
+    .bt-del { min-width: 34px; min-height: 34px; border: 0; border-radius: 8px; background: none; color: var(--muted); font-size: 1rem; }
+    .bt-del:hover { background: rgba(200, 61, 54, .08); color: var(--red); }
+
+    .bt-summary { display: grid; gap: 16px; margin-top: 18px; }
+    .bt-sumgrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+    .bt-sumcard { min-width: 0; padding: 17px; overflow-x: auto; }
+    .bt-sumcard h2 { margin: 0 0 10px; font-size: 1rem; }
+    .bt-sumtable { width: 100%; border-collapse: collapse; font-size: .88rem; }
+    .bt-sumtable th { padding: 7px 6px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: .66rem; font-weight: 800; letter-spacing: .07em; text-align: left; text-transform: uppercase; }
+    .bt-sumtable td { padding: 8px 6px; border-bottom: 1px solid var(--line); }
+    .bt-sumtable .r { text-align: right; font-variant-numeric: tabular-nums; }
+    .bt-sumtable .bt-none { color: var(--muted); }
+    #btChart svg { display: block; overflow: visible; }
+    #btChart text { fill: var(--muted); font-size: 11px; }
+    #btChart .g { stroke: var(--line); stroke-width: 1; }
+    #btChart .z { stroke: var(--control-line); stroke-width: 1; }
+    #btChart .l { fill: none; stroke: var(--green); stroke-width: 2.5; stroke-linejoin: round; }
+    #btChart .up { fill: var(--green); }
+    #btChart .down { fill: var(--red); }
+    .auto-grade-note:empty { display: none; }
+    .auto-grade-note { margin-top: 8px; }
+
+    @media (max-width: 1100px) {
+      .bt-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .bt-sumgrid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 760px) {
+      .page-tabs { display: flex; width: 100%; margin-top: 0; }
+      .page-tab { flex: 1; padding: 0 10px; }
+      .bt-stats { gap: 8px; margin-bottom: 12px; }
+      .bt-stat { padding: 9px 10px; border-radius: 12px; }
+      .bt-stat strong { font-size: 1.15rem; }
+      .bt-stat em { display: none; }
+      .bt-toolbar { gap: 10px; padding: 12px; }
+      .bt-settings { width: 100%; }
+      .bt-settings summary { display: list-item; cursor: pointer; color: var(--muted); font-size: .82rem; font-weight: 800; }
+      .bt-settings-inner { padding-top: 10px; }
+      .bt-spacer { display: none; }
+      .bt-filters { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); width: 100%; }
+      .bt-filters select { width: 100%; min-width: 0; }
+      .bt-actions { display: grid; grid-template-columns: 1fr 1fr 1fr; width: 100%; }
+      .bt-actions .btn, .bt-menu .btn { width: 100%; padding: 0 6px; font-size: .9rem; white-space: nowrap; }
+      .bt-menu-pop { left: auto; right: 0; }
+      .bt-tablecard { max-height: none; overflow: visible; border: 0; background: transparent; box-shadow: none; }
+      .bt-table { display: block; min-width: 0; }
+      .bt-table thead { display: none; }
+      .bt-table tbody { display: block; }
+      .bt-table tbody tr { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-areas: "bet bet bet res" "date date book book" "odds risk win units" "pl fin fin x" "notes notes notes notes"; gap: 7px; margin-bottom: 10px; padding: 11px; border: 1px solid var(--line); border-left: 5px solid var(--line); border-radius: 14px; background: var(--panel); box-shadow: var(--shadow); }
+      .bt-table tbody tr.W { border-left-color: var(--green); }
+      .bt-table tbody tr.L { border-left-color: var(--red); }
+      .bt-table tbody tr.P { border-left-color: #6b7280; }
+      .bt-table td { display: block; min-width: 0; padding: 0 !important; border: 0; }
+      .bt-table td.bt-n { display: none; }
+      .bt-bet { grid-area: bet; } .bt-res { grid-area: res; } .bt-date { grid-area: date; } .bt-book { grid-area: book; }
+      .bt-odds { grid-area: odds; } .bt-risk { grid-area: risk; } .bt-win { grid-area: win; } .bt-units { grid-area: units; }
+      .bt-pl { grid-area: pl; text-align: left; font-size: 1.02rem; } .bt-fin { grid-area: fin; white-space: normal; font-size: .8rem; }
+      .bt-x { grid-area: x; align-self: end; text-align: right; } .bt-notes { grid-area: notes; }
+      .bt-table td[data-label]::before { content: attr(data-label); display: block; margin-bottom: 2px; color: var(--muted); font-size: .62rem; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; }
+      .bt-table td input, .bt-table td select { min-height: 40px; border-color: var(--control-line); background: #ffffff; font-size: 16px; }
+      .bt-table input.num, .bt-table input.bet, .bt-table input.book, .bt-table input[type="date"], .bt-table input.notes { width: 100%; min-width: 0; text-align: left; }
+      .bt-table select { min-width: 0; }
+      .bt-sumcard { padding: 14px; }
+    }
+    .past-toolbar { display: flex; flex-wrap: wrap; gap: 8px; }
   </style>
 </head>
 <body>
   <main class="app">
     <header class="topbar">
       <div>
-        <p class="eyebrow">Standalone tool • Light v7</p>
+        <p class="eyebrow">Standalone tool • Light v8</p>
         <h1>CFB Splash Pool Builder</h1>
-        <p class="subtitle">Build two 7-pick entries, control every team's exposure, and place any team with a tap — S1, S2, or Lock both for both entries (drag works too on desktop).</p>
+        <p class="subtitle subtitle-pool">Build two 7-pick entries, control every team's exposure, and place any team with a tap — S1, S2, or Lock both for both entries (drag works too on desktop).</p>
+        <p class="subtitle subtitle-bets">Track every bet you place. Results fill in automatically from final scores, and your bets sync between your laptop and phone.</p>
       </div>
       <div class="top-actions">
         <button class="sync-pill sync-pending" id="syncStatus" type="button" title="Sync status between your devices. Tap to sync now.">Checking sync…</button>
         <button class="btn" id="helpBtn" type="button">Help</button>
-        <button class="btn" id="historyBtn" type="button">Saved weeks</button>
-        <button class="btn" id="transferBtn" type="button">Copy / Load setup</button>
-        <button class="btn" id="printBtn" type="button">Print / Save PDF</button>
+        <button class="btn pool-only" id="historyBtn" type="button">Saved weeks</button>
+        <button class="btn pool-only" id="transferBtn" type="button">Copy / Load setup</button>
+        <button class="btn pool-only" id="printBtn" type="button">Print / Save PDF</button>
       </div>
     </header>
 
+    <nav class="page-tabs" id="pageTabs" role="tablist" aria-label="Pages">
+      <button class="page-tab" id="tabPool" type="button" role="tab" aria-selected="true" aria-controls="poolPage">Pool Builder</button>
+      <button class="page-tab" id="tabBets" type="button" role="tab" aria-selected="false" aria-controls="betsPage" tabindex="-1">Bet Tracker</button>
+    </nav>
+
+    <div id="poolPage" role="tabpanel" aria-labelledby="tabPool">
     <section class="setup">
       <div class="card setup-panel">
         <div class="section-head">
@@ -827,6 +969,95 @@
         <div class="benched-list" id="benchedList"></div>
       </section>
     </section>
+    </div>
+
+    <section id="betsPage" class="bets-page" role="tabpanel" aria-labelledby="tabBets" hidden>
+      <div class="bt-stats">
+        <div class="bt-stat"><span>Record</span><strong id="btRec">0-0-0</strong><em>W-L-Push</em></div>
+        <div class="bt-stat"><span>Profit</span><strong id="btNet">$0.00</strong><em>graded bets</em></div>
+        <div class="bt-stat"><span>Units</span><strong id="btUnits">+0.00u</strong><em>at your unit size</em></div>
+        <div class="bt-stat"><span>ROI</span><strong id="btRoi">0.0%</strong><em>profit &divide; risked</em></div>
+        <div class="bt-stat"><span>Win %</span><strong id="btWinPct">0.0%</strong><em>pushes excluded</em></div>
+        <div class="bt-stat pending"><span>Pending</span><strong id="btPending">0</strong><em id="btPendingRisk">none open</em></div>
+      </div>
+
+      <div class="card bt-toolbar">
+        <details class="bt-settings" id="btSettings">
+          <summary>Settings</summary>
+          <div class="bt-settings-inner">
+            <label><span class="field-label">Unit size ($)</span><input type="number" id="btUnit" min="1" step="1" inputmode="decimal" class="bt-unit"></label>
+            <label><span class="field-label">League</span>
+              <select id="btLeague"><option value="cfb">College football</option><option value="nfl">NFL</option></select></label>
+            <label class="bt-check"><input type="checkbox" id="btAutoGrade"> Auto-grade on open</label>
+          </div>
+        </details>
+        <div class="bt-spacer"></div>
+        <div class="bt-filters">
+          <label><span class="field-label">Show</span>
+            <select id="btFilterResult"><option value="">All bets</option><option value="pending">Pending</option><option value="W">Wins</option><option value="L">Losses</option><option value="P">Pushes</option></select></label>
+          <label><span class="field-label">Book</span><select id="btFilterBook"><option value="">All books</option></select></label>
+          <label><span class="field-label">Sort</span>
+            <select id="btSort"><option value="new">Newest</option><option value="old">Oldest</option><option value="entry">Entry order</option></select></label>
+        </div>
+        <div class="bt-actions">
+          <button class="btn primary" id="btAddBtn" type="button">+ Add bet</button>
+          <button class="btn" id="btGradeBtn" type="button">Auto-grade</button>
+          <div class="bt-menu">
+            <button class="btn" id="btDataBtn" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="btDataMenu">Data &#9662;</button>
+            <div class="bt-menu-pop" id="btDataMenu" hidden>
+              <button type="button" data-act="import">Import (paste rows, CSV, or backup)</button>
+              <button type="button" data-act="csv">Export CSV (Sheets / Excel)</button>
+              <button type="button" data-act="backup">Download full backup (.json)</button>
+            </div>
+          </div>
+        </div>
+        <div class="bt-foot">
+          <button type="button" class="bt-sync sync-pending" id="btSync" title="Bet sync between your devices. Tap to sync now.">Checking bet sync…</button>
+          <span id="btBackup"></span>
+        </div>
+      </div>
+
+      <div class="bt-msg" id="btMsg" role="status" hidden><span id="btMsgText"></span><button class="btn" id="btMsgBtn" type="button" hidden></button></div>
+
+      <div class="card bt-tablecard">
+        <table class="bt-table">
+          <thead><tr>
+            <th scope="col"><span class="sr-only">Row</span>#</th><th scope="col">Date</th><th scope="col">Bet</th><th scope="col" class="r">Odds</th>
+            <th scope="col" class="r">Risk ($)</th><th scope="col" class="r">Win ($)</th><th scope="col" class="r">Units</th><th scope="col">Where placed</th>
+            <th scope="col">Result</th><th scope="col" class="r">Profit/Loss</th><th scope="col">Final score</th><th scope="col">Notes</th><th scope="col"><span class="sr-only">Delete</span></th>
+          </tr></thead>
+          <tbody id="btBody"></tbody>
+        </table>
+        <div class="empty-state" id="btEmpty" hidden><strong>No bets yet</strong><span>Tap + Add bet, or Data &gt; Import to paste rows from your spreadsheet.</span></div>
+        <datalist id="btBooks"></datalist>
+      </div>
+
+      <div class="bt-summary">
+        <div class="card bt-sumcard bt-chartcard"><h2>Cumulative profit</h2><div id="btChart"></div></div>
+        <div class="bt-sumgrid">
+          <div class="card bt-sumcard"><h2>By week</h2><table class="bt-sumtable" id="btByWeek"></table></div>
+          <div class="card bt-sumcard"><h2>By book</h2><table class="bt-sumtable" id="btByBook"></table></div>
+          <div class="card bt-sumcard"><h2>By bet type</h2><table class="bt-sumtable" id="btByType"></table></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="modal-overlay hidden" id="btImportOverlay" role="dialog" aria-modal="true" aria-labelledby="btImportTitle">
+      <div class="card modal-card">
+        <div class="modal-head">
+          <h2 id="btImportTitle">Import bets</h2>
+          <button class="btn" id="btImportClose" type="button" aria-label="Close">✕</button>
+        </div>
+        <p class="helper">Paste rows copied from Google Sheets (include the header row), or load a CSV or backup (.json) file. New bets are added; bets from a backup that are already here get updated.</p>
+        <textarea id="btImportText" aria-label="Rows or backup to import" placeholder="Date	Bet	Odds (American)	Risk ($)	Win ($)	Units	Where placed	Result	Profit/Loss ($)	Notes"></textarea>
+        <div class="modal-actions">
+          <button class="btn primary" id="btImportGo" type="button">Import</button>
+          <button class="btn" id="btImportPick" type="button">Load from file</button>
+          <button class="btn" id="btImportCancel" type="button">Cancel</button>
+        </div>
+        <input type="file" id="btImportFile" accept=".csv,.tsv,.txt,.json,application/json,text/csv" hidden>
+      </div>
+    </div>
 
     <div class="modal-overlay hidden" id="helpOverlay" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
       <div class="card modal-card help-card">
@@ -845,7 +1076,7 @@
           <li><strong>Build.</strong> Tap <strong>Build 2 entries</strong>. Tap <strong>Another valid build</strong> for a different arrangement.</li>
           <li><strong>Adjust.</strong> On any pick, <strong>Move to</strong> sends it to the other entry and <strong>Unlock</strong> releases a locked pick. <strong>Undo</strong> reverses your last change.</li>
           <li><strong>Submit and record.</strong> Tap <strong>Copy entry</strong> under each entry to copy its list, then tap <strong>Save this week</strong>.</li>
-          <li><strong>Grade it.</strong> After the games, open <strong>Saved weeks</strong> and tap the dash beside each pick to mark it W, L, or Push. For weeks you didn't save here, tap <strong>Add a past week</strong> and enter the records by hand.</li>
+          <li><strong>Grade it.</strong> After the games, open <strong>Saved weeks</strong> and tap <strong>Auto-grade from scores</strong>. It fills in W, L, or Push for every pick with a spread. You can also tap the dash beside a pick to grade it yourself. For weeks you didn't save here, tap <strong>Add a past week</strong> and enter the records by hand.</li>
           <li><strong>Next week.</strong> Tap <strong>Start new week</strong> in section 1. Your overlap setting and saved weeks are kept.</li>
         </ol>
 
@@ -875,9 +1106,32 @@
           <dt>Past weeks</dt>
           <dd>In Saved weeks, <strong>Add a past week</strong> lets you enter a week's records without the individual picks: Entry 1, Entry 2, your 2/2 picks (in both entries), and your 1/2 picks (in just one). Entry 1 + Entry 2 always equals 2 × (2/2 picks) + (1/2 picks), so the 1/2 row fills itself in and you're warned if the numbers don't add up. These weeks count toward your season record.</dd>
           <dt>Sync</dt>
-          <dd>The pill at the top shows whether your laptop and phone are in step. Tap it to sync now.</dd>
+          <dd>The pill at the top shows whether your pool setup is in step between your laptop and phone. Tap it to sync now. The Bet Tracker page has its own sync line under its buttons.</dd>
           <dt>Copy / Load setup</dt>
           <dd>Makes a backup code (or file) of your current setup that you can load on another device.</dd>
+        </dl>
+
+        <h3 class="help-h" id="helpBets">Bet Tracker</h3>
+        <p class="helper">Tap <strong>Bet Tracker</strong> at the top to switch pages, and <strong>Pool Builder</strong> to switch back. Bookmark the page with <em>#bets</em> at the end of the address to open straight to it.</p>
+        <ol class="help-steps">
+          <li><strong>Set up.</strong> Open <strong>Settings</strong> and set your unit size and league (College football or NFL).</li>
+          <li><strong>Add a bet.</strong> Tap <strong>+ Add bet</strong>. A new bet copies the last bet's date and book, uses -110 odds, and wins exactly 1 unit. Change any of it.</li>
+          <li><strong>Type the bet.</strong> Use <em>Team +3.5</em> for a spread, <em>Team ML</em> for a moneyline, or <em>Team Over 55.5</em> for a total (either team in the game).</li>
+          <li><strong>Grade.</strong> After the games, tap <strong>Auto-grade</strong>. Results come from final scores. You can also pick the Result yourself.</li>
+          <li><strong>Review.</strong> The stats at the top and the summary below your bets show your record, profit, units, ROI, a profit chart, and records by week, book, and bet type.</li>
+          <li><strong>Bring bets in or out.</strong> Under <strong>Data</strong>: Import pastes rows from Google Sheets or loads a CSV or backup file, Export CSV opens in Sheets or Excel, and the full backup saves everything.</li>
+        </ol>
+        <dl class="help-terms">
+          <dt>Odds, Risk, Win, Units</dt>
+          <dd>Edit any one and the rest update. Changing Odds or Risk recalculates Win. Changing Win calculates the American odds from Risk and Win (handy for Kalshi-style prices). Changing Units sets Risk to Units &times; unit size.</dd>
+          <dt>Profit/Loss and ROI</dt>
+          <dd>A win pays the Win amount, a loss costs the Risk amount, a push is $0. ROI is profit divided by dollars risked on wins and losses (pushes left out).</dd>
+          <dt>Final score</dt>
+          <dd>Shows the score the grader used so you can check it. Orange text means it couldn't grade that bet and says why. Results you set by hand are never overwritten.</dd>
+          <dt>Color bar</dt>
+          <dd>Green is a win, red a loss, gray a push. No bar means it's still pending.</dd>
+          <dt>Sync and backups</dt>
+          <dd>Bets save in this browser and sync between your devices automatically. The line under the buttons shows sync status (tap it to sync now). A full backup is still a good idea now and then.</dd>
         </dl>
 
         <h3 class="help-h">Common questions</h3>
@@ -901,6 +1155,16 @@
           <p>Tap Undo (or press Ctrl/Cmd+Z). If you tapped Start new week by accident, Undo brings back your teams and build.</p></details>
         <details class="faq"><summary>How do I add weeks from before I started using the tool?</summary>
           <p>Open Saved weeks and tap <strong>Add a past week</strong>. Enter the week number and each record as wins, losses, and pushes. Use <strong>Edit</strong> on a saved week to fix a typo. By-tier records only include builds you saved here, since tiers aren't known for weeks entered by hand.</p></details>
+        <details class="faq"><summary>Auto-grade from scores skipped some picks.</summary>
+          <p>Picks need a spread (for example <em>Purdue +14.5</em> or <em>Rice PK</em>) to be graded against the line. It looks for each team's game from the day you saved the week through the following 7 days. Picks it can't match are listed under the button; grade those by tapping the dash. Picks you've already graded are never changed.</p></details>
+        <details class="faq"><summary>Bet Tracker says "Game not found."</summary>
+          <p>Check the bet's date and team name. Try the full school name (for example <em>Eastern Michigan</em>). It looks on that date and the next day, for late kickoffs.</p></details>
+        <details class="faq"><summary>A bet says "Not final yet."</summary>
+          <p>Only finished games are graded. Tap <strong>Auto-grade</strong> again later. With Auto-grade on open checked, it also re-checks when you come back to the app.</p></details>
+        <details class="faq"><summary>I deleted a bet by accident.</summary>
+          <p>Tap <strong>Undo</strong> in the message right after deleting. Ctrl/Cmd+Z only undoes Pool Builder changes.</p></details>
+        <details class="faq"><summary>My bets aren't on my other device.</summary>
+          <p>Check the bet sync line under the Bet Tracker buttons and tap it to sync now. If it says sync isn't set up, the <code>/api/bets</code> route isn't deployed yet. Until then, use Data &gt; Download full backup on one device and Data &gt; Import on the other.</p></details>
         <details class="faq"><summary>Can I use it with a keyboard?</summary>
           <p>Yes. Tab moves between controls, Enter or Space presses a button, and Escape closes any pop-up. Ctrl/Cmd+Z undoes your last change. While a pop-up is open, Tab stays inside it.</p></details>
         <details class="faq"><summary>The team list is very long on my phone.</summary>
@@ -939,8 +1203,9 @@
           <h2 id="historyTitle">Saved weeks</h2>
           <button class="btn" id="historyCloseBtn" type="button" aria-label="Close">✕</button>
         </div>
-        <p class="helper">Builds you've saved, with your results. Tap the dash next to a pick to grade it (W, then L, then Push, then clear). For weeks you didn't save here, use Add a past week to enter the records by hand. Your season record combines both.</p>
-        <div class="past-toolbar"><button class="btn" id="addPastWeekBtn" type="button">Add a past week</button></div>
+        <p class="helper">Builds you've saved, with your results. Tap <strong>Auto-grade from scores</strong> to fill in results from final scores, or tap the dash next to a pick to grade it yourself (W, then L, then Push, then clear). For weeks you didn't save here, use Add a past week to enter the records by hand. Your season record combines both.</p>
+        <div class="past-toolbar"><button class="btn" id="autoGradeBtn" type="button">Auto-grade from scores</button> <button class="btn" id="addPastWeekBtn" type="button">Add a past week</button></div>
+        <p class="helper auto-grade-note" id="autoGradeNote" aria-live="polite"></p>
         <div class="past-form hidden" id="pastForm">
           <h3 id="pastTitle">Add a past week</h3>
           <p class="helper">Enter each record as wins, losses, and pushes. You don't need the individual picks. The 1/2 picks row fills itself in (Entry 1 + Entry 2 − 2 × the 2/2 picks), and you can overwrite it.</p>
@@ -966,6 +1231,145 @@
     </div>
   </main>
 
+  <script>
+    // --- Shared score grader (ESPN public scoreboard) ---
+    // Used by the Bet Tracker page and by Saved weeks > Auto-grade from scores. Reads a pick like
+    // "West Va +3.5", "Temple ML", or "Ohio St Over 55.5", finds that team's game, and grades it
+    // W / L / P once the game is final. Scoreboards are cached for 5 minutes and shared requests
+    // are deduplicated, so grading a full week costs one or two requests.
+    window.ScoreGrader = (() => {
+      'use strict';
+      const ALIASES = { st: 'state', va: 'virginia', mich: 'michigan', ariz: 'arizona', miss: 'mississippi', fla: 'florida', ga: 'georgia',
+        tenn: 'tennessee', ky: 'kentucky', ill: 'illinois', ind: 'indiana', wash: 'washington', wisc: 'wisconsin', minn: 'minnesota',
+        okla: 'oklahoma', ala: 'alabama', caro: 'carolina', cent: 'central', conn: 'connecticut', mass: 'massachusetts', kan: 'kansas',
+        nev: 'nevada', fl: 'florida', intl: 'international' };
+      const pad = n => String(n).padStart(2, '0');
+      const ymd = d => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+      const addDays = (ds, n) => { const [y, m, d] = ds.split('-').map(Number); return ymd(new Date(y, m - 1, d + n)); };
+      const compact = ds => ds.replace(/-/g, '');
+
+      function norm(s) {
+        return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+          .replace(/&/g, ' and ').replace(/[().'\u2019]/g, '').replace(/[^a-z0-9 ]/g, ' ')
+          .split(/\s+/).filter(Boolean).map(t => ALIASES[t] || t).join(' ');
+      }
+
+      function parseBet(text) {
+        const t = String(text || '').trim();
+        if (!t) return null;
+        let m = t.match(/^(.*?)\s*\b(over|under|o|u)\s*(\d+(?:\.\d+)?)\s*(.*)$/i);
+        if (m) {
+          const team = ((m[1] || '') + ' ' + (m[4] || '')).trim().split(/\s*(?:\/|\bvs\.?\b|@)\s*/i)[0].trim();
+          return { kind: 'Total', team, side: /^o/i.test(m[2]) ? 'over' : 'under', line: parseFloat(m[3]) };
+        }
+        m = t.match(/^(.*?)\s+(?:ml|moneyline)\s*$/i);
+        if (m) return { kind: 'Moneyline', team: m[1].trim(), line: 0 };
+        m = t.match(/^(.*?)\s+(?:pk|pick|pick'em|pickem)\s*$/i);
+        if (m) return { kind: 'Spread', team: m[1].trim(), line: 0 };
+        m = t.match(/^(.*?)\s*([+-]\s*\d+(?:\.\d+)?)\s*$/);
+        if (m && m[1].trim()) return { kind: 'Spread', team: m[1].trim(), line: parseFloat(m[2].replace(/\s/g, '')) };
+        return null;
+      }
+      const betType = text => { const p = parseBet(text); return p ? p.kind : 'Other'; };
+
+      function matchScore(wanted, team) {
+        const names = [team.location, team.shortDisplayName, team.displayName, team.name, team.abbreviation].filter(Boolean).map(norm);
+        if (names.includes(wanted)) return 100;
+        const want = wanted.split(' ');
+        if (want.length < 2) return 0; // one word must match exactly ("Colorado" never means Colorado State)
+        let best = 0;
+        names.forEach(name => {
+          const words = name.split(' ');
+          if (want.length <= words.length && want.every((w, i) => words[i].startsWith(w))) best = Math.max(best, 60 - (words.length - want.length));
+        });
+        return best;
+      }
+      // Events come back in date order, so on a tie the earliest game wins.
+      function findGame(events, wanted) {
+        let best = null, bestScore = 49;
+        events.forEach(ev => {
+          const comp = (ev.competitions || [])[0];
+          if (!comp) return;
+          const sides = comp.competitors || [];
+          sides.forEach(side => {
+            const score = matchScore(wanted, side.team || {});
+            if (score > bestScore) { bestScore = score; best = { ev, me: side, opp: sides.find(x => x !== side) }; }
+          });
+        });
+        return best;
+      }
+
+      const cache = new Map();
+      class HttpError extends Error {}
+      function board(league, datesParam, group) {
+        const key = league + '|' + datesParam + '|' + group;
+        const hit = cache.get(key);
+        if (hit && Date.now() - hit.t < 300000) return hit.p;
+        const path = league === 'nfl' ? 'football/nfl' : 'football/college-football';
+        let url = 'https://site.api.espn.com/apis/site/v2/sports/' + path + '/scoreboard?dates=' + datesParam + '&limit=500';
+        if (league !== 'nfl' && group) url += '&groups=' + group;
+        const ctl = typeof AbortController === 'function' ? new AbortController() : null;
+        const timer = ctl ? setTimeout(() => ctl.abort(), 12000) : null;
+        const p = fetch(url, ctl ? { signal: ctl.signal } : undefined)
+          .then(r => { if (!r.ok) throw new HttpError('HTTP ' + r.status); return r.json(); })
+          .then(j => ((j && j.events) || []).slice().sort((a, b) => String(a.date || '').localeCompare(String(b.date || ''))))
+          .catch(err => { cache.delete(key); throw err; })
+          .finally(() => { if (timer) clearTimeout(timer); });
+        cache.set(key, { t: Date.now(), p });
+        return p;
+      }
+      // One request for a date range; if the range form is ever rejected, fall back to day by day.
+      async function boardRange(league, start, end, group) {
+        if (start >= end) return board(league, compact(start), group);
+        try {
+          return await board(league, compact(start) + '-' + compact(end), group);
+        } catch (err) {
+          if (!(err instanceof HttpError)) throw err;
+          const days = [];
+          for (let d = start; d <= end; d = addDays(d, 1)) days.push(d);
+          const lists = await Promise.all(days.map(d => board(league, compact(d), group)));
+          return [].concat(...lists);
+        }
+      }
+      const groupsFor = league => league === 'nfl' ? [null] : [80, 81]; // 80 = FBS, 81 = FCS
+
+      // Returns { result: 'W'|'L'|'P', final } | { skip: true, final } | { err }.
+      // Network failures throw, so callers can stop and report "can't reach ESPN" once.
+      async function grade(text, opts) {
+        const league = (opts && opts.league) || 'cfb';
+        const date = opts && opts.date;
+        const p = parseBet(text);
+        if (!p) return { err: 'needs a spread, ML, or total' };
+        if (!p.team) return { err: 'add a team name' };
+        if (!date) return { err: 'needs a date' };
+        if (date > ymd(new Date())) return { skip: true, final: 'Game not played yet' };
+        const end = (opts && opts.endDate) || addDays(date, 1);
+        const wanted = norm(p.team);
+        let found = null;
+        for (const group of groupsFor(league)) {
+          found = findGame(await boardRange(league, date, end, group), wanted);
+          if (found) break;
+        }
+        if (!found) return { err: 'game not found' };
+        const status = (found.ev.status && found.ev.status.type) || {};
+        if (/CANCEL|POSTPON|SUSPEND|FORFEIT/i.test(status.name || '')) return { err: (status.description || 'postponed/canceled').toLowerCase() + ', set by hand' };
+        if (!status.completed) return { skip: true, final: 'Not final yet' };
+        const ms = parseInt(found.me.score, 10), os = parseInt(found.opp.score, 10);
+        if (isNaN(ms) || isNaN(os)) return { err: 'score unavailable' };
+        const abbr = side => (side.team.abbreviation || side.team.shortDisplayName || '');
+        const line = abbr(found.me) + ' ' + ms + '-' + os + ' ' + abbr(found.opp);
+        if (p.kind === 'Total') {
+          const total = ms + os;
+          return { result: total === p.line ? 'P' : ((p.side === 'over') === (total > p.line) ? 'W' : 'L'), final: line + ' (total ' + total + ')' };
+        }
+        const margin = ms - os + (p.kind === 'Moneyline' ? 0 : p.line);
+        return { result: margin > 0 ? 'W' : margin < 0 ? 'L' : 'P', final: line };
+      }
+      const prefetch = (league, start, end) => boardRange(league, start, end, groupsFor(league)[0]).catch(() => null);
+
+      return { parseBet, betType, norm, grade, prefetch, ymd, addDays };
+    })();
+  </script>
   <script>
     (() => {
       'use strict';
@@ -995,7 +1399,8 @@
         historyClose: $('#historyCloseBtn'), historyList: $('#historyList'), historyEmpty: $('#historyEmpty'),
         historyClearRow: $('#historyClearRow'), clearHistory: $('#clearHistoryBtn'),
         addPastWeek: $('#addPastWeekBtn'), pastForm: $('#pastForm'), pastTitle: $('#pastTitle'), pastWeek: $('#pastWeek'),
-        pastCheck: $('#pastCheck'), pastError: $('#pastError'), pastSave: $('#pastSaveBtn'), pastCancel: $('#pastCancelBtn')
+        pastCheck: $('#pastCheck'), pastError: $('#pastError'), pastSave: $('#pastSaveBtn'), pastCancel: $('#pastCancelBtn'),
+        autoGrade: $('#autoGradeBtn'), autoGradeNote: $('#autoGradeNote')
       };
 
       let state = { teams: [], overlap: 3, result: null, history: [] };
@@ -1910,6 +2315,55 @@
         renderHistory();
       }
 
+      // --- Auto-grade saved weeks from final scores ---
+      // For every saved build, looks up each ungraded pick's game from the day the week was saved
+      // through the next 7 days and grades it against the spread. Never touches a pick that already
+      // has a grade, and skips weeks entered by hand (they have no picks).
+      async function autoGradeWeeks() {
+        const grader = window.ScoreGrader;
+        if (!grader) return;
+        els.autoGrade.disabled = true;
+        els.autoGrade.textContent = 'Checking scores\u2026';
+        els.autoGradeNote.textContent = '';
+        let gradedCount = 0, waiting = 0, netErr = false;
+        const problems = [];
+        const weeks = state.history.filter(week => !week.manual);
+        for (const week of weeks) {
+          const open = Array.from(new Set(week.entry1.concat(week.entry2))).filter(name => !week.results[name]);
+          if (!open.length) continue;
+          const start = grader.ymd(new Date(week.savedAt));
+          const found = {};
+          for (const name of open) {
+            let r;
+            try { r = await grader.grade(name, { league: 'cfb', date: start, endDate: grader.addDays(start, 7) }); }
+            catch (_) { netErr = true; break; }
+            if (r.result) found[name] = r.result;
+            else if (r.skip) waiting++;
+            else problems.push(name + ' (' + r.err + ')');
+          }
+          // The week may have been replaced by a sync while we waited, so write to the live copy.
+          const live = state.history.find(item => item.id === week.id);
+          const fresh = live ? Object.keys(found).filter(name => !live.results[name]) : [];
+          if (fresh.length) {
+            const results = Object.assign({}, live.results);
+            fresh.forEach(name => { results[name] = found[name]; });
+            live.results = results;
+            live.updatedAt = new Date().toISOString();
+            gradedCount += fresh.length;
+          }
+          if (netErr) break;
+        }
+        if (gradedCount) { save(); renderHistory(); }
+        els.autoGrade.disabled = false;
+        els.autoGrade.textContent = 'Auto-grade from scores';
+        const parts = [];
+        if (netErr) parts.push('Couldn\u2019t reach ESPN for scores. Check your connection and try again.');
+        if (!netErr || gradedCount) parts.push(gradedCount ? 'Graded ' + gradedCount + ' pick' + (gradedCount === 1 ? '' : 's') + '.' : (waiting || problems.length ? 'No new results yet.' : 'Every saved pick already has a grade.'));
+        if (waiting) parts.push(waiting + ' game' + (waiting === 1 ? ' isn\u2019t' : 's aren\u2019t') + ' final yet.');
+        if (problems.length) parts.push('Grade by hand: ' + problems.slice(0, 6).join(', ') + (problems.length > 6 ? ', and ' + (problems.length - 6) + ' more' : '') + '.');
+        els.autoGradeNote.textContent = parts.join(' ');
+      }
+
       function saveWeek() {
         const entry1 = picksForEntry(1).map(item => item.team.name);
         const entry2 = picksForEntry(2).map(item => item.team.name);
@@ -2428,6 +2882,7 @@
         if (editBtn) return openPastForm(state.history.find(week => week.id === editBtn.dataset.historyId));
       });
       els.addPastWeek.addEventListener('click', () => openPastForm(null));
+      els.autoGrade.addEventListener('click', autoGradeWeeks);
       els.pastCancel.addEventListener('click', closePastForm);
       els.pastSave.addEventListener('click', savePastWeek);
       els.pastForm.addEventListener('input', event => {
@@ -2452,9 +2907,12 @@
       document.addEventListener('keydown', event => {
         if (!(event.ctrlKey || event.metaKey) || event.shiftKey || event.key.toLowerCase() !== 'z') return;
         if (event.target.closest('input, textarea, select')) return; // leave text-field undo alone
+        if (document.body.classList.contains('on-bets')) return; // Bet Tracker page: nothing here to undo
         event.preventDefault();
         undo();
       });
+
+      window.PoolUI = { openOverlay, closeOverlay }; // lets the Bet Tracker page use the same pop-up behavior
 
       restore();
       resetUndoBaseline();
@@ -2467,6 +2925,677 @@
       window.addEventListener('online', () => pullFromServer());
       els.syncStatus.addEventListener('click', () => pullFromServer());
       setInterval(() => { if (syncStatus === 'ok') renderSyncStatus(); }, 30000);
+    })();
+  </script>
+  <script>
+    // --- Bet Tracker page ---
+    // Individual bets (spreads, totals, moneylines) with automatic grading from final scores.
+    // Saved in this browser and synced between devices through /api/bets — its own Redis key,
+    // separate from the pool setup, so neither can overwrite the other.
+    (() => {
+      'use strict';
+      const SG = window.ScoreGrader;
+      const KEY = 'cfb-pool-bets-v1';
+      const TAB_KEY = 'cfb-pool-tab';
+      const $ = id => document.getElementById(id);
+      const UI = window.PoolUI || {
+        openOverlay: o => o.classList.remove('hidden'),
+        closeOverlay: o => o.classList.add('hidden')
+      };
+
+      const S = { settings: defaultSettings(), bets: [], deleted: {} };
+      let IDX = new Map();
+      function defaultSettings() { return { unit: 30, league: 'cfb', autoGrade: true, sort: 'new', lastBackup: 0, updatedAt: 0 }; }
+      const reindex = () => { IDX = new Map(S.bets.map(b => [b.id, b])); };
+      const uid = () => 'b-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+      const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+      const today = () => SG.ymd(new Date());
+
+      // ---------- money math ----------
+      const round2 = x => Math.round(x * 100) / 100;
+      const isOdds = o => typeof o === 'number' && isFinite(o) && Math.abs(o) >= 100;
+      const winFromOdds = (risk, odds) => (!(risk > 0) || !isOdds(odds)) ? null : round2(odds > 0 ? risk * odds / 100 : risk * 100 / -odds);
+      const oddsFromRiskWin = (risk, win) => (risk > 0 && win > 0) ? (win >= risk ? Math.round(win / risk * 100) : -Math.round(risk / win * 100)) : null;
+      function parseNum(s) { if (s == null) return null; const t = String(s).replace(/[$,\s]/g, ''); if (t === '') return null; const n = Number(t); return isFinite(n) ? n : null; }
+      const fmtOdds = o => o == null ? '' : (o > 0 ? '+' : '') + Math.round(o);
+      const fmt2 = n => n == null ? '' : Number(n).toFixed(2);
+      const money = n => (n < 0 ? '-' : '') + '$' + Math.abs(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      function profit(b) { if (b.result === 'W') return b.win || 0; if (b.result === 'L') return -(b.risk || 0); if (b.result === 'P') return 0; return null; }
+
+      // ---------- storage ----------
+      // Every bet and the settings go through these, so localStorage, sync, and imports all hold
+      // the same clean shape (and compare equal as JSON).
+      function cleanBet(x) {
+        if (!x || typeof x !== 'object') return null;
+        const num = v => (v === null || v === undefined || v === '' || !isFinite(Number(v))) ? null : Number(v);
+        return {
+          id: String(x.id || uid()),
+          date: /^\d{4}-\d{2}-\d{2}$/.test(x.date || '') ? x.date : '',
+          bet: String(x.bet || '').slice(0, 200),
+          odds: num(x.odds), risk: num(x.risk), win: num(x.win),
+          book: String(x.book || '').slice(0, 60),
+          result: ['W', 'L', 'P'].includes(x.result) ? x.result : '',
+          auto: Boolean(x.auto),
+          final: String(x.final || '').slice(0, 140),
+          notes: String(x.notes || '').slice(0, 500),
+          updatedAt: Number(x.updatedAt) || 0
+        };
+      }
+      function cleanSettings(x) {
+        const d = defaultSettings();
+        if (!x || typeof x !== 'object') return d;
+        return {
+          unit: Number(x.unit) > 0 ? Number(x.unit) : d.unit,
+          league: x.league === 'nfl' ? 'nfl' : 'cfb',
+          autoGrade: x.autoGrade !== false,
+          sort: ['new', 'old', 'entry'].includes(x.sort) ? x.sort : d.sort,
+          lastBackup: Number(x.lastBackup) || 0,
+          updatedAt: Number(x.updatedAt) || 0
+        };
+      }
+      function cleanStore(o) {
+        if (!o || typeof o !== 'object' || !Array.isArray(o.bets)) return null;
+        const deleted = {};
+        if (o.deleted && typeof o.deleted === 'object') Object.keys(o.deleted).forEach(id => { const t = Number(o.deleted[id]); if (t > 0) deleted[id] = t; });
+        return { bets: o.bets.map(cleanBet).filter(b => b && b.bet), deleted, settings: cleanSettings(o.settings) };
+      }
+      const canon = () => JSON.stringify(cleanStore({ bets: S.bets, deleted: S.deleted, settings: S.settings }));
+      function load() {
+        try {
+          const saved = cleanStore(JSON.parse(localStorage.getItem(KEY) || 'null'));
+          if (saved) { S.bets = saved.bets; S.deleted = saved.deleted; S.settings = saved.settings; }
+        } catch (_) {}
+        reindex();
+      }
+      function persist() {
+        try { localStorage.setItem(KEY, canon()); }
+        catch (_) { showMsg('Could not save in this browser (storage full or private mode). Use Data > Download full backup now.', 'err'); }
+      }
+      const touch = b => { b.updatedAt = Date.now(); };
+      function save() { persist(); schedulePush(); }
+
+      // ---------- sync (/api/bets) ----------
+      let pushTimer = null, lastSyncedJSON = null, pushFailed = false, syncState = 'checking', lastSyncAt = 0;
+      function relTime(ts) {
+        const s = (Date.now() - ts) / 1000;
+        if (s < 45) return 'just now';
+        if (s < 3600) return Math.round(s / 60) + ' min ago';
+        return 'at ' + new Date(ts).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+      }
+      function renderSync() {
+        const views = {
+          checking: ['Checking bet sync\u2026', 'pending'],
+          saving: ['Syncing bets\u2026', 'pending'],
+          ok: ['Bets synced ' + (lastSyncAt ? relTime(lastSyncAt) : ''), 'ok'],
+          offline: ['Offline \u00b7 bets saved on this device', 'warn'],
+          unavailable: ['Bet sync not set up \u00b7 this device only', 'warn'],
+          error: ['Bet sync error \u00b7 tap to retry', 'error']
+        };
+        const v = views[syncState];
+        const el = $('btSync');
+        el.textContent = v[0];
+        el.className = 'bt-sync sync-' + v[1];
+      }
+      function setSync(state) { syncState = state; if (state === 'ok') lastSyncAt = Date.now(); renderSync(); }
+      async function failKind(r) {
+        if (r.status === 404) return 'unavailable';
+        try { const body = await r.json(); if (body && /not connected/i.test(body.error || '')) return 'unavailable'; } catch (_) {}
+        return 'error';
+      }
+      function schedulePush() { clearTimeout(pushTimer); pushTimer = setTimeout(push, 700); }
+      async function push() {
+        pushTimer = null;
+        const json = canon();
+        if (json === lastSyncedJSON) { pushFailed = false; setSync('ok'); return; }
+        setSync('saving');
+        try {
+          const r = await fetch('/api/bets', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: json });
+          if (!r.ok) { pushFailed = true; setSync(await failKind(r)); return; }
+          lastSyncedJSON = json; pushFailed = false; setSync('ok');
+        } catch (_) { pushFailed = true; setSync('offline'); }
+      }
+      // Newest edit of each bet wins; a delete wins over any edit made before it.
+      function merge(local, remote) {
+        const deleted = Object.assign({}, local.deleted);
+        Object.keys(remote.deleted).forEach(id => { if (!(deleted[id] >= remote.deleted[id])) deleted[id] = remote.deleted[id]; });
+        const newest = new Map(), order = [];
+        local.bets.concat(remote.bets).forEach(b => {
+          const cur = newest.get(b.id);
+          if (!cur) order.push(b.id);
+          if (!cur || b.updatedAt > cur.updatedAt) newest.set(b.id, b);
+        });
+        const bets = order.map(id => newest.get(id)).filter(b => !(deleted[b.id] >= b.updatedAt));
+        const cutoff = Date.now() - 120 * 864e5;
+        Object.keys(deleted).forEach(id => { if (deleted[id] < cutoff) delete deleted[id]; });
+        const settings = remote.settings.updatedAt > local.settings.updatedAt ? Object.assign({}, remote.settings) : Object.assign({}, local.settings);
+        settings.lastBackup = Math.max(local.settings.lastBackup || 0, remote.settings.lastBackup || 0);
+        return { bets, deleted, settings };
+      }
+      async function pull() {
+        if (pushTimer) return; // a local edit is about to go up; don't clobber it
+        if (pushFailed) { await push(); if (pushFailed) return; }
+        try {
+          const r = await fetch('/api/bets');
+          if (!r.ok) { setSync(await failKind(r)); return; }
+          const body = await r.json();
+          setSync('ok');
+          if (!body || !body.data) { if (S.bets.length || Object.keys(S.deleted).length) schedulePush(); return; }
+          const remote = cleanStore(body.data);
+          if (!remote) return;
+          const remoteJSON = JSON.stringify(remote);
+          if (remoteJSON === lastSyncedJSON) return; // our own last push, echoed back
+          const before = canon();
+          const snap = focusSnap();
+          const merged = merge(cleanStore(JSON.parse(before)), remote);
+          S.bets = merged.bets; S.deleted = merged.deleted; S.settings = merged.settings;
+          reindex();
+          const after = canon();
+          if (after !== before) { persist(); applySettingsUI(); renderAll(); focusRestore(snap); showMsg('Bets synced from your other device.', 'ok'); }
+          if (after !== remoteJSON) schedulePush(); else lastSyncedJSON = after;
+        } catch (_) { setSync('offline'); }
+      }
+
+      // ---------- rows ----------
+      const body = $('btBody');
+      const rowEl = id => body.querySelector('tr[data-id="' + id + '"]');
+      function rowHTML(b, i) {
+        const cell = (cls, label, inner) => '<td class="' + cls + '"' + (label ? ' data-label="' + label + '"' : '') + '>' + inner + '</td>';
+        return '<tr data-id="' + esc(b.id) + '">' +
+          cell('bt-n', '', String(i + 1)) +
+          cell('bt-date', 'Date', '<input type="date" data-f="date" aria-label="Date" value="' + esc(b.date) + '">') +
+          cell('bt-bet', '', '<input class="bet" data-f="bet" aria-label="Bet" value="' + esc(b.bet) + '" placeholder="Team +3.5 / Team ML / Team Over 55.5" autocomplete="off">') +
+          cell('bt-odds', 'Odds', '<input class="num" data-f="odds" aria-label="Odds (American)" autocomplete="off">') +
+          cell('bt-risk', 'Risk $', '<input class="num" data-f="risk" aria-label="Risk in dollars" inputmode="decimal" autocomplete="off">') +
+          cell('bt-win', 'Win $', '<input class="num" data-f="win" aria-label="Win in dollars" inputmode="decimal" autocomplete="off">') +
+          cell('bt-units', 'Units', '<input class="num" data-f="units" aria-label="Units" inputmode="decimal" autocomplete="off">') +
+          cell('bt-book', 'Where placed', '<input class="book" data-f="book" aria-label="Where placed" list="btBooks" value="' + esc(b.book) + '" autocomplete="off">') +
+          cell('bt-res', 'Result', '<select data-f="result" aria-label="Result"><option value="">\u2014</option><option value="W">W</option><option value="L">L</option><option value="P">Push</option></select>') +
+          cell('bt-pl', 'Profit/Loss', '') +
+          cell('bt-fin', 'Final score', '') +
+          cell('bt-notes', 'Notes', '<input class="notes" data-f="notes" aria-label="Notes" value="' + esc(b.notes) + '" autocomplete="off">') +
+          cell('bt-x', '', '<button type="button" class="bt-del" data-del aria-label="Delete bet ' + esc(b.bet || '') + '">\u2715</button>') +
+          '</tr>';
+      }
+      function setVal(tr, f, v) { const el = tr.querySelector('[data-f="' + f + '"]'); if (el && el !== document.activeElement) el.value = v; }
+      function refreshRow(tr, b) {
+        const unit = S.settings.unit;
+        setVal(tr, 'odds', fmtOdds(b.odds));
+        tr.querySelector('[data-f="odds"]').classList.toggle('bad', b.odds != null && !isOdds(b.odds));
+        setVal(tr, 'risk', fmt2(b.risk));
+        setVal(tr, 'win', fmt2(b.win));
+        setVal(tr, 'units', b.risk > 0 && unit > 0 ? (b.risk / unit).toFixed(2) : '');
+        setVal(tr, 'result', b.result || '');
+        tr.className = b.result || '';
+        const p = profit(b), pl = tr.querySelector('.bt-pl');
+        pl.textContent = p == null ? '' : money(p);
+        pl.className = 'bt-pl' + (p > 0 ? ' pos' : p < 0 ? ' neg' : '');
+        const fin = tr.querySelector('.bt-fin');
+        fin.textContent = b.final || '';
+        fin.className = 'bt-fin' + ((b.final || '').startsWith('!') ? ' bad' : '');
+      }
+      function renderAll() {
+        reindex();
+        body.innerHTML = S.bets.map(rowHTML).join('');
+        body.querySelectorAll('tr').forEach(tr => refreshRow(tr, IDX.get(tr.dataset.id)));
+        $('btEmpty').hidden = S.bets.length > 0;
+        updateBooks(); sortRows(); stats(); applyFilters(); backupNote(); renderSummary();
+      }
+      // A sync can redraw the list while you're in a field. Remember where the cursor was, put it
+      // back afterwards, and keep anything you'd typed but not finished (it saves when you leave).
+      function displayOf(b, f) {
+        if (f === 'odds') return fmtOdds(b.odds);
+        if (f === 'risk' || f === 'win') return fmt2(b[f]);
+        if (f === 'units') return b.risk > 0 && S.settings.unit > 0 ? (b.risk / S.settings.unit).toFixed(2) : '';
+        return String(b[f] == null ? '' : b[f]);
+      }
+      function focusSnap() {
+        const a = document.activeElement;
+        if (!a || !body.contains(a) || !a.dataset || !a.dataset.f) return null;
+        const id = a.closest('tr').dataset.id, b = IDX.get(id);
+        let start = null, end = null;
+        try { start = a.selectionStart; end = a.selectionEnd; } catch (_) {}
+        return { id, f: a.dataset.f, value: a.value, dirty: !b || a.value !== displayOf(b, a.dataset.f), start, end };
+      }
+      function focusRestore(snap) {
+        if (!snap) return;
+        const tr = rowEl(snap.id);
+        const el = tr && tr.querySelector('[data-f="' + snap.f + '"]');
+        if (!el) return; // that bet was deleted on the other device
+        if (snap.dirty) el.value = snap.value;
+        el.focus({ preventScroll: true });
+        try { if (snap.start != null) el.setSelectionRange(snap.start, snap.end); } catch (_) {}
+      }
+      const renumber = () => S.bets.forEach((b, i) => { const tr = rowEl(b.id); if (tr) tr.querySelector('.bt-n').textContent = i + 1; });
+
+      function newBet() {
+        const last = S.bets[S.bets.length - 1], u = S.settings.unit;
+        return cleanBet({ id: uid(), date: last && last.date ? last.date : today(), bet: '', odds: -110, risk: round2(u * 1.1), win: u, book: last ? last.book : '', updatedAt: Date.now() });
+      }
+      function clearAuto(b) { if (b.auto) { b.result = ''; b.auto = false; } b.final = ''; }
+      function onChange(e) {
+        const el = e.target, f = el.dataset.f;
+        if (!f) return;
+        const tr = el.closest('tr'), b = IDX.get(tr.dataset.id);
+        if (!b) return;
+        const v = el.value, unit = S.settings.unit;
+        switch (f) {
+          case 'date': b.date = v; clearAuto(b); break;
+          case 'bet': b.bet = v.trim(); clearAuto(b); break;
+          case 'book': b.book = v.trim(); updateBooks(); break;
+          case 'notes': b.notes = v; break;
+          case 'odds': b.odds = parseNum(v); if (isOdds(b.odds) && b.risk > 0) b.win = winFromOdds(b.risk, b.odds); break;
+          case 'risk': b.risk = parseNum(v); if (isOdds(b.odds)) b.win = winFromOdds(b.risk, b.odds); break;
+          case 'win': b.win = parseNum(v); if (b.risk > 0 && b.win > 0) b.odds = oddsFromRiskWin(b.risk, b.win); break;
+          case 'units': { const u = parseNum(v); if (u > 0) { b.risk = round2(u * unit); if (isOdds(b.odds)) b.win = winFromOdds(b.risk, b.odds); } break; }
+          case 'result': b.result = v; b.auto = false; break;
+        }
+        touch(b);
+        if (f === 'odds') el.value = fmtOdds(b.odds);
+        else if (f === 'risk' || f === 'win') el.value = fmt2(b[f]);
+        else if (f === 'units') el.value = b.risk > 0 ? (b.risk / unit).toFixed(2) : '';
+        refreshRow(tr, b); stats(); applyFilters(); save(); renderSummary();
+      }
+
+      // ---------- stats, filters, sort ----------
+      const byDate = (a, c) => (a.b.date || '9999').localeCompare(c.b.date || '9999') || a.i - c.i;
+      const graded = () => S.bets.map((b, i) => ({ b, i })).filter(x => ['W', 'L', 'P'].includes(x.b.result)).sort(byDate).map(x => x.b);
+      function agg(list) {
+        let w = 0, l = 0, p = 0, net = 0, risked = 0;
+        list.forEach(b => {
+          if (b.result === 'W') { w++; risked += b.risk || 0; }
+          else if (b.result === 'L') { l++; risked += b.risk || 0; }
+          else if (b.result === 'P') p++;
+          net += profit(b) || 0;
+        });
+        return { w, l, p, net, risked, roi: risked > 0 ? net / risked : 0 };
+      }
+      function tone(el, n) { el.classList.toggle('pos', n > 0); el.classList.toggle('neg', n < 0); }
+      function stats() {
+        const a = agg(graded()), unit = S.settings.unit || 1, u = a.net / unit;
+        $('btRec').textContent = a.w + '-' + a.l + '-' + a.p;
+        $('btNet').textContent = money(a.net); tone($('btNet'), a.net);
+        $('btUnits').textContent = (u >= 0 ? '+' : '') + u.toFixed(2) + 'u'; tone($('btUnits'), a.net);
+        $('btRoi').textContent = (a.roi * 100).toFixed(1) + '%'; tone($('btRoi'), a.net);
+        $('btWinPct').textContent = (a.w + a.l ? a.w / (a.w + a.l) * 100 : 0).toFixed(1) + '%';
+        const pending = S.bets.filter(b => b.bet && !b.result);
+        $('btPending').textContent = pending.length;
+        $('btPendingRisk').textContent = pending.length ? money(pending.reduce((s, b) => s + (b.risk || 0), 0)) + ' at risk' : 'none open';
+      }
+      function updateBooks() {
+        const books = Array.from(new Set(S.bets.map(b => b.book).filter(Boolean))).sort();
+        $('btBooks').innerHTML = books.map(x => '<option value="' + esc(x) + '">').join('');
+        const sel = $('btFilterBook'), cur = sel.value;
+        sel.innerHTML = '<option value="">All books</option>' + books.map(x => '<option value="' + esc(x) + '"' + (x === cur ? ' selected' : '') + '>' + esc(x) + '</option>').join('');
+      }
+      function sortRows() {
+        const mode = $('btSort').value, list = S.bets.map((b, i) => ({ b, i }));
+        if (mode === 'new') list.sort((a, c) => -byDate(a, c)); else if (mode === 'old') list.sort(byDate);
+        const frag = document.createDocumentFragment();
+        list.forEach(x => { const tr = rowEl(x.b.id); if (tr) frag.appendChild(tr); });
+        body.appendChild(frag);
+      }
+      function applyFilters() {
+        const fr = $('btFilterResult').value, fb = $('btFilterBook').value;
+        body.querySelectorAll('tr').forEach(tr => {
+          const b = IDX.get(tr.dataset.id);
+          if (!b) return;
+          let show = fr === 'pending' ? !b.result : fr ? b.result === fr : true;
+          if (show && fb) show = b.book === fb;
+          tr.hidden = !show;
+        });
+      }
+      function backupNote() {
+        const el = $('btBackup'), lb = S.settings.lastBackup;
+        if (!S.bets.length) { el.textContent = ''; return; }
+        const days = lb ? Math.floor((Date.now() - lb) / 864e5) : null;
+        el.textContent = 'Last backup: ' + (lb ? (days === 0 ? 'today' : days + ' day' + (days === 1 ? '' : 's') + ' ago') : 'never');
+        el.className = days == null || days >= 14 ? 'due' : '';
+      }
+
+      // ---------- summary ----------
+      function weekKey(ds) {
+        if (!ds) return '(no date)';
+        const [y, m, d] = ds.split('-').map(Number), dt = new Date(y, m - 1, d);
+        dt.setDate(dt.getDate() - ((dt.getDay() + 6) % 7));
+        return SG.ymd(dt);
+      }
+      const weekLabel = k => { if (k[0] === '(') return k; const [y, m, d] = k.split('-').map(Number); return 'Week of ' + new Date(y, m - 1, d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); };
+      function groupTable(id, keyFn, opts) {
+        const groups = {};
+        graded().forEach(b => { const k = keyFn(b) || '(none)'; (groups[k] = groups[k] || []).push(b); });
+        const keys = Object.keys(groups).sort(opts.newestFirst ? (a, b) => b.localeCompare(a) : (a, b) => agg(groups[b]).net - agg(groups[a]).net);
+        let html = '<thead><tr><th>' + opts.head + '</th><th class="r">Record</th><th class="r">Profit</th><th class="r">ROI</th></tr></thead><tbody>';
+        if (!keys.length) html += '<tr><td colspan="4" class="bt-none">No graded bets yet.</td></tr>';
+        keys.forEach(k => {
+          const a = agg(groups[k]);
+          html += '<tr><td>' + esc(opts.label ? opts.label(k) : k) + '</td><td class="r">' + a.w + '-' + a.l + '-' + a.p + '</td>' +
+            '<td class="r ' + (a.net > 0 ? 'pos' : a.net < 0 ? 'neg' : '') + '">' + money(a.net) + '</td><td class="r">' + (a.roi * 100).toFixed(1) + '%</td></tr>';
+        });
+        $(id).innerHTML = html + '</tbody>';
+      }
+      function chart() {
+        const host = $('btChart');
+        const pts = [0];
+        let run = 0;
+        graded().forEach(b => { run += profit(b) || 0; pts.push(round2(run)); });
+        if (pts.length < 2) { host.innerHTML = '<p class="helper">No graded bets yet. The chart fills in as bets are graded.</p>'; return; }
+        const W = Math.max(300, Math.round(host.clientWidth || 640)), H = 220, L = 58, R = 12, T = 12, B = 24;
+        const lo = Math.min(...pts), hi = Math.max(...pts), span = (hi - lo) || 1;
+        const X = i => L + (W - L - R) * i / (pts.length - 1), Y = v => T + (H - T - B) * (1 - (v - lo) / span);
+        let grid = '';
+        for (let k = 0; k <= 4; k++) {
+          const v = lo + span * k / 4, y = Y(v).toFixed(1);
+          grid += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + y + '" y2="' + y + '" class="g"/><text x="4" y="' + (Number(y) + 4) + '">' + money(Math.round(v)).replace('.00', '') + '</text>';
+        }
+        const last = pts.length - 1;
+        host.innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" height="' + H + '" role="img" aria-label="Cumulative profit: ' + money(pts[last]) + ' after ' + last + ' graded bets">' + grid +
+          '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + Y(0).toFixed(1) + '" y2="' + Y(0).toFixed(1) + '" class="z"/>' +
+          '<polyline points="' + pts.map((v, i) => X(i).toFixed(1) + ',' + Y(v).toFixed(1)).join(' ') + '" class="l"/>' +
+          '<circle cx="' + X(last).toFixed(1) + '" cy="' + Y(pts[last]).toFixed(1) + '" r="4.5" class="' + (pts[last] >= 0 ? 'up' : 'down') + '"/>' +
+          '<text x="' + L + '" y="' + (H - 6) + '">Graded bets, oldest to newest</text></svg>';
+      }
+      function renderSummary() {
+        if ($('betsPage').hidden) return; // drawn when the page is shown
+        groupTable('btByWeek', b => weekKey(b.date), { head: 'Week', newestFirst: true, label: weekLabel });
+        groupTable('btByBook', b => b.book, { head: 'Book' });
+        groupTable('btByType', b => SG.betType(b.bet), { head: 'Type' });
+        chart();
+      }
+
+      // ---------- grading ----------
+      let grading = false, lastGrade = 0;
+      async function gradeAll(silent) {
+        if (grading) return;
+        grading = true; lastGrade = Date.now();
+        const btn = $('btGradeBtn');
+        btn.disabled = true; btn.textContent = 'Grading\u2026';
+        const league = S.settings.league, t = today();
+        const rows = S.bets.filter(b => b.bet && !b.result);
+        await Promise.all(Array.from(new Set(rows.filter(b => b.date && b.date <= t).map(b => b.date))).map(d => SG.prefetch(league, d, SG.addDays(d, 1))));
+        let done = 0, waiting = 0, bad = 0, netErr = false, changed = false;
+        for (const b of rows) {
+          let r;
+          try { r = await SG.grade(b.bet, { league, date: b.date }); } catch (_) { netErr = true; break; }
+          const live = IDX.get(b.id);
+          if (!live || live.result) continue; // deleted or graded by hand while we waited
+          const final = r.result ? r.final : r.skip ? r.final : '! ' + r.err.charAt(0).toUpperCase() + r.err.slice(1);
+          if (r.result) { live.result = r.result; live.auto = true; done++; } else if (r.skip) waiting++; else bad++;
+          if (r.result || live.final !== final) { live.final = final; touch(live); changed = true; }
+          const tr = rowEl(live.id);
+          if (tr) refreshRow(tr, live);
+        }
+        grading = false; btn.disabled = false; btn.textContent = 'Auto-grade';
+        if (changed) { save(); stats(); applyFilters(); renderSummary(); }
+        if (netErr) showMsg('Couldn\u2019t reach ESPN for scores. Check your connection and try again, or set results by hand.', 'err');
+        else if (!silent || done || bad) {
+          if (!rows.length) showMsg('Nothing to grade. Every bet already has a result.', 'ok');
+          else showMsg('Graded ' + done + ' bet' + (done === 1 ? '' : 's') + (waiting ? ' \u00b7 ' + waiting + ' not final yet' : '') + (bad ? ' \u00b7 ' + bad + ' need attention (see Final score)' : ''), bad ? 'warn' : 'ok');
+        }
+      }
+
+      // ---------- import / export ----------
+      function parseTable(text) {
+        text = text.replace(/^\uFEFF/, '');
+        const delim = (text.split(/\r?\n/).find(l => l.trim()) || '').includes('\t') ? '\t' : ',';
+        const rows = []; let row = [], cur = '', q = false;
+        for (let i = 0; i < text.length; i++) {
+          const c = text[i];
+          if (q) { if (c === '"') { if (text[i + 1] === '"') { cur += '"'; i++; } else q = false; } else cur += c; }
+          else if (c === '"' && cur === '') q = true;
+          else if (c === delim) { row.push(cur); cur = ''; }
+          else if (c === '\n' || c === '\r') { if (c === '\r' && text[i + 1] === '\n') i++; row.push(cur); cur = ''; rows.push(row); row = []; }
+          else cur += c;
+        }
+        if (cur !== '' || row.length) { row.push(cur); rows.push(row); }
+        return rows.filter(r => r.some(x => x.trim() !== ''));
+      }
+      function normDate(s) {
+        s = (s || '').trim();
+        if (!s) return '';
+        if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+        const m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
+        if (m) { let y = +m[3]; if (y < 100) y += 2000; return y + '-' + String(m[1]).padStart(2, '0') + '-' + String(m[2]).padStart(2, '0'); }
+        const d = new Date(s);
+        return isNaN(d) ? '' : SG.ymd(d);
+      }
+      function importRows(text) {
+        const rows = parseTable(text);
+        if (!rows.length) return 0;
+        let map = { date: 0, bet: 1, odds: 2, risk: 3, win: 4, book: 6, result: 7, notes: 9 };
+        const head = rows.slice(0, 15).findIndex(r => r.some(x => x.trim().toLowerCase() === 'bet'));
+        if (head >= 0) {
+          map = {};
+          rows[head].map(x => x.trim().toLowerCase()).forEach((x, i) => {
+            if (/date/.test(x)) map.date = i; else if (x === 'bet') map.bet = i; else if (/odds/.test(x)) map.odds = i; else if (/risk/.test(x)) map.risk = i;
+            else if (/^win/.test(x)) map.win = i; else if (/where|book/.test(x)) map.book = i; else if (/result/.test(x)) map.result = i; else if (/note/.test(x)) map.notes = i;
+          });
+          rows.splice(0, head + 1);
+        }
+        const get = (r, k) => map[k] == null ? '' : (r[map[k]] || '').trim();
+        let prev = S.bets.length ? S.bets[S.bets.length - 1].date : '', n = 0;
+        const u = S.settings.unit, now = Date.now();
+        rows.forEach(r => {
+          const bet = get(r, 'bet');
+          if (!bet) return;
+          if (head < 0 && !SG.parseBet(bet) && parseNum(get(r, 'odds')) == null && parseNum(get(r, 'risk')) == null) return; // title rows
+          const date = normDate(get(r, 'date')) || prev; prev = date;
+          let odds = parseNum(get(r, 'odds')), risk = parseNum(get(r, 'risk')), win = parseNum(get(r, 'win'));
+          if (!isOdds(odds)) odds = null;
+          if (risk == null && win != null && odds != null) risk = round2(win * (odds > 0 ? 100 / odds : -odds / 100));
+          if (risk == null) { risk = round2(u * 1.1); if (odds == null) odds = -110; }
+          if (win == null && odds != null) win = winFromOdds(risk, odds);
+          if (odds == null && win != null) odds = oddsFromRiskWin(risk, win);
+          const res = (get(r, 'result') || '').charAt(0).toUpperCase();
+          S.bets.push(cleanBet({ id: uid(), date, bet, odds, risk, win, book: get(r, 'book'), result: 'WLP'.includes(res) ? res : '', notes: get(r, 'notes'), updatedAt: now + n }));
+          n++;
+        });
+        return n;
+      }
+      // Accepts this page's backup and the standalone Bet Tracker's backup (same bet fields).
+      function importBackup(text) {
+        const parsed = JSON.parse(text);
+        const store = cleanStore(Array.isArray(parsed) ? { bets: parsed } : parsed);
+        if (!store) throw new Error('not a backup');
+        let added = 0, updated = 0;
+        const now = Date.now();
+        store.bets.forEach((b, i) => {
+          b.updatedAt = now + i;
+          delete S.deleted[b.id];
+          const cur = IDX.get(b.id);
+          if (cur) { Object.assign(cur, b); updated++; } else { S.bets.push(b); IDX.set(b.id, b); added++; }
+        });
+        if (parsed && parsed.settings) {
+          const s = cleanSettings(parsed.settings);
+          Object.assign(S.settings, { unit: s.unit, league: s.league, autoGrade: s.autoGrade, updatedAt: now });
+        }
+        return { added, updated };
+      }
+      function download(name, text, type) {
+        if (!window.URL || !URL.createObjectURL) return;
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([text], { type }));
+        a.download = name;
+        document.body.appendChild(a); a.click();
+        setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+      }
+      function exportCSV() {
+        const q = s => '"' + String(s == null ? '' : s).replace(/"/g, '""') + '"', unit = S.settings.unit;
+        let out = 'Date,Bet,Odds (American),Risk ($),Win ($),Units,Where placed,Result,Profit/Loss ($),Notes\n';
+        S.bets.forEach(b => {
+          const p = profit(b);
+          out += [q(b.date), q(b.bet), q(fmtOdds(b.odds)), fmt2(b.risk), fmt2(b.win), b.risk > 0 ? (b.risk / unit).toFixed(2) : '', q(b.book), q(b.result), p == null ? '' : p.toFixed(2), q(b.notes)].join(',') + '\n';
+        });
+        download('bets_' + today() + '.csv', out, 'text/csv');
+      }
+      function backup() {
+        S.settings.lastBackup = Date.now();
+        save(); backupNote();
+        download('bets_backup_' + today() + '.json', JSON.stringify({ app: 'cfb-pool-bets', version: 1, exported: new Date().toISOString(), settings: S.settings, bets: S.bets }, null, 1), 'application/json');
+        showMsg('Backup downloaded.', 'ok');
+      }
+
+      // ---------- messages ----------
+      let msgTimer = null;
+      function showMsg(text, kind, action) {
+        const box = $('btMsg'), btn = $('btMsgBtn');
+        $('btMsgText').textContent = text;
+        box.className = 'bt-msg ' + (kind || '');
+        box.hidden = false;
+        btn.hidden = !action;
+        if (action) { btn.textContent = action.label; btn.onclick = () => { box.hidden = true; action.fn(); }; }
+        clearTimeout(msgTimer);
+        if (kind !== 'err') msgTimer = setTimeout(() => { box.hidden = true; }, action ? 12000 : 8000);
+      }
+
+      // ---------- page tabs ----------
+      const tabs = { pool: $('tabPool'), bets: $('tabBets') };
+      function showPage(name, focus) {
+        const bets = name === 'bets';
+        document.body.classList.toggle('on-bets', bets);
+        $('poolPage').hidden = bets;
+        $('betsPage').hidden = !bets;
+        Object.keys(tabs).forEach(k => { const on = k === name; tabs[k].setAttribute('aria-selected', String(on)); tabs[k].tabIndex = on ? 0 : -1; });
+        if (focus) tabs[name].focus();
+        try { localStorage.setItem(TAB_KEY, name); } catch (_) {}
+        if (history.replaceState) history.replaceState(null, '', bets ? '#bets' : location.pathname + location.search);
+        if (bets) renderSummary();
+      }
+      tabs.pool.addEventListener('click', () => showPage('pool'));
+      tabs.bets.addEventListener('click', () => showPage('bets'));
+      $('pageTabs').addEventListener('keydown', e => {
+        if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) return;
+        e.preventDefault();
+        const next = e.key === 'Home' ? 'pool' : e.key === 'End' ? 'bets' : (document.body.classList.contains('on-bets') ? 'pool' : 'bets');
+        showPage(next, true);
+      });
+      window.addEventListener('hashchange', () => showPage(location.hash === '#bets' ? 'bets' : 'pool'));
+      // Help opened from this page jumps to the Bet Tracker section.
+      $('helpBtn').addEventListener('click', () => {
+        if (!document.body.classList.contains('on-bets')) return;
+        setTimeout(() => { const h = $('helpBets'); if (h && h.scrollIntoView) h.scrollIntoView({ block: 'start' }); }, 0);
+      });
+
+      // ---------- wiring ----------
+      body.addEventListener('change', onChange);
+      body.addEventListener('click', e => {
+        const del = e.target.closest('[data-del]');
+        if (!del) return;
+        const tr = del.closest('tr'), i = S.bets.findIndex(x => x.id === tr.dataset.id);
+        if (i < 0) return;
+        const [gone] = S.bets.splice(i, 1);
+        IDX.delete(gone.id);
+        S.deleted[gone.id] = Date.now();
+        tr.remove();
+        renumber(); stats(); updateBooks(); renderSummary();
+        $('btEmpty').hidden = S.bets.length > 0;
+        save();
+        showMsg('Deleted \u201c' + (gone.bet || 'blank bet') + '\u201d.', '', {
+          label: 'Undo',
+          fn: () => { delete S.deleted[gone.id]; touch(gone); S.bets.splice(Math.min(i, S.bets.length), 0, gone); renderAll(); save(); }
+        });
+      });
+      $('btAddBtn').addEventListener('click', () => {
+        const b = newBet();
+        S.bets.push(b); IDX.set(b.id, b);
+        $('btEmpty').hidden = true;
+        body.insertAdjacentHTML($('btSort').value === 'new' ? 'afterbegin' : 'beforeend', rowHTML(b, S.bets.length - 1));
+        const tr = rowEl(b.id);
+        refreshRow(tr, b);
+        if ($('btFilterResult').value && $('btFilterResult').value !== 'pending') $('btFilterResult').value = '';
+        applyFilters(); stats(); save();
+        if (tr.scrollIntoView) tr.scrollIntoView({ block: 'center' });
+        tr.querySelector('[data-f="bet"]').focus({ preventScroll: true });
+      });
+      $('btGradeBtn').addEventListener('click', () => gradeAll(false));
+      const menu = $('btDataMenu');
+      $('btDataBtn').addEventListener('click', e => {
+        e.stopPropagation();
+        menu.hidden = !menu.hidden;
+        $('btDataBtn').setAttribute('aria-expanded', String(!menu.hidden));
+      });
+      document.addEventListener('click', e => { if (!e.target.closest('.bt-menu')) { menu.hidden = true; $('btDataBtn').setAttribute('aria-expanded', 'false'); } });
+      document.addEventListener('keydown', e => { if (e.key === 'Escape' && !menu.hidden) { menu.hidden = true; $('btDataBtn').focus(); } });
+      menu.addEventListener('click', e => {
+        const act = e.target.closest('[data-act]');
+        if (!act) return;
+        menu.hidden = true;
+        if (act.dataset.act === 'csv') exportCSV();
+        else if (act.dataset.act === 'backup') backup();
+        else { $('btImportText').value = ''; $('btImportFile').value = ''; UI.openOverlay($('btImportOverlay')); }
+      });
+      const closeImport = () => UI.closeOverlay($('btImportOverlay'));
+      $('btImportClose').addEventListener('click', closeImport);
+      $('btImportCancel').addEventListener('click', closeImport);
+      $('btImportOverlay').addEventListener('click', e => { if (e.target === $('btImportOverlay')) closeImport(); });
+      $('btImportPick').addEventListener('click', () => $('btImportFile').click());
+      $('btImportFile').addEventListener('change', e => {
+        const f = e.target.files[0];
+        if (!f) return;
+        const r = new FileReader();
+        r.onload = () => { $('btImportText').value = r.result; };
+        r.readAsText(f);
+      });
+      $('btImportGo').addEventListener('click', () => {
+        const text = $('btImportText').value.trim();
+        if (!text) { closeImport(); return; }
+        try {
+          if (text[0] === '{' || text[0] === '[') {
+            const r = importBackup(text);
+            closeImport(); applySettingsUI(); renderAll(); save();
+            showMsg('Backup loaded: ' + r.added + ' added, ' + r.updated + ' updated.', 'ok');
+          } else {
+            const n = importRows(text);
+            closeImport(); renderAll(); save();
+            showMsg(n ? 'Imported ' + n + ' bet' + (n === 1 ? '' : 's') + '. Tap Auto-grade to fill in results.' : 'Nothing imported. Make sure the rows include a Bet column.', n ? 'ok' : 'warn');
+          }
+        } catch (_) {
+          showMsg('Couldn\u2019t read that. If it\u2019s a backup file, make sure the whole file was pasted.', 'err');
+        }
+      });
+      function applySettingsUI() {
+        $('btUnit').value = S.settings.unit;
+        $('btLeague').value = S.settings.league;
+        $('btAutoGrade').checked = S.settings.autoGrade;
+        $('btSort').value = S.settings.sort;
+      }
+      const settingChanged = () => { S.settings.updatedAt = Date.now(); save(); };
+      $('btUnit').addEventListener('change', e => {
+        const v = parseNum(e.target.value);
+        if (!(v > 0)) { e.target.value = S.settings.unit; return; }
+        S.settings.unit = v;
+        S.bets.forEach(b => { const tr = rowEl(b.id); if (tr) refreshRow(tr, b); });
+        stats(); settingChanged();
+      });
+      $('btLeague').addEventListener('change', e => { S.settings.league = e.target.value; settingChanged(); });
+      $('btAutoGrade').addEventListener('change', e => { S.settings.autoGrade = e.target.checked; settingChanged(); });
+      $('btSort').addEventListener('change', () => { S.settings.sort = $('btSort').value; sortRows(); settingChanged(); });
+      $('btFilterResult').addEventListener('change', applyFilters);
+      $('btFilterBook').addEventListener('change', applyFilters);
+      $('btSync').addEventListener('click', () => pull());
+      let resizeTimer = null;
+      window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => { if (!$('betsPage').hidden) chart(); }, 200); });
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState !== 'visible') return;
+        pull();
+        if (S.settings.autoGrade && Date.now() - lastGrade > 600000 && S.bets.some(b => b.bet && !b.result)) gradeAll(true);
+      });
+      window.addEventListener('online', () => pull());
+      setInterval(() => { if (syncState === 'ok') renderSync(); }, 30000);
+      if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
+
+      // ---------- start ----------
+      load();
+      applySettingsUI();
+      if (window.matchMedia && window.matchMedia('(min-width: 761px)').matches) $('btSettings').open = true;
+      renderAll();
+      let startTab = 'pool';
+      try { startTab = localStorage.getItem(TAB_KEY) || 'pool'; } catch (_) {}
+      showPage(location.hash === '#bets' ? 'bets' : location.hash ? 'pool' : startTab);
+      renderSync();
+      pull();
+      if (S.settings.autoGrade && S.bets.some(b => b.bet && !b.result)) gradeAll(true);
+
+      window.BetTracker = { gradeAll, pull, showPage }; // used by the tests
     })();
   </script>
 </body>

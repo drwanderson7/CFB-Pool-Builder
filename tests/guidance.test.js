@@ -162,7 +162,7 @@ test('Escape closes the other pop-ups too', async t => {
 test('Help covers steps, outputs, features, and FAQ', async t => {
   const app = await open(t);
   const headings = app.$$('#helpOverlay .help-h').map(h => h.textContent);
-  assert.deepEqual(headings, ['Quick start', 'What you get', 'Key features', 'Common questions']);
+  assert.deepEqual(headings, ['Quick start', 'What you get', 'Key features', 'Bet Tracker', 'Common questions']);
   assert.ok(app.$$('#helpOverlay .help-steps li').length >= 8);
   assert.ok(app.$$('#helpOverlay .faq').length >= 8);
 });

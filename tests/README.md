@@ -1,8 +1,8 @@
 # Tests
 
-Automated checks for `index.html` (the pool builder) and `api/setup.js` (the sync route).
+Automated checks for `index.html` (the pool builder and Bet Tracker), `api/setup.js` (pool sync), and `api/bets.js` (bet sync).
 Each test opens the real page in a simulated browser and clicks through it, with a fake
-sync server standing in for Redis, so nothing touches your live data.
+sync server standing in for Redis and a fake ESPN scoreboard standing in for live scores, so nothing touches your live data.
 
 ## Run them
 
@@ -29,9 +29,12 @@ shows `fail 0`. Any failure prints which check broke and why.
 | `sync.test.js` | Laptop/phone sync, merging saved weeks and grades, offline handling, sync pill |
 | `transfer.test.js` | Copy / Load setup codes |
 | `api.test.js` | `/api/setup` GET/POST, validation, missing-Redis error |
+| `bets.test.js` | Bet Tracker: page tabs and `#bets` links, odds/risk/win/units, paste import, auto-grading (W/L/Push, not final, not found, no connection), hand results kept, delete + Undo, Ctrl+Z isolation, laptop/phone bet sync incl. deletes and typing during a sync, standalone backup import, Help buttons |
+| `autograde.test.js` | Saved weeks > Auto-grade from scores: grades spread picks, keeps hand grades, skips hand-entered weeks, no-connection message |
+| `api-bets.test.js` | `/api/bets` GET/POST, separate Redis key, validation and size limit, missing-Redis error |
 
 ## Notes
 
 - This folder has its own `package.json` so Vercel never installs anything for it, and the
   project's `.vercelignore` keeps it out of deployments.
-- Run the tests after any change to `index.html` or `api/setup.js`.
+- Run the tests after any change to `index.html`, `api/setup.js`, or `api/bets.js`.
