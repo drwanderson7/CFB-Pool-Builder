@@ -392,6 +392,18 @@
     }
     .pick-action-btn:hover { color: var(--text); border-color: #91aa99; }
     .pick-action-btn.unlock:hover { color: var(--red); border-color: rgba(255,116,108,.55); }
+    .pick-remove {
+      flex: none;
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 28px; height: 28px; margin-right: -3px;
+      border: 1px solid transparent; border-radius: 7px;
+      background: transparent; color: var(--muted);
+      font-size: .95rem; font-weight: 700; line-height: 1;
+    }
+    .pick-remove:hover, .pick-remove:focus-visible { border-color: rgba(200, 61, 54, .4); background: rgba(200, 61, 54, .08); color: var(--red); }
+    button.bench-chip { cursor: pointer; font-family: inherit; color: inherit; }
+    button.bench-chip:hover { background: var(--panel-3); }
+    button.bench-chip .bench-note { color: var(--red); }
     .entry-footer { display: flex; gap: 8px; margin-top: 11px; }
     .entry-footer .btn { flex: 1; }
 
@@ -698,7 +710,7 @@
     @media print {
       body { background: #fff; color: #111; }
       .app { width: 100%; padding: 0; }
-      .top-actions, .setup, .candidates, .buildbar, .benched, .entry-footer, .pick-actions, .modal-overlay { display: none !important; }
+      .top-actions, .setup, .candidates, .buildbar, .benched, .entry-footer, .pick-actions, .pick-remove, .modal-overlay { display: none !important; }
       .workspace { grid-template-columns: 1fr 1fr; }
       .card, .dropzone, .pick-card { box-shadow: none; background: #fff; color: #111; border-color: #bbb; }
       .entry { min-height: 0; }
@@ -1184,6 +1196,8 @@
           <dd>S1 or S2 locks a team into that entry. The lock puts it in both, which counts toward your shared picks.</dd>
           <dt>Shared picks (overlap)</dt>
           <dd>The number of teams that appear in both entries. You need at least 14 minus that many teams. If you don't have enough, the message in the build bar offers a button to fix it.</dd>
+          <dt>Remove a pick (&#10005;)</dt>
+          <dd>The &#10005; on the right of a pick card takes that team out of this build. Its slot is refilled from your other teams, and your other picks stay put wherever the rules allow. The team stays in your list with Max set to 0 and shows on the Benched list as "Max 0 &middot; put back"; tap it there to make it pickable again, or tap Undo.</dd>
           <dt>Line check</dt>
           <dd>Check lines compares each team's spread with the line ESPN lists now (games in the next 7 days). A moved line gets a badge on the team and its pick: green &#9650; means the number is better for your side now, amber &#9660; means worse. Use current lines in the message updates the spreads and keeps everything else; Undo reverses it. It also runs quietly when teams load.</dd>
           <dt>Hide setup</dt>
@@ -1254,6 +1268,8 @@
           <p>Tap <strong>Undo</strong> in the message right after deleting. Ctrl/Cmd+Z only undoes Pool Builder changes.</p></details>
         <details class="faq"><summary>My bets aren't on my other device.</summary>
           <p>Check the bet sync line under the Bet Tracker buttons and tap it to sync now. If it says sync isn't set up, the <code>/api/bets</code> route isn't deployed yet. Until then, use Data &gt; Download full backup on one device and Data &gt; Import on the other.</p></details>
+        <details class="faq"><summary>The &#10005; says it couldn't remove a team.</summary>
+          <p>Without that team there aren't enough picks left to fill both entries with your overlap. Add another team, raise a Max from 0, or lower the overlap, then try again.</p></details>
         <details class="faq"><summary>Check lines says "No line found" for some teams.</summary>
           <p>ESPN didn't list a line for that game yet, the game is more than 7 days out, or the team name didn't match. Try the full school name.</p></details>
         <details class="faq"><summary>The Close column is blank or says "now."</summary>
@@ -2260,7 +2276,8 @@
               return '<div class="' + cardClasses + '" draggable="true" data-team-id="' + escapeHtml(item.team.id) + '" data-source-entry="' + entry + '">' +
                 '<span class="pick-num">' + (index + 1) + '</span><div class="pick-main"><div class="pick-name" title="' + escapeHtml(item.team.name) + '">' + nameHtml(item.team.name) + '</div>' +
                 '<div class="pick-sub">' + (shared ? '<span class="shared-marker">Shared</span>' : '') + '<span class="pick-meta">' + meta + '</span>' +
-                (actions.length ? '<div class="pick-actions">' + actions.join('') + '</div>' : '') + '</div></div></div>';
+                (actions.length ? '<div class="pick-actions">' + actions.join('') + '</div>' : '') + '</div></div>' +
+                '<button type="button" class="pick-remove" data-action="remove" data-team-id="' + escapeHtml(item.team.id) + '" title="Remove from this build" aria-label="Remove ' + escapeHtml(item.team.name) + ' from this build">\u2715</button></div>';
             }).join('');
           }
           els.counts[entry].textContent = picks.length + ' / 7';
@@ -2284,10 +2301,11 @@
         els.benched.classList.toggle('hidden', benched.length === 0);
         if (!benched.length) return;
         els.benchedCount.textContent = benched.length + (benched.length === 1 ? ' team' : ' teams');
-        els.benchedList.innerHTML = benched.map(team =>
-          '<span class="bench-chip tier-' + team.tier + '" title="' + escapeHtml(team.name + ' \u2014 ' + TIER_LABELS[team.tier] + (team.max === 0 ? ', Max 0' : '')) + '">' +
-            '<span class="bench-tier">' + TIER_LABELS[team.tier] + '</span>' + nameHtml(team.name) +
-            (team.max === 0 ? '<span class="bench-note">Max 0</span>' : '') + '</span>'
+        els.benchedList.innerHTML = benched.map(team => team.max === 0
+          ? '<button type="button" class="bench-chip tier-' + team.tier + '" data-restore="' + escapeHtml(team.id) + '" title="' + escapeHtml(team.name + ' \u2014 ' + TIER_LABELS[team.tier] + ', Max 0. Tap to make it pickable again.') + '" aria-label="Put ' + escapeHtml(team.name) + ' back in play">' +
+              '<span class="bench-tier">' + TIER_LABELS[team.tier] + '</span>' + nameHtml(team.name) + '<span class="bench-note">Max 0 \u00b7 put back</span></button>'
+          : '<span class="bench-chip tier-' + team.tier + '" title="' + escapeHtml(team.name + ' \u2014 ' + TIER_LABELS[team.tier]) + '">' +
+              '<span class="bench-tier">' + TIER_LABELS[team.tier] + '</span>' + nameHtml(team.name) + '</span>'
         ).join('');
       }
 
@@ -2956,6 +2974,35 @@
         }, action);
       }
 
+      // ✕ on a pick card: takes the team out of this build (Max 0, unfixed) and refills its slot,
+      // keeping your other picks where the rules allow. The team stays in your list and shows on
+      // the Benched list, where one tap puts it back. Undo reverses it like any other change.
+      function removeFromBuild(teamId) {
+        const team = state.teams.find(item => item.id === teamId);
+        if (!team) return;
+        const before = state.result ? { 1: state.result[1].slice(), 2: state.result[2].slice() } : null;
+        const ok = applyMutation(() => {
+          team.fixedMask = 0;
+          team.min = 0;
+          team.max = 0;
+        }, team.name + ' removed from this build.');
+        if (!ok) {
+          setStatus('Couldn\u2019t remove ' + team.name, 'Without it there\u2019s no valid build: you need enough other teams (and exposure) to fill both entries. Add a team or raise a Max, then try again.', 'error');
+          return;
+        }
+        if (!before || !state.result) return;
+        const added = [1, 2].map(entry => state.result[entry].filter(id => !before[entry].includes(id))).flat();
+        const names = Array.from(new Set(added)).map(id => (state.teams.find(t => t.id === id) || {}).name).filter(Boolean);
+        setStatus(team.name + ' removed', (names.length ? names.join(' and ') + (names.length === 1 ? ' took' : ' took') + ' its place. ' : '') + 'It\u2019s on the Benched list. Tap it there to put it back, or tap Undo.', 'success');
+      }
+
+      function restoreToPool(teamId) {
+        const team = state.teams.find(item => item.id === teamId);
+        if (!team) return;
+        const ok = applyMutation(() => { team.max = 2; }, team.name + ' can be picked again.');
+        if (ok) setStatus(team.name + ' is back in play', 'Its Max is back to 2. Your entries didn\u2019t change; tap Build 2 entries or Another valid build to pick from it again.', 'success');
+      }
+
       function setExposure(teamId, field, value) {
         const team = state.teams.find(item => item.id === teamId);
         if (!team) return;
@@ -3089,11 +3136,17 @@
           setPlacement(teamId, targetEntry, false);
         });
         zone.addEventListener('click', event => {
-          const button = event.target.closest('.pick-action-btn');
+          const button = event.target.closest('.pick-action-btn, .pick-remove');
           if (!button) return;
-          if (button.dataset.action === 'move') setPlacement(button.dataset.teamId, Number(button.dataset.targetEntry), false);
+          if (button.dataset.action === 'remove') removeFromBuild(button.dataset.teamId);
+          else if (button.dataset.action === 'move') setPlacement(button.dataset.teamId, Number(button.dataset.targetEntry), false);
           else if (button.dataset.action === 'unlock') setPlacement(button.dataset.teamId, 0);
         });
+      });
+
+      els.benchedList.addEventListener('click', event => {
+        const chip = event.target.closest('[data-restore]');
+        if (chip) restoreToPool(chip.dataset.restore);
       });
 
       [1, 2].forEach(entry => {
