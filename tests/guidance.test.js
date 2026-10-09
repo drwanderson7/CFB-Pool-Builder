@@ -174,8 +174,8 @@ test('every button named in the Help steps exists in the tool (Help stays in syn
   app.build();
   const mentioned = app.$$('#helpOverlay .help-steps strong').map(e => e.textContent.replace(/\.$/, ''));
   const uiText = [...app.$$('button'), ...app.$$('h2'), ...app.$$('option'), ...app.$$('.field-label')]
-    .filter(e => !e.closest('#helpOverlay')).map(e => e.textContent.trim());
-  const buttons = ['Load / update teams', 'Build 2 entries', 'Another valid build', 'Copy entry', 'Save this week', 'Saved weeks', 'Start new week', 'Undo', 'Move to', 'Unlock', 'Shared', 'Add a past week'];
+    .filter(e => !e.closest('#helpOverlay')).map(e => e.textContent.trim().replace(/^\+\s*/, ''));
+  const buttons = ['Load / update teams', 'Build 2 entries', 'Another valid build', 'Copy entry', 'Save this week', 'Saved weeks', 'Start new week', 'Undo', 'Move to', 'Unlock', 'Shared', 'Add a past week', 'Add pool', 'Copy its teams & tiers'];
   for (const label of buttons) {
     assert.ok(mentioned.includes(label), `Help should mention "${label}"`);
     assert.ok(uiText.some(text => text.startsWith(label)), `"${label}" should exist in the tool`);

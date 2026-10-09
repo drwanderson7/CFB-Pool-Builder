@@ -290,8 +290,9 @@ test('hand-entered weeks travel in a Copy / Load setup code, and bad numbers are
   assert.equal(code.history.length, 1);
   assert.equal(code.history[0].manual.week, 2);
 
-  code.history[0].manual.e1 = [-5, 99, 'x'];   // nonsense
-  code.history[0].manual.week = 400;
+  const hist = code.pools[0].history[0];
+  hist.manual.entries[0] = [-5, 99, 'x'];   // nonsense
+  hist.manual.week = 400;
   const target = await open(t);
   target.loadTeams(teamNames(12));
   target.$('#historyCloseBtn').click();
@@ -301,7 +302,7 @@ test('hand-entered weeks travel in a Copy / Load setup code, and bad numbers are
   target.openHistory();
   const card = manualCards(target)[0];
   assert.match(card.querySelector('.history-head strong').textContent, /Week 30/);
-  assert.match(card.querySelector('.manual-grid > div strong').textContent, /^0-14$/);
+  assert.match(card.querySelector('.manual-grid > div strong').textContent, /^0-7$/, 'an entry cannot win more than its 7 picks');
 });
 
 test('Tab wraps inside Saved weeks, ignoring the form while it is closed', async t => {

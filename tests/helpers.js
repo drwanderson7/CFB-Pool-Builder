@@ -65,7 +65,7 @@ function mockFetch(backend, espn) {
 
 // Opens a fresh "device". Pass the same backend to two apps to simulate laptop + phone.
 // backend: null means no sync server at all (e.g. opened as a local file).
-function openApp({ backend = null, confirm = true, storage = null, espn = null, bets = null, url = 'https://pool.test/', now = null } = {}) {
+function openApp({ backend = null, confirm = true, storage = null, espn = null, bets = null, local = null, url = 'https://pool.test/', now = null } = {}) {
   const dom = new JSDOM(HTML, {
     runScripts: 'dangerously',
     pretendToBeVisual: true,
@@ -81,6 +81,7 @@ function openApp({ backend = null, confirm = true, storage = null, espn = null, 
       });
       if (storage) w.localStorage.setItem(STORAGE_KEY, JSON.stringify(storage));
       if (bets) w.localStorage.setItem('cfb-pool-bets-v1', JSON.stringify(bets));
+      if (local) Object.keys(local).forEach(key => w.localStorage.setItem(key, local[key]));
     }
   });
   return makeApi(dom);

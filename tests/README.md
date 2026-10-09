@@ -34,6 +34,9 @@ shows `fail 0`. Any failure prints which check broke and why.
 | `lines.test.js` | Check lines: picks the right game (last week vs. this week), finished-slate detection, far-off lines flagged, quiet check on load, moved/started/missing report, badges on teams and picks, Use current lines + Undo, no-connection message |
 | `remove.test.js` | ✕ on a pick card: removes the team, refills its slot keeping other picks, shared and locked picks, Benched put-back, Undo, no-replacement message |
 | `layout.test.js` | Hide setup: summary text, focus, remembered choice, reopens on Start new week |
+| `entries-n.test.js` | Pools with other shapes: 3–6 entries, picks 1–15, spread, tiers, placements, Min/Max, shape changes + Undo, legacy storage opens as Pick 7 |
+| `records-n.test.js` | Saved weeks, grading, season tiles and hand-entered weeks for 3+ entries (k/N levels, add-up check), mixed shapes, old 2-entry weeks |
+| `pools.test.js` | Pool tabs: add/rename/delete, isolation of teams/builds/records, copy teams & tiers, remembered pool, two-device sync and deletes, setup codes |
 | `api-bets.test.js` | `/api/bets` GET/POST, separate Redis key, validation and size limit, missing-Redis error |
 
 ## Notes

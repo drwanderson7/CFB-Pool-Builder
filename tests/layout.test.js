@@ -26,7 +26,7 @@ test('Hide setup folds steps 1 and 2 into a summary, and Edit brings them back',
   app.$('#setupHideBtn').click();
   assert.equal(hidden(app, '#setupSection'), true);
   assert.equal(hidden(app, '#setupSummary'), false);
-  assert.equal(app.$('#setupSummaryText').textContent, '12 teams \u00b7 4 shared picks');
+  assert.equal(app.$('#setupSummaryText').textContent, '12 teams \u00b7 7 picks \u00d7 2 entries \u00b7 4 shared picks');
   assert.equal(app.doc.activeElement, app.$('#setupShowBtn'), 'focus moves to the Edit button');
   assert.equal(app.$('#setupShowBtn').getAttribute('aria-expanded'), 'false');
   app.$('#setupShowBtn').click();

@@ -188,6 +188,57 @@
       grid-template-columns: repeat(3, 1fr);
       gap: 8px;
     }
+    .pool-bar { display: flex; align-items: center; gap: 8px; margin: 0 0 14px; }
+    .pool-tabs { display: flex; gap: 6px; flex: 1; min-width: 0; overflow-x: auto; padding: 2px 0 4px; }
+    .pool-tab {
+      flex: none;
+      display: inline-flex;
+      align-items: baseline;
+      gap: 7px;
+      min-height: 40px;
+      padding: 0 14px;
+      border: 1px solid var(--control-line);
+      border-radius: 999px;
+      background: #ffffff;
+      color: var(--text);
+      font-size: .9rem;
+      font-weight: 800;
+      align-items: center;
+    }
+    .pool-tab small { color: var(--muted); font-size: .72rem; font-weight: 800; }
+    .pool-tab:hover { border-color: var(--green); }
+    .pool-tab.active { background: var(--green); border-color: var(--green); color: #ffffff; }
+    .pool-tab.active small { color: rgba(255, 255, 255, .85); }
+    #addPoolBtn { flex: none; white-space: nowrap; }
+    .pool-name-row { display: flex; align-items: flex-end; gap: 12px; margin-bottom: 12px; }
+    .pool-name-row label { flex: 1; min-width: 0; }
+    .pool-name-row input { width: 100%; }
+    .copy-from { display: flex; align-items: flex-end; gap: 10px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--line); }
+    .copy-from label { flex: 1; min-width: 160px; }
+    .copy-from select { width: 100%; }
+    .print-pool-name { display: none; margin: 0 0 8px; font-size: 1.1rem; }
+    .pool-shape { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 14px; }
+    .pool-shape select { width: 100%; }
+    .spread-field .field-label { text-transform: none; letter-spacing: 0; font-size: .7rem; }
+    .entries-host { display: contents; }
+    /* Three or more entries: the candidates panel takes the full width and the entries tile beneath it. */
+    .workspace.entries-many { grid-template-columns: repeat(var(--entry-cols, 3), minmax(0, 1fr)); }
+    @media (max-width: 1100px) { .workspace.entries-many { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 760px) { .workspace.entries-many { grid-template-columns: 1fr; } }
+    .workspace.entries-many > .candidates { grid-column: 1 / -1; min-height: auto; }
+    .partial-marker {
+      display: inline-block;
+      padding: 1px 6px;
+      border: 1px solid var(--amber-line);
+      border-radius: 6px;
+      color: #8a5a00;
+      font-size: .66rem;
+      font-weight: 800;
+    }
+    .pick-card.partial { border-color: var(--amber-line); }
+    .entries-many .entry-head { flex-wrap: wrap; gap: 4px 10px; }
+    .entries-many .entry-mix { order: 3; width: 100%; margin-left: 0; white-space: normal; }
+    .entries-many .entry-count { margin-left: auto; }
     .mini-stat { padding: 11px; border-radius: 11px; background: #f7faf8; border: 1px solid var(--line); }
     .mini-stat strong { display: block; margin-bottom: 3px; font-size: 1.08rem; }
     .mini-stat span { color: var(--muted); font-size: .76rem; }
@@ -218,7 +269,7 @@
     .candidate-list { display: grid; gap: 4px; }
     .candidate-columns {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 95px 95px 106px 86px;
+      grid-template-columns: minmax(0, 1fr) var(--exp-col, 95px) var(--exp-col, 95px) var(--place-col, 106px) 86px;
       gap: 6px;
       padding: 0 9px 6px;
       color: var(--muted);
@@ -232,7 +283,7 @@
     .team-row .field-label { display: none; }
     .team-row {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 95px 95px 106px 86px;
+      grid-template-columns: minmax(0, 1fr) var(--exp-col, 95px) var(--exp-col, 95px) var(--place-col, 106px) 86px;
       gap: 6px;
       align-items: center;
       padding: 5px 8px;
@@ -491,7 +542,7 @@
     .history-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 9px; }
     .history-head strong { font-size: .92rem; }
     .history-head span { color: var(--muted); font-size: .78rem; }
-    .history-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .history-columns { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
     .history-columns h4 { margin: 0 0 5px; font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
     .history-columns ol { margin: 0; padding-left: 18px; font-size: .84rem; line-height: 1.5; }
     .history-columns li { margin-bottom: 3px; }
@@ -707,8 +758,89 @@
       .team-row.expanded .row-details { grid-row: 3; }
     }
 
+    /* Four or more entries make the Min / Max / Place columns too wide for the table layout, so those pools
+       always use the one-line rows (name, tier, Edit), the same as on a phone. */
+    .compact-always .candidate-columns { display: none;
+    }
+    .compact-always .team-row { grid-template-columns: minmax(0, 1fr) 92px 58px; align-items: center;
+    }
+    .compact-always .team-name-wrap { grid-column: 1; grid-row: 1;
+    }
+    .compact-always .tier-group { grid-column: 2; grid-row: 1;
+    }
+    .compact-always .tier-group .field-label { display: none;
+    }
+    .compact-always .tier-select { padding: 0 4px; font-size: .72rem;
+    }
+    .compact-always .row-toggle {
+        display: inline-flex;
+        grid-column: 3;
+        grid-row: 1;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        padding: 0 8px;
+        border: 1px solid var(--control-line);
+        border-radius: 8px;
+        background: #ffffff;
+        color: var(--text);
+        font-size: .74rem;
+        font-weight: 800;
+    }
+    .compact-always .team-row.expanded .row-toggle { background: var(--green-soft); border-color: var(--green); color: var(--green-2);
+    }
+    .compact-always .row-summary { display: block; margin-top: 2px; color: var(--muted); font-size: .7rem; font-weight: 700;
+    }
+    .compact-always .row-summary:empty, .compact-always .team-row.expanded .row-summary { display: none;
+    }
+    .compact-always .team-row:not(.expanded) .rank-arrows { display: none;
+    }
+    .compact-always .row-details { display: none;
+    }
+    .compact-always .team-row.expanded .row-details {
+        display: grid;
+        grid-column: 1 / -1;
+        grid-row: 2;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        align-items: end;
+        padding-top: 6px;
+        border-top: 1px dashed var(--line);
+    }
+    .compact-always .team-row.expanded .row-details .field-label { display: block;
+    }
+    .compact-always .team-row.expanded .row-details .placement-group { grid-column: 1 / -1;
+    }
+    .compact-always .expand-all {
+        display: inline-block;
+        margin-top: 6px;
+        padding: 6px 0;
+        border: 0;
+        background: none;
+        color: var(--green-2);
+        font-size: .8rem;
+        font-weight: 800;
+        text-decoration: underline;
+    }
+    .compact-always .choice-btn { min-width: 36px;
+    }
+    .compact-always .rank-btn { min-width: 38px; height: 38px;
+    }
+    @media (max-width: 340px) {
+      .compact-always .team-row { grid-template-columns: minmax(0, 1fr) 58px;
+      }
+      .compact-always .tier-group { grid-column: 1; grid-row: 2;
+      }
+      .compact-always .row-toggle { grid-column: 2;
+      }
+      .compact-always .team-row.expanded .row-details { grid-row: 3;
+      }
+    }
+
     @media print {
       body { background: #fff; color: #111; }
+      .pool-bar { display: none !important; }
+      .print-pool-name { display: block; }
       .app { width: 100%; padding: 0; }
       .top-actions, .setup, .candidates, .buildbar, .benched, .entry-footer, .pick-actions, .pick-remove, .modal-overlay { display: none !important; }
       .workspace { grid-template-columns: 1fr 1fr; }
@@ -935,7 +1067,7 @@
     <header class="topbar">
       <div>
         <h1>CFB Splash Pool Builder</h1>
-        <p class="subtitle subtitle-pool">Two 7-pick Splash entries with exact overlap, tiers, and full exposure control.</p>
+        <p class="subtitle subtitle-pool" id="poolSubtitle">Two 7-pick Splash entries with exact overlap, tiers, and full exposure control.</p>
         <p class="subtitle subtitle-bets">Every bet, graded from final scores and checked against the closing line.</p>
       </div>
       <div class="top-actions">
@@ -959,6 +1091,11 @@
     </div>
 
     <div id="poolPage" role="tabpanel" aria-labelledby="tabPool">
+    <div class="pool-bar" id="poolBar">
+      <div class="pool-tabs" id="poolTabs" role="group" aria-label="Pools"></div>
+      <button class="btn" id="addPoolBtn" type="button">+ Add pool</button>
+    </div>
+    <h2 class="print-pool-name" id="printPoolName"></h2>
     <section class="setup" id="setupSection">
       <div class="card setup-panel">
         <div class="section-head">
@@ -974,22 +1111,48 @@
           <span class="count-note" id="inputCount">0 entered</span>
           <button class="btn danger new-week-btn" id="resetBtn" type="button">Start new week</button>
         </div>
+        <div class="copy-from hidden" id="copyFromRow">
+          <label><span class="field-label">Same games as another pool?</span>
+            <select id="copyFromSelect" aria-label="Pool to copy teams and tiers from"></select></label>
+          <button class="btn" id="copyFromBtn" type="button">Copy its teams &amp; tiers</button>
+        </div>
       </div>
 
       <div class="card setup-panel">
         <div class="section-head">
           <div>
-            <h2>2. Set exact overlap</h2>
-            <p class="helper">This is the number of teams that must appear in both entries.</p>
+            <h2>2. Set up the pool</h2>
+            <p class="helper" id="overlapHelper">Say how many picks and entries the pool has, then how many teams must appear in both entries.</p>
           </div>
+        </div>
+        <div class="pool-name-row">
+          <label>
+            <span class="field-label">Pool name</span>
+            <input type="text" id="poolName" maxlength="40" autocomplete="off" aria-label="Pool name" placeholder="Pick 7">
+          </label>
+          <button class="btn danger hidden" id="deletePoolBtn" type="button">Delete pool</button>
+        </div>
+        <div class="pool-shape" id="poolShape">
+          <label>
+            <span class="field-label">Picks per entry</span>
+            <select id="picksSelect" aria-label="Picks per entry"></select>
+          </label>
+          <label>
+            <span class="field-label">Entries</span>
+            <select id="entriesSelect" aria-label="Number of entries"></select>
+          </label>
+          <label class="spread-field hidden" id="spreadField">
+            <span class="field-label">Most entries for a non-shared team</span>
+            <select id="spreadSelect" aria-label="Most entries a team that is not in every entry can be in"></select>
+          </label>
         </div>
         <div class="overlap-wrap">
           <div>
-            <div class="overlap-number"><strong id="overlapValue">3</strong><span>shared picks</span></div>
+            <div class="overlap-number"><strong id="overlapValue">3</strong><span id="overlapUnit">shared picks</span></div>
             <p class="helper" id="overlapSentence">Each entry will share exactly 3 of its 7 teams.</p>
           </div>
           <label>
-            <span class="field-label">Shared</span>
+            <span class="field-label" id="overlapLabel">Shared</span>
             <select id="overlapSelect" class="overlap-select" aria-label="Exact shared picks">
               <option value="0">0 picks</option><option value="1">1 pick</option><option value="2">2 picks</option>
               <option value="3" selected>3 picks</option><option value="4">4 picks</option><option value="5">5 picks</option>
@@ -1000,13 +1163,13 @@
         <div class="overlap-explainer">
           <div class="mini-stat"><strong id="totalSlots">14</strong><span>Total pick slots</span></div>
           <div class="mini-stat"><strong id="uniqueNeeded">11</strong><span>Distinct teams needed</span></div>
-          <div class="mini-stat"><strong id="differentPicks">4 + 4</strong><span>Entry-specific picks</span></div>
+          <div class="mini-stat"><strong id="differentPicks">4 + 4</strong><span id="differentLabel">Entry-specific picks</span></div>
         </div>
       </div>
     </section>
 
-    <section class="workspace">
-      <div class="card candidates">
+    <section class="workspace" id="workspace">
+      <div class="card candidates" id="candidatesCard">
         <div class="candidate-toolbar">
           <div>
             <h2>3. Set exposure, locks &amp; tier</h2>
@@ -1032,34 +1195,10 @@
           <button class="btn primary" id="buildBtn" type="button" disabled>Build 2 entries</button>
         </div>
       </section>
-      <div class="card entry" data-entry="1">
-        <div class="entry-head">
-          <h2>Splash Entry 1</h2>
-          <span class="entry-mix" id="entry1Mix"></span>
-          <span class="entry-count" id="entry1Count">0 / 7</span>
-        </div>
-        <div class="dropzone" id="entry1Zone" data-entry="1" aria-label="Splash Entry 1 drop zone"></div>
-        <div class="entry-footer">
-          <button class="btn" id="copyEntry1" type="button" disabled>Copy entry</button>
-          <button class="btn" id="clearEntry1" type="button" disabled>Clear locks</button>
-        </div>
-      </div>
-
-      <div class="card entry" data-entry="2">
-        <div class="entry-head">
-          <h2>Splash Entry 2</h2>
-          <span class="entry-mix" id="entry2Mix"></span>
-          <span class="entry-count" id="entry2Count">0 / 7</span>
-        </div>
-        <div class="dropzone" id="entry2Zone" data-entry="2" aria-label="Splash Entry 2 drop zone"></div>
-        <div class="entry-footer">
-          <button class="btn" id="copyEntry2" type="button" disabled>Copy entry</button>
-          <button class="btn" id="clearEntry2" type="button" disabled>Clear locks</button>
-        </div>
-      </div>
+      <div class="entries-host" id="entriesHost"></div>
 
       <section class="card benched hidden" id="benchedBox" aria-label="Benched teams">
-        <div class="benched-head"><h2>Benched</h2><span id="benchedCount"></span><span>Left out of both entries this build.</span></div>
+        <div class="benched-head"><h2>Benched</h2><span id="benchedCount"></span><span id="benchedNote">Left out of both entries this build.</span></div>
         <div class="benched-list" id="benchedList"></div>
       </section>
     </section>
@@ -1160,12 +1299,13 @@
           <h2 id="helpTitle">How to use this tool</h2>
           <button class="btn" id="helpCloseBtn" type="button" aria-label="Close">✕</button>
         </div>
-        <p class="helper">Builds two 7-pick Splash entries that share exactly the number of picks you choose, favoring the teams you feel best about.</p>
+        <p class="helper">Builds your Splash entries (two 7-pick entries to start; each pool can have its own number of picks and entries) so that exactly the number of picks you choose are in every entry, favoring the teams you feel best about.</p>
 
         <h3 class="help-h">Quick start</h3>
         <ol class="help-steps">
           <li><strong>Add teams.</strong> In section 1, paste this week's candidates, one per line, with the spread after the name (for example <em>Purdue +14.5</em>). Tap <strong>Load / update teams</strong>.</li>
-          <li><strong>Set the overlap.</strong> In section 2, choose how many picks must appear in both entries (the <strong>Shared</strong> menu).</li>
+          <li><strong>Set up the pool.</strong> In section 2, name the pool and choose its picks per entry and number of entries (the starting pool is 7 picks, 2 entries). Then choose how many picks must appear in every entry (the <strong>Shared</strong> menu).</li>
+          <li><strong>In more than one pool?</strong> Tap <strong>Add pool</strong> above section 1 for each pool you're in, then tap a pool's name to switch to it. Each pool keeps its own teams, build, saved weeks, and records. If two pools use the same games and lines, open the second pool and tap <strong>Copy its teams &amp; tiers</strong> to bring them over.</li>
           <li><strong>Set each team's tier.</strong> In section 3, use the Tier menu: Lock, Strong, Lean, or Meh. Every team starts at Lean.</li>
           <li><strong>Optional: fine-tune.</strong> Use Min and Max to limit how many entries a team can be in. Use S1, S2, or the lock to force a team into Entry 1, Entry 2, or both. On a phone these settings are tucked behind each team's <strong>Edit</strong> button.</li>
           <li><strong>Build.</strong> Tap <strong>Build 2 entries</strong>. Tap <strong>Another valid build</strong> for a different arrangement.</li>
@@ -1191,11 +1331,15 @@
           <dt>Order within a tier</dt>
           <dd>The ▲▼ arrows (or dragging on desktop) reorder teams within their own tier. That order keeps your build stable when you make small edits. To change a team's tier, use its Tier menu.</dd>
           <dt>Min and Max</dt>
-          <dd>How many entries a team may be in (0, 1, or 2). Max 0 benches a team. Min 2 puts it in both entries.</dd>
+          <dd>How many entries a team may be in (from 0 up to the number of entries). Max 0 benches a team. Min equal to the number of entries puts it in every entry.</dd>
           <dt>Place (S1, S2, lock)</dt>
-          <dd>S1 or S2 locks a team into that entry. The lock puts it in both, which counts toward your shared picks.</dd>
+          <dd>S1, S2, and so on lock a team into that one entry. The lock puts it in every entry, which counts toward your shared picks.</dd>
           <dt>Shared picks (overlap)</dt>
-          <dd>The number of teams that appear in both entries. You need at least 14 minus that many teams. If you don't have enough, the message in the build bar offers a button to fix it.</dd>
+          <dd>The number of teams that appear in every entry. With two entries you need at least twice the picks per entry minus that many teams (14 minus the overlap for a 7-pick pool). If you don't have enough, the message in the build bar offers a button to fix it.</dd>
+          <dt>Three or more entries</dt>
+          <dd>Besides the shared group, teams from the highest tiers go in as many entries as the pool allows and lower tiers fill the rest, so your best teams get the most exposure. The <strong>most entries for a non-shared team</strong> menu controls how spread out the entries are: 1 means every non-shared team is in just one entry (the most variety, and the most teams needed); a higher number lets your best teams repeat more. A pick that is in some but not all entries is marked "In 2 of 3" (for example).</dd>
+          <dt>Pools</dt>
+          <dd>Each pool is separate: its own picks per entry, number of entries, teams, tiers, build, saved weeks, and season record. Switching pools never mixes them. The pools you add, rename, or delete follow you to your other device. Delete pool removes a pool and its records everywhere, after you confirm.</dd>
           <dt>Remove a pick (&#10005;)</dt>
           <dd>The &#10005; on the right of a pick card takes that team out of this build. Its slot is refilled from your other teams, and your other picks stay put wherever the rules allow. The team stays in your list with Max set to 0 and shows on the Benched list as "Max 0 &middot; put back"; tap it there to make it pickable again, or tap Undo.</dd>
           <dt>Line check</dt>
@@ -1205,7 +1349,7 @@
           <dt>Undo</dt>
           <dd>The Undo button or Ctrl/Cmd+Z reverses your last 30 changes. It resets when the page reloads or when changes arrive from your other device. Saving and grading weeks aren't part of Undo.</dd>
           <dt>Past weeks</dt>
-          <dd>In Saved weeks, <strong>Add a past week</strong> lets you enter a week's records without the individual picks: Entry 1, Entry 2, your 2/2 picks (in both entries), and your 1/2 picks (in just one). Entry 1 + Entry 2 always equals 2 × (2/2 picks) + (1/2 picks), so the 1/2 row fills itself in and you're warned if the numbers don't add up. These weeks count toward your season record.</dd>
+          <dd>In Saved weeks, <strong>Add a past week</strong> lets you enter a week's records without the individual picks: each entry, plus your picks that were in every entry (2/2 picks with two entries), in some of them, and in just one (1/2 picks). The entries' totals always equal the sum of each group's record times how many entries it was in (with two entries, Entry 1 + Entry 2 = 2 × the 2/2 picks + the 1/2 picks), so the last row fills itself in and you're warned if the numbers don't add up. These weeks count toward the season record of the pool you're in.</dd>
           <dt>Sync</dt>
           <dd>The pill at the top shows whether your pool setup is in step between your laptop and phone. Tap it to sync now. The Bet Tracker page has its own sync line under its buttons.</dd>
           <dt>Copy / Load setup</dt>
@@ -1242,6 +1386,10 @@
           <p>Read the message in the build bar; it says what's wrong. The most common cause is too few teams for your overlap. If so, tap the button in the message (for example "Set overlap to 4"). You need at least 7 teams with Max above 0.</p></details>
         <details class="faq"><summary>My Lock team isn't in both entries.</summary>
           <p>Only as many teams can be in both entries as your shared-picks number. With 3 shared picks, extra Lock teams land in a single entry. Raise the overlap if you want more teams in both.</p></details>
+        <details class="faq"><summary>How do I add a second pool?</summary>
+          <p>Tap <strong>+ Add pool</strong> above section 1. Name it and set its picks per entry and number of entries in section 2, then paste its teams (or copy them from another pool). Tap a pool's name to switch. Each pool's saved weeks and records stay separate.</p></details>
+        <details class="faq"><summary>Why are some teams in more than one entry?</summary>
+          <p>With three or more entries, each entry has its own picks but there aren't usually enough teams for every pick to be different. Teams outside the shared group are placed in as many entries as the "most entries for a non-shared team" menu allows, best tiers first. Lower that number for more variety, if you have enough teams.</p></details>
         <details class="faq"><summary>A Meh team got picked.</summary>
           <p>Two 7-pick entries need a certain number of different teams. When your higher tiers can't cover them, the builder reaches down into lower tiers.</p></details>
         <details class="faq"><summary>Another valid build gave me different teams.</summary>
@@ -1318,12 +1466,9 @@
         <p class="helper auto-grade-note" id="autoGradeNote" aria-live="polite"></p>
         <div class="past-form hidden" id="pastForm">
           <h3 id="pastTitle">Add a past week</h3>
-          <p class="helper">Enter each record as wins, losses, and pushes. You don't need the individual picks. The 1/2 picks row fills itself in (Entry 1 + Entry 2 − 2 × the 2/2 picks), and you can overwrite it.</p>
+          <p class="helper" id="pastHelp">Enter each record as wins, losses, and pushes. You don't need the individual picks. The 1/2 picks row fills itself in (Entry 1 + Entry 2 − 2 × the 2/2 picks), and you can overwrite it.</p>
           <label class="past-week">Week <input type="number" id="pastWeek" min="0" max="30" inputmode="numeric" aria-label="Week number"></label>
-          <div class="past-row"><div class="row-label">Entry 1</div><div class="wlp"><label><span>W</span><input type="number" class="past-input" id="past-e1-W" data-row="e1" data-col="W" min="0" max="14" inputmode="numeric" placeholder="0" aria-label="Entry 1 wins"></label><label><span>L</span><input type="number" class="past-input" id="past-e1-L" data-row="e1" data-col="L" min="0" max="14" inputmode="numeric" placeholder="0" aria-label="Entry 1 losses"></label><label><span>P</span><input type="number" class="past-input" id="past-e1-P" data-row="e1" data-col="P" min="0" max="14" inputmode="numeric" placeholder="0" aria-label="Entry 1 pushes"></label></div></div>
-          <div class="past-row"><div class="row-label">Entry 2</div><div class="wlp"><label><span>W</span><input type="number" class="past-input" id="past-e2-W" data-row="e2" data-col="W" min="0" max="14" inputmode="numeric" placeholder="0" aria-label="Entry 2 wins"></label><label><span>L</span><input type="number" class="past-input" id="past-e2-L" data-row="e2" data-col="L" min="0" max="14" inputmode="numeric" placeholder="0" aria-label="Entry 2 losses"></label><label><span>P</span><input type="number" class="past-input" id="past-e2-P" data-row="e2" data-col="P" min="0" max="14" inputmode="numeric" placeholder="0" aria-label="Entry 2 pushes"></label></div></div>
-          <div class="past-row"><div class="row-label">2/2 picks<small>in both entries</small></div><div class="wlp"><label><span>W</span><input type="number" class="past-input" id="past-shared-W" data-row="shared" data-col="W" min="0" max="14" inputmode="numeric" placeholder="0" aria-label="2/2 picks wins"></label><label><span>L</span><input type="number" class="past-input" id="past-shared-L" data-row="shared" data-col="L" min="0" max="14" inputmode="numeric" placeholder="0" aria-label="2/2 picks losses"></label><label><span>P</span><input type="number" class="past-input" id="past-shared-P" data-row="shared" data-col="P" min="0" max="14" inputmode="numeric" placeholder="0" aria-label="2/2 picks pushes"></label></div></div>
-          <div class="past-row"><div class="row-label">1/2 picks<small>in one entry only</small></div><div class="wlp"><label><span>W</span><input type="number" class="past-input" id="past-singles-W" data-row="singles" data-col="W" min="0" max="14" inputmode="numeric" placeholder="0" aria-label="1/2 picks wins"></label><label><span>L</span><input type="number" class="past-input" id="past-singles-L" data-row="singles" data-col="L" min="0" max="14" inputmode="numeric" placeholder="0" aria-label="1/2 picks losses"></label><label><span>P</span><input type="number" class="past-input" id="past-singles-P" data-row="singles" data-col="P" min="0" max="14" inputmode="numeric" placeholder="0" aria-label="1/2 picks pushes"></label></div></div>
+          <div id="pastRows"></div>
           <div class="past-check" id="pastCheck" aria-live="polite"></div>
           <div class="past-error" id="pastError" role="alert"></div>
           <div class="modal-actions">
@@ -1333,7 +1478,7 @@
         </div>
         <div id="historySummary"></div>
         <div id="historyList"></div>
-        <div class="empty-state" id="historyEmpty"><strong>No saved weeks yet</strong><span>Build your two entries and tap "Save this week," or add a past week above.</span></div>
+        <div class="empty-state" id="historyEmpty"><strong>No saved weeks yet</strong><span id="historyEmptyHint">Build your two entries and tap "Save this week," or add a past week above.</span></div>
         <div class="modal-actions" id="historyClearRow" hidden>
           <button class="btn danger" id="clearHistoryBtn" type="button">Clear all saved weeks</button>
         </div>
@@ -1574,10 +1719,13 @@
         overlap: $('#overlapSelect'), overlapValue: $('#overlapValue'), overlapSentence: $('#overlapSentence'),
         uniqueNeeded: $('#uniqueNeeded'), differentPicks: $('#differentPicks'), candidateList: $('#candidateList'),
         candidateEmpty: $('#candidateEmpty'), candidateBadge: $('#candidateBadge'),
-        zones: { 1: $('#entry1Zone'), 2: $('#entry2Zone') },
-        counts: { 1: $('#entry1Count'), 2: $('#entry2Count') },
-        clear: { 1: $('#clearEntry1'), 2: $('#clearEntry2') },
-        copy: { 1: $('#copyEntry1'), 2: $('#copyEntry2') },
+        entriesHost: $('#entriesHost'), workspace: $('#workspace'), candidatesCard: $('#candidatesCard'),
+        picksSelect: $('#picksSelect'), entriesSelect: $('#entriesSelect'), spreadSelect: $('#spreadSelect'), spreadField: $('#spreadField'),
+        overlapUnit: $('#overlapUnit'), overlapLabel: $('#overlapLabel'), overlapHelper: $('#overlapHelper'), differentLabel: $('#differentLabel'),
+        totalSlots: $('#totalSlots'), poolSubtitle: $('#poolSubtitle'),
+        poolTabs: $('#poolTabs'), addPool: $('#addPoolBtn'), poolName: $('#poolName'), deletePool: $('#deletePoolBtn'),
+        copyFromRow: $('#copyFromRow'), copyFromSelect: $('#copyFromSelect'), copyFrom: $('#copyFromBtn'), printPoolName: $('#printPoolName'),
+        zones: {}, counts: {}, clear: {}, copy: {}, mix: {},
         build: $('#buildBtn'), another: $('#anotherBtn'), status: $('#statusBox'),
         reset: $('#resetBtn'), print: $('#printBtn'),
         transferBtn: $('#transferBtn'), transferOverlay: $('#transferOverlay'), transferClose: $('#transferCloseBtn'),
@@ -1586,27 +1734,54 @@
         loadSetup: $('#loadSetupBtn'), uploadSetup: $('#uploadSetupBtn'), setupFile: $('#setupFileInput'),
         saveWeek: $('#saveWeekBtn'), historyBtn: $('#historyBtn'), historyOverlay: $('#historyOverlay'),
         undo: $('#undoBtn'), historySummary: $('#historySummary'), syncStatus: $('#syncStatus'),
-        mix: { 1: $('#entry1Mix'), 2: $('#entry2Mix') },
         benched: $('#benchedBox'), benchedList: $('#benchedList'), benchedCount: $('#benchedCount'),
         expandAll: $('#expandAllBtn'), help: $('#helpBtn'), helpOverlay: $('#helpOverlay'), helpClose: $('#helpCloseBtn'),
         historyClose: $('#historyCloseBtn'), historyList: $('#historyList'), historyEmpty: $('#historyEmpty'),
         historyClearRow: $('#historyClearRow'), clearHistory: $('#clearHistoryBtn'),
         addPastWeek: $('#addPastWeekBtn'), pastForm: $('#pastForm'), pastTitle: $('#pastTitle'), pastWeek: $('#pastWeek'),
-        pastCheck: $('#pastCheck'), pastError: $('#pastError'), pastSave: $('#pastSaveBtn'), pastCancel: $('#pastCancelBtn'),
+        pastCheck: $('#pastCheck'), pastError: $('#pastError'), pastHelp: $('#pastHelp'), pastSave: $('#pastSaveBtn'), pastCancel: $('#pastCancelBtn'),
         autoGrade: $('#autoGradeBtn'), autoGradeNote: $('#autoGradeNote'),
         setupSection: $('#setupSection'), setupSummary: $('#setupSummary'), setupSummaryText: $('#setupSummaryText'),
         setupHide: $('#setupHideBtn'), setupShow: $('#setupShowBtn'), checkLines: $('#checkLinesBtn')
       };
 
-      let state = { teams: [], overlap: 3, result: null, history: [] };
+      // The pool being worked on. picks = picks per entry, entries = how many entries, overlap = how many
+      // teams are in EVERY entry, spread = the most entries a team outside that shared group can be in.
+      const MAX_PICKS = 15, MAX_ENTRIES = 6;
+      function newPool(over) {
+        return Object.assign({ id: 'main', name: 'Pick 7', picks: 7, entries: 2, spread: 1, overlap: 3, teams: [], result: null, history: [] }, over || {});
+      }
+      // Every pool lives in store.pools; `state` is always one of them (the pool on screen), so all the
+      // builder code works on "the current pool" without knowing there are others.
+      let state = newPool();
+      const store = { pools: [state], deleted: {} };
+      const ACTIVE_KEY = 'cfb-pool-active';
+      function setState(next) {
+        const i = store.pools.indexOf(state);
+        state = next;
+        if (i >= 0) store.pools[i] = next;
+      }
       let dragData = { teamId: null, sourceEntry: 0, tier: null };
 
       const escapeHtml = (value) => String(value).replace(/[&<>"']/g, char => ({
         '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
       }[char]));
       const uid = () => 't-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
-      const popcount = (mask) => mask === 3 ? 2 : mask === 0 ? 0 : 1;
-      const includesEntry = (mask, entry) => Boolean(mask & entry);
+      // A mask has one bit per entry (entry 1 = 1, entry 2 = 2, entry 3 = 4, ...); a team's mask is the set
+      // of entries it is in. "Full" means every entry.
+      const popcount = (mask) => { let n = 0; while (mask) { n += mask & 1; mask >>= 1; } return n; };
+      const entryBit = (entry) => 1 << (entry - 1);
+      const includesEntry = (mask, entry) => Boolean(mask & entryBit(entry));
+      const fullMask = () => (1 << state.entries) - 1;
+      const entryIds = () => Array.from({ length: state.entries }, (_, i) => i + 1);
+      const spreadCap = () => Math.max(1, Math.min(state.entries - 1, Number(state.spread) || (state.entries - 1)));
+      const everyEntry = () => state.entries === 2 ? 'both entries' : 'all ' + state.entries + ' entries';
+      const clampInt = (value, min, max, fallback) => {
+        const n = Math.trunc(Number(value));
+        return Number.isFinite(n) ? Math.max(min, Math.min(max, n)) : fallback;
+      };
+      const NUMBER_WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen'];
+      const capitalize = (text) => text.charAt(0).toUpperCase() + text.slice(1);
       const clone = (value) => JSON.parse(JSON.stringify(value));
       const shuffled = (items) => {
         const copy = items.slice();
@@ -1628,7 +1803,7 @@
       let applyingUndo = false;
 
       function setupSnapshot() {
-        return JSON.stringify({ teams: state.teams, overlap: state.overlap, result: state.result });
+        return JSON.stringify({ teams: state.teams, overlap: state.overlap, result: state.result, picks: state.picks, entries: state.entries, spread: state.spread });
       }
       function resetUndoBaseline() {
         lastSetupJSON = setupSnapshot();
@@ -1645,6 +1820,9 @@
         state.teams = snap.teams;
         state.overlap = snap.overlap;
         state.result = snap.result;
+        state.picks = snap.picks || 7;
+        state.entries = snap.entries || 2;
+        state.spread = snap.spread || (state.entries - 1);
         applyingUndo = true;
         save();
         applyingUndo = false;
@@ -1660,7 +1838,7 @@
         }
         lastSetupJSON = snap;
         updateUndoButton();
-        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (_) {}
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(fullSyncPayload())); } catch (_) {}
         scheduleServerPush();
       }
 
@@ -1722,8 +1900,15 @@
         pushTimer = setTimeout(pushToServer, 600);
       }
 
+      const setupOf = (p) => ({ name: p.name, picks: p.picks, entries: p.entries, spread: p.spread, teams: p.teams, overlap: p.overlap, result: p.result });
+      const poolPayload = (p) => ({ id: p.id, name: p.name, picks: p.picks, entries: p.entries, spread: p.spread, overlap: p.overlap, teams: p.teams, result: p.result, history: p.history });
+      // What is stored and synced: every pool, plus (at the top level, in the old single-pool shape) the
+      // first pool, so a device still on an older version keeps working and the sync route's check passes.
+      function storePayload(pools, deleted) {
+        return Object.assign(Object.assign(setupOf(pools[0]), { history: pools[0].history }), { v: 2, pools: pools.map(poolPayload), deleted });
+      }
       function fullSyncPayload() {
-        return { teams: state.teams, overlap: state.overlap, result: state.result, history: state.history };
+        return storePayload(store.pools, store.deleted);
       }
 
       async function pushToServer() {
@@ -1763,42 +1948,33 @@
           const body = await response.json();
           setSync('ok');
           if (!body || !body.data) {
-            if (state.teams.length || state.history.length) scheduleServerPush(); // server empty: seed it
+            if (store.pools.some(p => p.teams.length || p.history.length)) scheduleServerPush(); // server empty: seed it
             return;
           }
-          const sanitized = sanitizeSavedState(body.data);
-          if (!sanitized) return;
+          const incoming = sanitizeStore(body.data);
+          if (!incoming) return;
 
-          const incomingFullJSON = JSON.stringify({ teams: sanitized.teams, overlap: sanitized.overlap, result: sanitized.result, history: sanitized.history });
-          if (incomingFullJSON === lastSyncedJSON) return; // just our own last push, echoed back
+          const incomingJSON = JSON.stringify(storePayload(incoming.pools.length ? incoming.pools : store.pools, incoming.deleted));
+          if (incomingJSON === lastSyncedJSON) return; // just our own last push, echoed back
 
-          const mergedHistory = mergeHistory(state.history, sanitized.history);
-          const buildChanged = sanitized.teams.length > 0 &&
-            JSON.stringify({ teams: sanitized.teams, overlap: sanitized.overlap, result: sanitized.result }) !==
-            JSON.stringify({ teams: state.teams, overlap: state.overlap, result: state.result });
-          const historyChanged = JSON.stringify(mergedHistory) !== JSON.stringify(state.history);
-          if (!buildChanged && !historyChanged) return;
+          const before = JSON.stringify(fullSyncPayload());
+          const info = mergeIncomingStore(incoming);
+          const after = JSON.stringify(fullSyncPayload());
+          if (after === before) return;
 
           syncing = true;
-          if (buildChanged) {
-            state.teams = sanitized.teams;
-            state.overlap = sanitized.overlap;
-            state.result = sanitized.result;
-            resetUndoBaseline();
-          }
-          state.history = mergedHistory;
-          try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (_) {}
+          if (info.activeSetupChanged || info.activeRemoved) resetUndoBaseline();
+          try { localStorage.setItem(STORAGE_KEY, after); } catch (_) {}
           renderAll();
           setStatus(
-            buildChanged ? 'Synced from your other device' : 'Synced saved weeks',
-            buildChanged ? 'Loaded the latest teams, exposure, locks, and build.' : 'Picked up saved-week history from your other device.',
+            info.setupChanged ? 'Synced from your other device' : 'Synced saved weeks',
+            info.setupChanged ? 'Loaded the latest teams, exposure, locks, and build.' : 'Picked up saved-week history from your other device.',
             'success'
           );
           syncing = false;
 
-          const finalJSON = JSON.stringify(fullSyncPayload());
-          if (finalJSON !== incomingFullJSON) scheduleServerPush(); // our merge has data the server doesn't yet
-          else lastSyncedJSON = finalJSON;
+          if (after !== incomingJSON) scheduleServerPush(); // our merge has data the server doesn't yet
+          else lastSyncedJSON = after;
         } catch (_) {
           setSync('offline'); // stay on whatever's local
         }
@@ -1810,14 +1986,45 @@
 
       const validIso = value => typeof value === 'string' && !isNaN(Date.parse(value));
 
+      // A manual week stores one [wins, losses, pushes] record per entry, and one per "level": levels[k - 1]
+      // is the record of the picks that were in k of the entries (so levels[N - 1] is the shared group).
+      // For two entries the old field names (e1, e2, shared, singles) are written too, so a device that
+      // hasn't updated yet still reads the week correctly.
+      function makeManual(week, picks, entryRecords, levelRecords) {
+        const manual = { week, picks, entries: entryRecords, levels: levelRecords };
+        if (entryRecords.length === 2) {
+          manual.e1 = entryRecords[0]; manual.e2 = entryRecords[1];
+          manual.shared = levelRecords[1]; manual.singles = levelRecords[0];
+        }
+        return manual;
+      }
+
+      function sanitizeManual(m) {
+        if (!m || typeof m !== 'object') return null;
+        const picks = clampInt(m.picks, 1, MAX_PICKS, 7);
+        const record = (value, max) => [0, 1, 2].map(i => clampInt(Array.isArray(value) ? value[i] : 0, 0, max, 0));
+        const week = clampInt(m.week, 0, 30, 0);
+        if (Array.isArray(m.entries) && m.entries.length >= 2 && Array.isArray(m.levels) && m.levels.length === m.entries.length) {
+          const n = Math.min(m.entries.length, MAX_ENTRIES);
+          return makeManual(week, picks, m.entries.slice(0, n).map(r => record(r, picks)), m.levels.slice(0, n).map(r => record(r, picks * n)));
+        }
+        return makeManual(week, picks, [record(m.e1, picks), record(m.e2, picks)], [record(m.singles, picks * 2), record(m.shared, picks * 2)]);
+      }
+
       function sanitizeHistory(history) {
         if (!Array.isArray(history)) return [];
         return history
-          .filter(entry => entry && Array.isArray(entry.entry1) && Array.isArray(entry.entry2))
+          .filter(entry => entry && typeof entry === 'object')
           .map(entry => {
+            // lineups: one list of pick names per entry. Weeks saved before pools had a shape only have
+            // entry1 / entry2, which are read as a two-entry week.
+            const wellFormed = Array.isArray(entry.lineups) && entry.lineups.length >= 2 && entry.lineups.length <= MAX_ENTRIES && entry.lineups.every(Array.isArray);
+            const lineups = wellFormed ? entry.lineups
+              : (Array.isArray(entry.entry1) && Array.isArray(entry.entry2) ? [entry.entry1, entry.entry2] : null);
+            if (!lineups) return null;
             const savedAt = validIso(entry.savedAt) ? entry.savedAt : new Date().toISOString();
             // results: { teamName: 'W' | 'L' | 'P' } — keyed by name, so a shared pick is graded
-            // once and counts in both entries. tiers: each pick's tier when the week was saved
+            // once and counts in every entry it is in. tiers: each pick's tier when the week was saved
             // (absent on weeks saved before grading existed, which just skip the by-tier stats).
             const results = {};
             if (entry.results && typeof entry.results === 'object') {
@@ -1833,30 +2040,23 @@
                 if ([0, 1, 2, 3].includes(t)) tiers[name] = t;
               });
             }
-            // manual: a week entered by hand as records only — { week, e1, e2, shared, singles },
-            // each [wins, losses, pushes] — for weeks whose individual picks weren't saved here.
-            let manual = null;
-            if (entry.manual && typeof entry.manual === 'object') {
-              const record = value => [0, 1, 2].map(i => Math.max(0, Math.min(14, parseInt(Array.isArray(value) ? value[i] : 0, 10) || 0)));
-              const week = parseInt(entry.manual.week, 10);
-              manual = {
-                week: Number.isFinite(week) ? Math.max(0, Math.min(30, week)) : 0,
-                e1: record(entry.manual.e1), e2: record(entry.manual.e2),
-                shared: record(entry.manual.shared), singles: record(entry.manual.singles)
-              };
-            }
+            const clean = lineups.map(list => list.map(String).slice(0, MAX_PICKS));
             return {
               id: String(entry.id || uid()),
               savedAt: savedAt,
               updatedAt: validIso(entry.updatedAt) ? entry.updatedAt : savedAt,
-              overlap: Math.max(0, Math.min(7, Number(entry.overlap) || 0)),
-              entry1: entry.entry1.map(String).slice(0, 7),
-              entry2: entry.entry2.map(String).slice(0, 7),
+              overlap: clampInt(entry.overlap, 0, MAX_PICKS, 0),
+              picks: clampInt(entry.picks, 1, MAX_PICKS, clean[0].length || 7),
+              lineups: clean,
+              // Kept so a device on the older version still sees (and never drops) the week.
+              entry1: clean[0],
+              entry2: clean[1],
               results: results,
               tiers: tiers,
-              manual: manual
+              manual: sanitizeManual(entry.manual)
             };
-          });
+          })
+          .filter(Boolean);
       }
 
       // Saved weeks are a cumulative record, never something a sync or import should be able to
@@ -1878,13 +2078,18 @@
 
       function sanitizeSavedState(saved) {
         if (!saved || !Array.isArray(saved.teams)) return null;
+        const picks = clampInt(saved.picks, 1, MAX_PICKS, 7);
+        const entries = clampInt(saved.entries, 2, MAX_ENTRIES, 2);
+        const full = (1 << entries) - 1;
+        const spread = clampInt(saved.spread, 1, entries - 1, entries - 1);
         const teams = saved.teams.map(team => {
           const oldLocks = Array.isArray(team.locks) ? team.locks : [];
           const migratedMask = oldLocks.reduce((mask, entry) => mask | (entry === 1 ? 1 : entry === 2 ? 2 : 0), 0);
-          const fixedMask = [0, 1, 2, 3].includes(Number(team.fixedMask)) ? Number(team.fixedMask) : migratedMask;
+          const rawMask = Number(team.fixedMask);
+          const fixedMask = Number.isInteger(rawMask) && rawMask >= 0 && rawMask <= full ? rawMask : (migratedMask & full);
           const exposure = popcount(fixedMask);
-          let min = Math.max(0, Math.min(2, Number(team.min) || 0));
-          let max = Math.max(0, Math.min(2, Number.isFinite(Number(team.max)) ? Number(team.max) : 2));
+          let min = clampInt(team.min, 0, entries, 0);
+          let max = Number.isFinite(Number(team.max)) ? clampInt(team.max, 0, entries, entries) : entries;
           if (fixedMask) {
             min = Math.min(min, exposure);
             max = Math.max(max, exposure);
@@ -1892,22 +2097,91 @@
           const tier = [0, 1, 2, 3].includes(Number(team.tier)) ? Number(team.tier) : 2;
           return { id: String(team.id || uid()), name: String(team.name || ''), min, max, fixedMask, tier };
         }).filter(team => team.name);
-        const overlap = Math.max(0, Math.min(7, Number(saved.overlap) || 0));
-        const result = saved.result && Array.isArray(saved.result[1]) && Array.isArray(saved.result[2]) ? saved.result : null;
+        const overlap = clampInt(saved.overlap, 0, picks, 0);
+        const r = saved.result;
+        const result = r && typeof r === 'object' && Array.from({ length: entries }, (_, i) => Array.isArray(r[i + 1])).every(Boolean) && r[entries + 1] === undefined ? r : null;
+        const name = typeof saved.name === 'string' && saved.name.trim() ? saved.name.trim().slice(0, 40) : 'Pick ' + picks;
         const history = sanitizeHistory(saved.history);
-        return { teams, overlap, result, history };
+        return { id: String(saved.id || 'main'), name, picks, entries, spread, teams, overlap, result, history };
+      }
+
+      // Copies a sanitized pool's setup (not its saved weeks) onto a pool (the one on screen by default).
+      function adoptSetup(sanitized, target) {
+        const pool = target || state;
+        pool.name = sanitized.name;
+        pool.picks = sanitized.picks;
+        pool.entries = sanitized.entries;
+        pool.spread = sanitized.spread;
+        pool.teams = sanitized.teams;
+        pool.overlap = sanitized.overlap;
+        pool.result = sanitized.result;
+      }
+
+      // Anything read from storage, the server, or a pasted code: the new shape ({ pools, deleted }) or the
+      // old single-pool one (which is read as the "Pick 7" pool).
+      function sanitizeStore(data) {
+        if (!data || typeof data !== 'object') return null;
+        if (Array.isArray(data.pools)) {
+          const seen = new Set();
+          const pools = data.pools.map(sanitizeSavedState).filter(p => {
+            if (!p || seen.has(p.id)) return false;
+            seen.add(p.id);
+            return true;
+          });
+          const deleted = {};
+          if (data.deleted && typeof data.deleted === 'object') {
+            Object.keys(data.deleted).forEach(id => { if (validIso(data.deleted[id])) deleted[id] = data.deleted[id]; });
+          }
+          return { pools, deleted };
+        }
+        const legacy = sanitizeSavedState(data);
+        return legacy ? { pools: [legacy], deleted: {} } : null;
+      }
+
+      function chooseActive() {
+        let id = null;
+        try { id = localStorage.getItem(ACTIVE_KEY); } catch (_) {}
+        return store.pools.find(p => p.id === id) || store.pools[0];
+      }
+
+      // Folds pools from another copy (the server) into this one. Pools are matched by id. Saved weeks always
+      // merge. A pool's setup (teams, tiers, exposure, build, shape) is replaced by the other copy when it
+      // differs, as before, but never wiped by an empty one. A pool deleted on either device stays deleted.
+      function mergeIncomingStore(incoming) {
+        const info = { setupChanged: false, activeSetupChanged: false, activeRemoved: false };
+        Object.keys(incoming.deleted).forEach(id => { if (!store.deleted[id]) store.deleted[id] = incoming.deleted[id]; });
+        incoming.pools.forEach(p => {
+          if (store.deleted[p.id]) return;
+          const existing = store.pools.find(x => x.id === p.id);
+          if (!existing) { store.pools.push(p); info.setupChanged = true; return; }
+          existing.history = mergeHistory(existing.history, p.history);
+          const replace = (p.teams.length > 0 || existing.teams.length === 0) && JSON.stringify(setupOf(p)) !== JSON.stringify(setupOf(existing));
+          if (replace) {
+            adoptSetup(p, existing);
+            info.setupChanged = true;
+            if (existing === state) info.activeSetupChanged = true;
+          }
+        });
+        const gone = store.pools.filter(p => store.deleted[p.id]);
+        if (gone.length) {
+          if (gone.includes(state)) info.activeRemoved = true;
+          store.pools = store.pools.filter(p => !store.deleted[p.id]);
+          info.setupChanged = true;
+        }
+        if (!store.pools.length) { store.pools.push(newPool()); info.activeRemoved = true; }
+        if (info.activeRemoved) state = store.pools[0];
+        return info;
       }
 
       function restore() {
         try {
           const raw = localStorage.getItem(STORAGE_KEY);
           if (!raw) return;
-          const sanitized = sanitizeSavedState(JSON.parse(raw));
-          if (!sanitized) return;
-          state.teams = sanitized.teams;
-          state.overlap = sanitized.overlap;
-          state.result = sanitized.result;
-          state.history = mergeHistory(state.history, sanitized.history);
+          const incoming = sanitizeStore(JSON.parse(raw));
+          if (!incoming || !incoming.pools.length) return;
+          store.pools = incoming.pools;
+          store.deleted = incoming.deleted;
+          state = chooseActive();
         } catch (_) {}
       }
 
@@ -1918,15 +2192,31 @@
         } catch (_) {
           return setStatus('Could not load setup', 'That doesn\u2019t look like a valid setup code \u2014 copy it exactly, with nothing added or missing.', 'error');
         }
-        const sanitized = sanitizeSavedState(parsed);
-        if (!sanitized || !sanitized.teams.length) {
+        const incoming = sanitizeStore(parsed);
+        const usable = incoming && incoming.pools.filter(p => p.teams.length || p.history.length);
+        if (!usable || !usable.length) {
           return setStatus('Could not load setup', 'That code doesn\u2019t contain a recognizable CFB Splash Pool Builder setup.', 'error');
         }
-        if (state.teams.length && !confirm('Load this setup? It will replace the teams, exposure, locks, and build currently loaded here. Saved-week history from both is kept.')) return;
-        state.teams = sanitized.teams;
-        state.overlap = sanitized.overlap;
-        state.result = sanitized.result;
-        state.history = mergeHistory(state.history, sanitized.history);
+        const isOldCode = !Array.isArray(parsed.pools);
+        if (isOldCode) {
+          // A code from before pools existed is one 7-pick, two-entry setup; it loads into the pool on screen.
+          if (!usable[0].teams.length) return setStatus('Could not load setup', 'That code doesn\u2019t contain a recognizable CFB Splash Pool Builder setup.', 'error');
+          if (state.teams.length && !confirm('Load this setup? It will replace the teams, exposure, locks, and build currently loaded here. Saved-week history from both is kept.')) return;
+          const keepName = state.name;
+          adoptSetup(usable[0]);
+          state.name = keepName;
+          state.history = mergeHistory(state.history, usable[0].history);
+        } else {
+          const clash = usable.some(p => { const mine = store.pools.find(x => x.id === p.id); return mine && mine.teams.length && p.teams.length; });
+          if (clash && !confirm('Load this setup? It will replace the teams, exposure, locks, and build of the pools in this code that you already have here. Saved-week history from both is kept.')) return;
+          usable.forEach(p => {
+            if (store.deleted[p.id]) delete store.deleted[p.id]; // loading a code brings a deleted pool back on purpose
+            const mine = store.pools.find(x => x.id === p.id);
+            if (!mine) { store.pools.push(p); return; }
+            if (p.teams.length) adoptSetup(p, mine);
+            mine.history = mergeHistory(mine.history, p.history);
+          });
+        }
         save();
         renderAll();
         closeOverlay(els.transferOverlay);
@@ -1970,14 +2260,50 @@
         els.inputCount.textContent = count + ' entered';
       }
 
-      function updateOverlapUI() {
-        state.overlap = Number(els.overlap.value);
+      // Teams the pool needs at least, given how many entries share them (used by the stats and validate()).
+      function distinctNeeded() {
+        const K = state.picks, N = state.entries, C = state.overlap;
+        return C + Math.ceil(N * (K - C) / spreadCap());
+      }
+
+      function fillSelect(select, options, value) {
+        const html = options.map(o => '<option value="' + o.value + '">' + o.label + '</option>').join('');
+        if (select.innerHTML !== html) select.innerHTML = html;
+        select.value = String(value);
+      }
+
+      function updatePoolUI() {
+        const K = state.picks, N = state.entries;
+        fillSelect(els.picksSelect, Array.from({ length: MAX_PICKS }, (_, i) => ({ value: i + 1, label: String(i + 1) })), K);
+        fillSelect(els.entriesSelect, Array.from({ length: MAX_ENTRIES - 1 }, (_, i) => ({ value: i + 2, label: String(i + 2) })), N);
+        fillSelect(els.overlap, Array.from({ length: K + 1 }, (_, i) => ({ value: i, label: i + (i === 1 ? ' pick' : ' picks') })), state.overlap);
+        els.spreadField.classList.toggle('hidden', N < 3);
+        fillSelect(els.spreadSelect, Array.from({ length: N - 1 }, (_, i) => ({ value: i + 1, label: i + 1 + (i === 0 ? ' entry' : ' entries') })), spreadCap());
         els.overlapValue.textContent = state.overlap;
-        els.overlapSentence.textContent = 'Each entry will share exactly ' + state.overlap + ' of its 7 teams.';
-        els.uniqueNeeded.textContent = 14 - state.overlap;
-        els.differentPicks.textContent = (7 - state.overlap) + ' + ' + (7 - state.overlap);
+        els.overlapUnit.textContent = N === 2 ? 'shared picks' : 'in every entry';
+        els.overlapLabel.textContent = N === 2 ? 'Shared' : 'In every entry';
+        els.overlap.setAttribute('aria-label', N === 2 ? 'Exact shared picks' : 'Exact picks in every entry');
+        els.overlapHelper.textContent = N === 2
+          ? 'Say how many picks and entries the pool has, then how many teams must appear in both entries.'
+          : 'Say how many picks and entries the pool has, then how many teams must appear in all ' + N + ' entries. Teams outside that group can be in up to ' + spreadCap() + ' of them.';
+        els.overlapSentence.textContent = N === 2
+          ? 'Each entry will share exactly ' + state.overlap + ' of its ' + K + ' teams.'
+          : 'Exactly ' + state.overlap + ' of each entry\u2019s ' + K + ' teams will be in all ' + N + ' entries.';
+        els.totalSlots.textContent = N * K;
+        els.uniqueNeeded.textContent = distinctNeeded();
+        els.differentPicks.textContent = N === 2 ? (K - state.overlap) + ' + ' + (K - state.overlap) : String(K - state.overlap);
+        els.differentLabel.textContent = N === 2 ? 'Entry-specific picks' : 'Non-shared picks per entry';
+        els.build.textContent = 'Build ' + N + ' entries';
+        els.poolSubtitle.textContent = capitalize(NUMBER_WORDS[N]) + ' ' + K + '-pick Splash entries with exact overlap, tiers, and full exposure control.';
+        // The candidate columns widen with the number of entries; 4+ entries use the one-line phone-style rows everywhere.
+        els.candidatesCard.style.setProperty('--exp-col', ((N + 1) * 29 + N * 4) + 'px');
+        els.candidatesCard.style.setProperty('--place-col', (N * 32 + 34 + N * 4) + 'px');
+        els.candidatesCard.classList.toggle('compact-always', N >= 4);
+        els.workspace.classList.toggle('entries-many', N >= 3);
+        els.workspace.style.setProperty('--entry-cols', String(N === 6 ? 3 : N));
         renderSetupSummary();
       }
+      const updateOverlapUI = updatePoolUI;
 
       // --- Hide setup ---
       // Once teams are in, steps 1 and 2 can fold into a one-line summary next to the page tabs.
@@ -1993,7 +2319,7 @@
         els.setupHide.disabled = n === 0;
         els.setupHide.setAttribute('aria-expanded', String(!collapsed));
         els.setupShow.setAttribute('aria-expanded', String(!collapsed));
-        els.setupSummaryText.textContent = n + ' team' + (n === 1 ? '' : 's') + ' \u00b7 ' + state.overlap + ' shared pick' + (state.overlap === 1 ? '' : 's');
+        els.setupSummaryText.textContent = n + ' team' + (n === 1 ? '' : 's') + ' \u00b7 ' + state.picks + ' picks \u00d7 ' + state.entries + ' entries \u00b7 ' + state.overlap + ' shared pick' + (state.overlap === 1 ? '' : 's');
       }
       function setSetupCollapsed(value) {
         setupCollapsed = value;
@@ -2004,36 +2330,46 @@
 
       function maskFromResult(teamId, result) {
         if (!result) return null;
-        return (result[1].includes(teamId) ? 1 : 0) | (result[2].includes(teamId) ? 2 : 0);
+        return entryIds().reduce((mask, entry) => mask | ((result[entry] || []).includes(teamId) ? entryBit(entry) : 0), 0);
       }
 
+      // Every set of entries this team may be in, given its tier-independent settings: a placement fixes it
+      // to one mask; otherwise any mask whose size is within Min/Max. A team outside the shared group is held to
+      // the pool's "most entries" limit (a Min set above that limit wins, since you asked for it explicitly).
       function allowedMasks(team) {
+        const full = fullMask();
         if (team.fixedMask) {
           const exposure = popcount(team.fixedMask);
           return exposure >= team.min && exposure <= team.max ? [team.fixedMask] : [];
         }
-        return [0, 1, 2, 3].filter(mask => {
+        const cap = Math.max(spreadCap(), team.min);
+        const masks = [];
+        for (let mask = 0; mask <= full; mask++) {
           const exposure = popcount(mask);
-          return exposure >= team.min && exposure <= team.max;
-        });
+          if (exposure < team.min || exposure > team.max) continue;
+          if (mask !== full && exposure > cap) continue;
+          masks.push(mask);
+        }
+        return masks;
       }
 
       function validate() {
-        if (state.teams.length < 7) return { ok: false, title: 'Add more teams', detail: 'You need at least 7 candidate teams.' };
-        const uniqueRequired = 14 - state.overlap;
+        const K = state.picks;
+        if (state.teams.length < K) return { ok: false, code: 'few', title: 'Add more teams', detail: 'You need at least ' + K + ' candidate teams.' };
+        const uniqueRequired = distinctNeeded();
         const usable = state.teams.filter(team => team.max > 0).length;
-        if (usable < uniqueRequired) return { ok: false, title: 'Not enough usable teams', detail: 'A ' + state.overlap + '-pick overlap needs at least ' + uniqueRequired + ' teams with Max above 0, and you have ' + usable + '.' };
+        if (usable < uniqueRequired) return { ok: false, code: 'usable', title: 'Not enough usable teams', detail: 'A ' + state.overlap + '-pick overlap needs at least ' + uniqueRequired + ' teams with Max above 0, and you have ' + usable + '.' + (state.entries > 2 ? ' Add teams, raise the shared picks, or let non-shared teams go in more entries.' : '') };
 
-        let fixed1 = 0, fixed2 = 0, fixedBoth = 0;
+        const fixedCounts = new Array(state.entries + 1).fill(0);
+        let fixedAll = 0;
         for (const team of state.teams) {
-          if (team.min > team.max) return { ok: false, title: 'Invalid exposure', detail: team.name + ' has a minimum above its maximum.' };
-          if (!allowedMasks(team).length) return { ok: false, title: 'Placement conflicts with exposure', detail: team.name + ' cannot satisfy its current placement and Min/Max settings.' };
-          if (includesEntry(team.fixedMask, 1)) fixed1++;
-          if (includesEntry(team.fixedMask, 2)) fixed2++;
-          if (team.fixedMask === 3) fixedBoth++;
+          if (team.min > team.max) return { ok: false, code: 'exposure', title: 'Invalid exposure', detail: team.name + ' has a minimum above its maximum.' };
+          if (!allowedMasks(team).length) return { ok: false, code: 'conflict', title: 'Placement conflicts with exposure', detail: team.name + ' cannot satisfy its current placement and Min/Max settings.' };
+          entryIds().forEach(entry => { if (includesEntry(team.fixedMask, entry)) fixedCounts[entry]++; });
+          if (team.fixedMask === fullMask()) fixedAll++;
         }
-        if (fixed1 > 7 || fixed2 > 7) return { ok: false, title: 'Too many fixed picks', detail: 'An entry cannot contain more than 7 fixed teams.' };
-        if (fixedBoth > state.overlap) return { ok: false, title: 'Too many teams locked in both', detail: fixedBoth + ' teams are locked in both entries, above your shared-pick target of ' + state.overlap + '.' };
+        if (fixedCounts.some(count => count > K)) return { ok: false, code: 'fixed', title: 'Too many fixed picks', detail: 'An entry cannot contain more than ' + K + ' fixed teams.' };
+        if (fixedAll > state.overlap) return { ok: false, code: 'locked', title: 'Too many teams locked in both', detail: fixedAll + ' teams are locked in ' + everyEntry() + ', above your shared-pick target of ' + state.overlap + '.' };
         return { ok: true };
       }
 
@@ -2042,7 +2378,7 @@
       // message can offer a one-tap fix instead of leaving you to work it out.
       function findOverlapFix() {
         const original = state.overlap;
-        for (let n = original + 1; n <= 7; n++) {
+        for (let n = original + 1; n <= state.picks; n++) {
           state.overlap = n;
           const ok = validate().ok;
           state.overlap = original;
@@ -2051,7 +2387,7 @@
         return null;
       }
       function validationAction(check) {
-        if (check.ok || (check.title !== 'Not enough usable teams' && check.title !== 'Too many teams locked in both')) return null;
+        if (check.ok || (check.code !== 'usable' && check.code !== 'locked')) return null;
         const n = findOverlapFix();
         return n === null ? null : { fix: 'overlap', value: n, label: 'Set overlap to ' + n };
       }
@@ -2061,7 +2397,7 @@
         const existing = new Map(state.teams.map(team => [team.name.toLowerCase(), team]));
         state.teams = names.map(name => {
           const old = existing.get(name.toLowerCase());
-          return old ? { ...old, name } : { id: uid(), name, min: 0, max: 2, fixedMask: 0, tier: 2 };
+          return old ? { ...old, name } : { id: uid(), name, min: 0, max: state.entries, fixedMask: 0, tier: 2 };
         });
         state.result = null;
         save();
@@ -2070,13 +2406,13 @@
         // validation message renderAll() just set (e.g. "Add more teams"), so a disabled Build
         // button always comes with the reason.
         if (!names.length) setStatus('Ready for your teams', 'Paste one team per line above.');
-        else if (validate().ok) setStatus('Teams loaded', 'Set exposure, tap S1/S2 to place teams, then build.');
+        else if (validate().ok) setStatus('Teams loaded', 'Set exposure, tap ' + (state.entries === 2 ? 'S1/S2' : 'S1\u2013S' + state.entries) + ' to place teams, then build.');
         if (names.length) checkLines(true);
       }
 
       function exposureButtons(team, field) {
         const fixedExposure = popcount(team.fixedMask);
-        return [0, 1, 2].map(value => {
+        return Array.from({ length: state.entries + 1 }, (_, value) => value).map(value => {
           const disabled = team.fixedMask && ((field === 'min' && value > fixedExposure) || (field === 'max' && value < fixedExposure));
           return '<button type="button" class="choice-btn exposure-btn ' + (team[field] === value ? 'active' : '') + '" data-field="' + field + '" data-value="' + value + '" data-team-id="' + escapeHtml(team.id) + '"' + (disabled ? ' disabled' : '') + ' aria-pressed="' + (team[field] === value) + '" aria-label="Set ' + field + 'imum exposure for ' + escapeHtml(team.name) + ' to ' + value + '">' + value + '</button>';
         }).join('');
@@ -2141,9 +2477,8 @@
                 '<div class="setting-group"><span class="field-label">Min</span><div class="segmented">' + exposureButtons(team, 'min') + '</div></div>' +
                 '<div class="setting-group"><span class="field-label">Max</span><div class="segmented">' + exposureButtons(team, 'max') + '</div></div>' +
                 '<div class="placement-group"><span class="field-label">Place</span><div class="placement-buttons">' +
-                  '<button type="button" class="choice-btn place-btn ' + (team.fixedMask === 1 ? 'active' : '') + '" data-mask="1" data-team-id="' + escapeHtml(team.id) + '" aria-pressed="' + (team.fixedMask === 1) + '" aria-label="Put ' + escapeHtml(team.name) + ' in Entry 1 only">S1</button>' +
-                  '<button type="button" class="choice-btn place-btn ' + (team.fixedMask === 2 ? 'active' : '') + '" data-mask="2" data-team-id="' + escapeHtml(team.id) + '" aria-pressed="' + (team.fixedMask === 2) + '" aria-label="Put ' + escapeHtml(team.name) + ' in Entry 2 only">S2</button>' +
-                  '<button type="button" class="choice-btn place-btn both ' + (team.fixedMask === 3 ? 'active' : '') + '" data-mask="3" data-team-id="' + escapeHtml(team.id) + '" aria-pressed="' + (team.fixedMask === 3) + '" aria-label="Lock ' + escapeHtml(team.name) + ' in both entries" title="Lock in both entries">🔒</button>' +
+                  entryIds().map(entry => '<button type="button" class="choice-btn place-btn ' + (team.fixedMask === entryBit(entry) ? 'active' : '') + '" data-mask="' + entryBit(entry) + '" data-team-id="' + escapeHtml(team.id) + '" aria-pressed="' + (team.fixedMask === entryBit(entry)) + '" aria-label="Put ' + escapeHtml(team.name) + ' in Entry ' + entry + ' only">S' + entry + '</button>').join('') +
+                  '<button type="button" class="choice-btn place-btn both ' + (team.fixedMask === fullMask() ? 'active' : '') + '" data-mask="' + fullMask() + '" data-team-id="' + escapeHtml(team.id) + '" aria-pressed="' + (team.fixedMask === fullMask()) + '" aria-label="Lock ' + escapeHtml(team.name) + ' in ' + everyEntry() + '" title="Lock in ' + everyEntry() + '">🔒</button>' +
                 '</div></div>' +
                 '</div>' +
                 '<label class="tier-group"><span class="field-label">Tier</span><select class="tier-select tier-' + team.tier + '" data-team-id="' + escapeHtml(team.id) + '" aria-label="Tier for ' + escapeHtml(team.name) + '">' +
@@ -2165,12 +2500,13 @@
 
       function rowSummary(team) {
         const parts = [];
-        if (team.fixedMask === 1) parts.push('In Entry 1');
-        else if (team.fixedMask === 2) parts.push('In Entry 2');
-        else if (team.fixedMask === 3) parts.push('Locked in both');
+        const inEntries = entryIds().filter(entry => includesEntry(team.fixedMask, entry));
+        if (team.fixedMask && team.fixedMask === fullMask()) parts.push(state.entries === 2 ? 'Locked in both' : 'Locked in all ' + state.entries);
+        else if (inEntries.length === 1) parts.push('In Entry ' + inEntries[0]);
+        else if (inEntries.length > 1) parts.push('In entries ' + inEntries.join(' + '));
         else {
           if (team.min > 0) parts.push('Min ' + team.min);
-          if (team.max < 2) parts.push('Max ' + team.max);
+          if (team.max < state.entries) parts.push('Max ' + team.max);
         }
         return parts.join(' \u00b7 ');
       }
@@ -2234,7 +2570,7 @@
 
       function picksForEntry(entry) {
         if (state.result) {
-          return state.result[entry].map(id => {
+          return (state.result[entry] || []).map(id => {
             const team = state.teams.find(item => item.id === id);
             return team ? { team, locked: includesEntry(team.fixedMask, entry) } : null;
           }).filter(Boolean);
@@ -2242,65 +2578,102 @@
         return state.teams.filter(team => includesEntry(team.fixedMask, entry)).map(team => ({ team, locked: true }));
       }
 
+      function entryCardHtml(entry) {
+        return '<div class="card entry" data-entry="' + entry + '">' +
+          '<div class="entry-head"><h2>Splash Entry ' + entry + '</h2><span class="entry-mix" id="entry' + entry + 'Mix"></span><span class="entry-count" id="entry' + entry + 'Count">0 / ' + state.picks + '</span></div>' +
+          '<div class="dropzone" id="entry' + entry + 'Zone" data-entry="' + entry + '" aria-label="Splash Entry ' + entry + ' drop zone"></div>' +
+          '<div class="entry-footer">' +
+            '<button class="btn" id="copyEntry' + entry + '" type="button" data-act="copy" data-entry="' + entry + '" disabled>Copy entry</button>' +
+            '<button class="btn" id="clearEntry' + entry + '" type="button" data-act="clear" data-entry="' + entry + '" disabled>Clear locks</button>' +
+          '</div></div>';
+      }
+
+      // One card per entry, built when the number of entries changes (and left alone otherwise, so
+      // nothing under your finger is replaced on every tap).
+      function ensureEntryCards() {
+        if (els.entriesHost.children.length !== state.entries) {
+          els.entriesHost.innerHTML = entryIds().map(entryCardHtml).join('');
+        }
+        els.zones = {}; els.counts = {}; els.clear = {}; els.copy = {}; els.mix = {};
+        entryIds().forEach(entry => {
+          els.zones[entry] = $('#entry' + entry + 'Zone');
+          els.counts[entry] = $('#entry' + entry + 'Count');
+          els.clear[entry] = $('#clearEntry' + entry);
+          els.copy[entry] = $('#copyEntry' + entry);
+          els.mix[entry] = $('#entry' + entry + 'Mix');
+        });
+      }
+
       function renderEntries() {
-        [1, 2].forEach(entry => {
-          const otherIds = new Set(picksForEntry(entry === 1 ? 2 : 1).map(item => item.team.id));
-          // Shared picks always lead the list, so the overlap between your two entries reads
+        ensureEntryCards();
+        const N = state.entries, K = state.picks, full = fullMask();
+        const lists = {};
+        const exposure = new Map();
+        entryIds().forEach(entry => {
+          lists[entry] = picksForEntry(entry);
+          lists[entry].forEach(item => exposure.set(item.team.id, (exposure.get(item.team.id) || 0) + 1));
+        });
+        entryIds().forEach(entry => {
+          // Picks in the most entries lead the list (shared with everyone first), so the overlap reads
           // at a glance instead of being buried among the entry-only picks.
-          const picks = picksForEntry(entry).sort((a, b) => {
-            const aShared = otherIds.has(a.team.id) ? 0 : 1;
-            const bShared = otherIds.has(b.team.id) ? 0 : 1;
-            return aShared - bShared;
-          });
+          const picks = lists[entry].slice().sort((a, b) => exposure.get(b.team.id) - exposure.get(a.team.id));
           const zone = els.zones[entry];
-          const otherEntry = entry === 1 ? 2 : 1;
+          const others = entryIds().filter(e => e !== entry);
           if (!picks.length) {
-            zone.innerHTML = '<div class="empty-state"><strong>No picks yet</strong><span>Tap S1, S2, or Lock both on a team above to place it here (or drag it, on desktop).</span></div>';
+            zone.innerHTML = '<div class="empty-state"><strong>No picks yet</strong><span>Tap ' + (N === 2 ? 'S1, S2, or Lock both' : 'S' + entry + ' or the lock') + ' on a team above to place it here (or drag it, on desktop).</span></div>';
           } else {
             zone.innerHTML = picks.map((item, index) => {
-              const both = item.team.fixedMask === 3;
-              const shared = otherIds.has(item.team.id);
+              const count = exposure.get(item.team.id);
+              const everywhere = count === N;
+              const partial = count > 1 && !everywhere;
+              const all = item.team.fixedMask === full;
               const meta = item.locked ? 'Locked' : 'Auto-picked';
-              const cardClasses = ['pick-card', item.locked ? 'locked' : '', shared ? 'shared' : ''].filter(Boolean).join(' ');
+              const cardClasses = ['pick-card', item.locked ? 'locked' : '', everywhere ? 'shared' : '', partial ? 'partial' : ''].filter(Boolean).join(' ');
               const actions = [];
-              if (both) {
-                actions.push('<button type="button" class="pick-action-btn unlock" data-action="unlock" data-team-id="' + escapeHtml(item.team.id) + '" aria-label="Unlock ' + escapeHtml(item.team.name) + ' from both entries">Unlock both</button>');
-              } else if (!shared) {
-                // Lets you move a pick to the other entry right from this view — no drag needed,
-                // and no trip back up to the candidate list's S1/S2 buttons required either.
-                actions.push('<button type="button" class="pick-action-btn move" data-action="move" data-target-entry="' + otherEntry + '" data-team-id="' + escapeHtml(item.team.id) + '" aria-label="Move ' + escapeHtml(item.team.name) + ' to Entry ' + otherEntry + '">Move to ' + otherEntry + '</button>');
+              if (all) {
+                actions.push('<button type="button" class="pick-action-btn unlock" data-action="unlock" data-team-id="' + escapeHtml(item.team.id) + '" aria-label="Unlock ' + escapeHtml(item.team.name) + ' from ' + everyEntry() + '">' + (N === 2 ? 'Unlock both' : 'Unlock all') + '</button>');
+              } else if (count === 1) {
+                // Lets you move a pick to another entry right from this view — no drag needed,
+                // and no trip back up to the candidate list's S buttons required either.
+                others.forEach(target => {
+                  actions.push('<button type="button" class="pick-action-btn move" data-action="move" data-target-entry="' + target + '" data-team-id="' + escapeHtml(item.team.id) + '" aria-label="Move ' + escapeHtml(item.team.name) + ' to Entry ' + target + '">' + (N === 2 ? 'Move to ' + target : '\u2192 ' + target) + '</button>');
+                });
                 if (item.locked) {
                   actions.push('<button type="button" class="pick-action-btn unlock" data-action="unlock" data-team-id="' + escapeHtml(item.team.id) + '" aria-label="Unlock ' + escapeHtml(item.team.name) + '">Unlock</button>');
                 }
+              } else if (item.locked) {
+                actions.push('<button type="button" class="pick-action-btn unlock" data-action="unlock" data-team-id="' + escapeHtml(item.team.id) + '" aria-label="Unlock ' + escapeHtml(item.team.name) + '">Unlock</button>');
               }
+              const marker = everywhere ? '<span class="shared-marker">Shared</span>' : partial ? '<span class="partial-marker">In ' + count + ' of ' + N + '</span>' : '';
               return '<div class="' + cardClasses + '" draggable="true" data-team-id="' + escapeHtml(item.team.id) + '" data-source-entry="' + entry + '">' +
                 '<span class="pick-num">' + (index + 1) + '</span><div class="pick-main"><div class="pick-name" title="' + escapeHtml(item.team.name) + '">' + nameHtml(item.team.name) + '</div>' +
-                '<div class="pick-sub">' + (shared ? '<span class="shared-marker">Shared</span>' : '') + '<span class="pick-meta">' + meta + '</span>' +
+                '<div class="pick-sub">' + marker + '<span class="pick-meta">' + meta + '</span>' +
                 (actions.length ? '<div class="pick-actions">' + actions.join('') + '</div>' : '') + '</div></div>' +
                 '<button type="button" class="pick-remove" data-action="remove" data-team-id="' + escapeHtml(item.team.id) + '" title="Remove from this build" aria-label="Remove ' + escapeHtml(item.team.name) + ' from this build">\u2715</button></div>';
             }).join('');
           }
-          els.counts[entry].textContent = picks.length + ' / 7';
+          els.counts[entry].textContent = picks.length + ' / ' + K;
           els.mix[entry].textContent = spreadMix(picks.map(item => item.team.name));
-          els.counts[entry].classList.toggle('complete', picks.length === 7);
+          els.counts[entry].classList.toggle('complete', picks.length === K);
           els.clear[entry].disabled = !state.teams.some(team => includesEntry(team.fixedMask, entry));
-          els.copy[entry].disabled = picks.length !== 7;
+          els.copy[entry].disabled = picks.length !== K;
         });
-        els.saveWeek.disabled = picksForEntry(1).length !== 7 || picksForEntry(2).length !== 7;
+        els.saveWeek.disabled = !entryIds().every(entry => lists[entry].length === K);
         renderBenched();
         decorateLines();
       }
 
-      // Teams left out of both entries after a build, so you can confirm the tiers did what you
+      // Teams left out of every entry after a build, so you can confirm the tiers did what you
       // expected without scanning the whole candidate list.
       function renderBenched() {
         if (!state.result) return els.benched.classList.add('hidden');
-        const used = new Set(picksForEntry(1).concat(picksForEntry(2)).map(item => item.team.id));
+        const used = new Set(entryIds().flatMap(entry => picksForEntry(entry)).map(item => item.team.id));
         const benched = state.teams.filter(team => !used.has(team.id))
           .sort((a, b) => a.tier - b.tier || state.teams.indexOf(a) - state.teams.indexOf(b));
         els.benched.classList.toggle('hidden', benched.length === 0);
         if (!benched.length) return;
         els.benchedCount.textContent = benched.length + (benched.length === 1 ? ' team' : ' teams');
+        $('#benchedNote').textContent = 'Left out of ' + everyEntry() + ' this build.';
         els.benchedList.innerHTML = benched.map(team => team.max === 0
           ? '<button type="button" class="bench-chip tier-' + team.tier + '" data-restore="' + escapeHtml(team.id) + '" title="' + escapeHtml(team.name + ' \u2014 ' + TIER_LABELS[team.tier] + ', Max 0. Tap to make it pickable again.') + '" aria-label="Put ' + escapeHtml(team.name) + ' back in play">' +
               '<span class="bench-tier">' + TIER_LABELS[team.tier] + '</span>' + nameHtml(team.name) + '<span class="bench-note">Max 0 \u00b7 put back</span></button>'
@@ -2346,39 +2719,40 @@
         return state.history.find(week => !week.manual) || null;
       }
 
-      // Records for one week, the same four ways whether its picks were tracked here or the
-      // week was entered by hand: each entry, the 2/2 picks (in both entries, counted once), and
-      // the 1/2 picks (in just one entry).
+      // Records for one week, in the same shape whether its picks were tracked here or the week was entered
+      // by hand: a record for each entry, and for each "level" (the picks that were in exactly k of the
+      // entries, each pick counted once, however many entries it was in).
       function weekStats(week) {
         if (week.manual) {
-          return { e1: toTally(week.manual.e1), e2: toTally(week.manual.e2), shared: toTally(week.manual.shared), singles: toTally(week.manual.singles) };
+          return { n: week.manual.entries.length, entries: week.manual.entries.map(toTally), levels: week.manual.levels.map(toTally) };
         }
-        const in1 = new Set(week.entry1), in2 = new Set(week.entry2);
-        return {
-          e1: tally(week.entry1, week.results),
-          e2: tally(week.entry2, week.results),
-          shared: tally(week.entry1.filter(name => in2.has(name)), week.results),
-          singles: tally(week.entry1.filter(name => !in2.has(name)).concat(week.entry2.filter(name => !in1.has(name))), week.results)
-        };
+        const n = week.lineups.length;
+        const exposure = new Map();
+        week.lineups.forEach(list => new Set(list).forEach(name => exposure.set(name, (exposure.get(name) || 0) + 1)));
+        const levels = Array.from({ length: n }, (_, i) => tally(Array.from(exposure).filter(([, count]) => count === i + 1).map(([name]) => name), week.results));
+        return { n, entries: week.lineups.map(list => tally(list, week.results)), levels };
       }
+      const levelLabel = (k, n) => k + '/' + n + ' picks';
 
       function renderSeasonSummary() {
-        const season = { e1: newTally(), e2: newTally(), shared: newTally(), singles: newTally(), all: newTally() };
+        const entryTotals = [];
+        const levelTotals = new Map();
+        const all = newTally();
         const byTier = [0, 1, 2, 3].map(newTally);
         let weeks = 0, handEntered = 0;
         state.history.forEach(week => {
           const stats = weekStats(week);
-          if (![stats.e1, stats.e2, stats.shared, stats.singles].some(t => tallyTotal(t) > 0)) return;
+          if (!stats.entries.concat(stats.levels).some(t => tallyTotal(t) > 0)) return;
           weeks++;
-          addTally(season.e1, stats.e1);
-          addTally(season.e2, stats.e2);
-          addTally(season.shared, stats.shared);
-          addTally(season.singles, stats.singles);
-          // Each team once per week: the 2/2 picks plus the 1/2 picks.
-          addTally(season.all, stats.shared);
-          addTally(season.all, stats.singles);
+          stats.entries.forEach((t, i) => { addTally(entryTotals[i] || (entryTotals[i] = newTally()), t); });
+          stats.levels.forEach((t, i) => {
+            const key = (i + 1) + '/' + stats.n;
+            if (!levelTotals.has(key)) levelTotals.set(key, { k: i + 1, n: stats.n, tally: newTally() });
+            addTally(levelTotals.get(key).tally, t);
+            addTally(all, t); // each pick once per week
+          });
           if (week.manual) { handEntered++; return; }
-          Array.from(new Set(week.entry1.concat(week.entry2))).forEach(name => {
+          Array.from(new Set(week.lineups.flat())).forEach(name => {
             const g = week.results[name];
             if (g && week.tiers && week.tiers[name] !== undefined) byTier[week.tiers[name]][g]++;
           });
@@ -2387,11 +2761,12 @@
         const tierChips = byTier.map((t, i) => tallyTotal(t)
           ? '<span class="tier-chip tier-' + i + '">' + TIER_LABELS[i] + ' ' + recordText(t) + ' \u00b7 ' + winPct(t) + '</span>' : '').join('');
         const cell = (label, t) => '<div><span>' + label + '</span><strong>' + recordText(t) + '</strong><em>' + winPct(t) + '</em></div>';
+        const levels = Array.from(levelTotals.values()).sort((a, b) => a.n - b.n || b.k - a.k);
         els.historySummary.innerHTML =
           '<div class="history-summary">' +
             '<div class="summary-stats">' +
-              cell('Entry 1', season.e1) + cell('Entry 2', season.e2) + cell('All picks', season.all) +
-              cell('2/2 picks', season.shared) + cell('1/2 picks', season.singles) +
+              entryTotals.map((t, i) => cell('Entry ' + (i + 1), t)).join('') + cell('All picks', all) +
+              levels.map(level => cell(levelLabel(level.k, level.n), level.tally)).join('') +
               '<div><span>Weeks</span><strong>' + weeks + '</strong></div>' +
             '</div>' +
             (tierChips ? '<div class="summary-tiers"><span>By tier' + (handEntered ? ' (saved builds only)' : '') + '</span>' + tierChips + '</div>' : '') +
@@ -2411,13 +2786,14 @@
         const trackedCard = entry => {
           const stats = weekStats(entry);
           const rec = t => tallyTotal(t) ? ' <span class="h-record">' + recordText(t) + '</span>' : '';
-          const mix = tallyTotal(stats.shared) + tallyTotal(stats.singles)
-            ? '<div class="history-mix">2/2 picks ' + recordText(stats.shared) + ' \u00b7 1/2 picks ' + recordText(stats.singles) + '</div>' : '';
+          const levelText = stats.levels.map((t, i) => ({ k: i + 1, t })).reverse().filter(x => tallyTotal(x.t) > 0)
+            .map(x => levelLabel(x.k, stats.n) + ' ' + recordText(x.t)).join(' \u00b7 ');
+          const mix = levelText ? '<div class="history-mix">' + levelText + '</div>' : '';
+          const shared = stats.n === 2 ? 'Shared ' + entry.overlap : entry.overlap + ' in all ' + stats.n;
           return '<div class="history-entry" data-history-id="' + escapeHtml(entry.id) + '">' +
-            '<div class="history-head"><strong>' + escapeHtml(formatSavedAt(entry.savedAt)) + '</strong><span>Shared ' + entry.overlap + '</span></div>' + mix +
+            '<div class="history-head"><strong>' + escapeHtml(formatSavedAt(entry.savedAt)) + '</strong><span>' + shared + '</span></div>' + mix +
             '<div class="history-columns">' +
-              '<div><h4>Splash Entry 1' + rec(stats.e1) + '</h4>' + pickList(entry, entry.entry1) + '</div>' +
-              '<div><h4>Splash Entry 2' + rec(stats.e2) + '</h4>' + pickList(entry, entry.entry2) + '</div>' +
+              entry.lineups.map((names, i) => '<div><h4>Splash Entry ' + (i + 1) + rec(stats.entries[i]) + '</h4>' + pickList(entry, names) + '</div>').join('') +
             '</div>' +
             '<div class="history-actions">' +
               '<button type="button" class="btn history-copy-btn" data-history-id="' + escapeHtml(entry.id) + '">Copy</button>' +
@@ -2428,9 +2804,11 @@
         const manualCard = entry => {
           const m = entry.manual;
           const cell = (label, record) => '<div><span>' + label + '</span><strong>' + recordText(toTally(record)) + '</strong><em>' + winPct(toTally(record)) + '</em></div>';
+          const n = m.entries.length;
           return '<div class="history-entry manual" data-history-id="' + escapeHtml(entry.id) + '">' +
             '<div class="history-head"><strong>Week ' + m.week + '</strong><span>Entered by hand</span></div>' +
-            '<div class="manual-grid">' + cell('Entry 1', m.e1) + cell('Entry 2', m.e2) + cell('2/2 picks', m.shared) + cell('1/2 picks', m.singles) + '</div>' +
+            '<div class="manual-grid">' + m.entries.map((r, i) => cell('Entry ' + (i + 1), r)).join('') +
+              m.levels.map((r, i) => ({ k: i + 1, r })).reverse().map(x => cell(levelLabel(x.k, n), x.r)).join('') + '</div>' +
             '<div class="history-actions">' +
               '<button type="button" class="btn history-edit-btn" data-history-id="' + escapeHtml(entry.id) + '">Edit</button>' +
               '<button type="button" class="btn danger history-delete-btn" data-history-id="' + escapeHtml(entry.id) + '">Delete</button>' +
@@ -2447,51 +2825,91 @@
       }
 
       // --- Adding a past week by hand ---
-      // Entry 1 + Entry 2 always equals 2 x (2/2 picks) + (1/2 picks), since each 2/2 pick sits in
-      // both entries and each 1/2 pick in one. That lets the form fill in the 1/2 row and flag
-      // numbers that can't all be right.
+      // Add up the picks entry by entry, or level by level, and you get the same total: every pick in k
+      // entries is counted k times by the entries and once by its level. So
+      //   Entry 1 + ... + Entry N  =  N x (N/N picks) + ... + 2 x (2/N picks) + 1 x (1/N picks)
+      // which lets the form fill in the last row and flag numbers that can't all be right.
       const PAST_COLS = ['W', 'L', 'P'];
       let pastEditingId = null;
       let pastSinglesEdited = false;
+      let pastShape = { n: 0, picks: 0 };
 
+      // Row ids: e1..eN for the entries; the group in every entry is "shared", the group in one entry is
+      // "singles", and any in between are l2, l3, ...
+      const levelRowId = (k, n) => k === n ? 'shared' : k === 1 ? 'singles' : 'l' + k;
+      const levelRowText = (k, n) => k === n ? (n === 2 ? 'in both entries' : 'in all ' + n + ' entries') : k === 1 ? 'in one entry only' : 'in ' + k + ' entries';
       const pastInput = (row, col) => document.getElementById('past-' + row + '-' + col);
+
+      function pastRowHtml(rowId, label, small, max) {
+        return '<div class="past-row"><div class="row-label">' + label + (small ? '<small>' + small + '</small>' : '') + '</div><div class="wlp">' +
+          PAST_COLS.map(col => '<label><span>' + col + '</span><input type="number" class="past-input" id="past-' + rowId + '-' + col + '" data-row="' + rowId + '" data-col="' + col + '" min="0" max="' + max + '" inputmode="numeric" placeholder="0" aria-label="' + label + ' ' + ({ W: 'wins', L: 'losses', P: 'pushes' })[col] + '"></label>').join('') +
+          '</div></div>';
+      }
+      function buildPastRows(n, picks) {
+        if (pastShape.n === n && pastShape.picks === picks) return;
+        pastShape = { n, picks };
+        const rows = [];
+        for (let i = 1; i <= n; i++) rows.push(pastRowHtml('e' + i, 'Entry ' + i, '', picks));
+        for (let k = n; k >= 1; k--) rows.push(pastRowHtml(levelRowId(k, n), levelLabel(k, n), levelRowText(k, n), picks * n));
+        document.getElementById('pastRows').innerHTML = rows.join('');
+        const sum = Array.from({ length: n }, (_, i) => 'Entry ' + (i + 1)).join(' + ');
+        els.pastHelp.textContent = 'Enter each record as wins, losses, and pushes. You don\u2019t need the individual picks. The 1/' + n + ' picks row fills itself in (' + sum + ' \u2212 ' +
+          Array.from({ length: n - 1 }, (_, i) => (n - i) + ' \u00d7 the ' + (n - i) + '/' + n + ' picks').join(' \u2212 ') + '), and you can overwrite it.';
+      }
       function readPast() {
-        const record = row => PAST_COLS.map(col => Math.max(0, Math.min(14, parseInt(pastInput(row, col).value, 10) || 0)));
-        return { week: parseInt(els.pastWeek.value, 10), e1: record('e1'), e2: record('e2'), shared: record('shared'), singles: record('singles') };
+        const { n, picks } = pastShape;
+        const record = (row, max) => PAST_COLS.map(col => clampInt(pastInput(row, col).value, 0, max, 0));
+        return {
+          week: parseInt(els.pastWeek.value, 10), n, picks,
+          entries: Array.from({ length: n }, (_, i) => record('e' + (i + 1), picks)),
+          levels: Array.from({ length: n }, (_, i) => record(levelRowId(i + 1, n), picks * n))
+        };
       }
       function writePast(row, record) {
         PAST_COLS.forEach((col, i) => { pastInput(row, col).value = record ? String(record[i]) : ''; });
       }
       function pastFillSingles() {
         const v = readPast();
-        writePast('singles', [0, 1, 2].map(i => Math.max(0, v.e1[i] + v.e2[i] - 2 * v.shared[i])));
+        writePast('singles', [0, 1, 2].map(i => {
+          let singles = v.entries.reduce((sum, record) => sum + record[i], 0);
+          for (let k = 2; k <= v.n; k++) singles -= k * v.levels[k - 1][i];
+          return Math.max(0, singles);
+        }));
       }
       function pastCheck() {
         const v = readPast();
         const total = record => record[0] + record[1] + record[2];
-        const anything = [v.e1, v.e2, v.shared, v.singles].some(record => total(record) > 0);
+        const anything = v.entries.concat(v.levels).some(record => total(record) > 0);
         const warnings = [];
+        const left = Array.from({ length: v.n }, (_, i) => 'Entry ' + (i + 1)).join(' + ');
+        const right = Array.from({ length: v.n }, (_, i) => v.n - i).map(k => (k > 1 ? k + ' \u00d7 ' : '') + '(' + levelLabel(k, v.n) + ')').join(' + ');
         ['wins', 'losses', 'pushes'].forEach((word, i) => {
-          const entries = v.e1[i] + v.e2[i], picks = 2 * v.shared[i] + v.singles[i];
-          if (entries !== picks) warnings.push(word + ' don\u2019t add up: Entry 1 + Entry 2 = ' + entries + ', but 2 \u00d7 (2/2 picks) + (1/2 picks) = ' + picks);
+          const fromEntries = v.entries.reduce((sum, record) => sum + record[i], 0);
+          const fromLevels = v.levels.reduce((sum, record, j) => sum + (j + 1) * record[i], 0);
+          if (fromEntries !== fromLevels) warnings.push(word + ' don\u2019t add up: ' + left + ' = ' + fromEntries + ', but ' + right + ' = ' + fromLevels);
         });
-        if (total(v.e1) > 7) warnings.push('Entry 1 adds up to ' + total(v.e1) + ' picks, but an entry has 7');
-        if (total(v.e2) > 7) warnings.push('Entry 2 adds up to ' + total(v.e2) + ' picks, but an entry has 7');
+        v.entries.forEach((record, i) => {
+          if (total(record) > v.picks) warnings.push('Entry ' + (i + 1) + ' adds up to ' + total(record) + ' picks, but an entry has ' + v.picks);
+        });
         if (!anything) { els.pastCheck.textContent = ''; els.pastCheck.className = 'past-check'; return; }
         if (warnings.length) {
           els.pastCheck.className = 'past-check warn';
           els.pastCheck.textContent = warnings.join('. ') + '. You can still save it, but your season totals may be off.';
         } else {
           els.pastCheck.className = 'past-check ok';
-          els.pastCheck.textContent = '\u2713 Adds up: Entry 1 + Entry 2 = 2 \u00d7 (2/2 picks) + (1/2 picks).';
+          els.pastCheck.textContent = '\u2713 Adds up: ' + left + ' = ' + right + '.';
         }
       }
       function openPastForm(entry) {
         pastEditingId = entry ? entry.id : null;
+        const n = entry ? entry.manual.entries.length : state.entries;
+        const picks = entry ? entry.manual.picks : state.picks;
+        buildPastRows(n, picks);
         els.pastTitle.textContent = entry ? 'Edit Week ' + entry.manual.week : 'Add a past week';
         const highest = state.history.reduce((max, week) => week.manual ? Math.max(max, week.manual.week) : max, 0);
         els.pastWeek.value = entry ? String(entry.manual.week) : String(highest + 1);
-        ['e1', 'e2', 'shared', 'singles'].forEach(row => writePast(row, entry ? entry.manual[row] : null));
+        for (let i = 1; i <= n; i++) writePast('e' + i, entry ? entry.manual.entries[i - 1] : null);
+        for (let k = 1; k <= n; k++) writePast(levelRowId(k, n), entry ? entry.manual.levels[k - 1] : null);
         pastSinglesEdited = Boolean(entry);
         els.pastError.textContent = '';
         pastCheck();
@@ -2508,18 +2926,18 @@
         const v = readPast();
         const fail = message => { els.pastError.textContent = message; };
         if (!Number.isInteger(v.week) || v.week < 0 || v.week > 30) return fail('Enter the week number (0 to 30).');
-        if (![v.e1, v.e2, v.shared, v.singles].some(record => record.some(n => n > 0))) return fail('Enter at least one record.');
+        if (!v.entries.concat(v.levels).some(record => record.some(n => n > 0))) return fail('Enter at least one record.');
         if (state.history.some(week => week.manual && week.manual.week === v.week && week.id !== pastEditingId)) {
           return fail('Week ' + v.week + ' already has a record. Use Edit on that one instead.');
         }
-        const manual = { week: v.week, e1: v.e1, e2: v.e2, shared: v.shared, singles: v.singles };
+        const manual = makeManual(v.week, v.picks, v.entries, v.levels);
         const now = new Date().toISOString();
         const existing = pastEditingId && state.history.find(week => week.id === pastEditingId);
         if (existing) {
           existing.manual = manual;
           existing.updatedAt = now;
         } else {
-          state.history = mergeHistory(state.history, [{ id: uid(), savedAt: now, updatedAt: now, overlap: 0, entry1: [], entry2: [], results: {}, tiers: null, manual: manual }]);
+          state.history = mergeHistory(state.history, [{ id: uid(), savedAt: now, updatedAt: now, overlap: 0, picks: v.picks, lineups: [], entry1: [], entry2: [], results: {}, tiers: null, manual: manual }]);
         }
         save();
         closePastForm();
@@ -2553,7 +2971,7 @@
         const problems = [];
         const weeks = state.history.filter(week => !week.manual);
         for (const week of weeks) {
-          const open = Array.from(new Set(week.entry1.concat(week.entry2))).filter(name => !week.results[name]);
+          const open = Array.from(new Set(week.lineups.flat())).filter(name => !week.results[name]);
           if (!open.length) continue;
           const start = grader.ymd(new Date(week.savedAt));
           const found = {};
@@ -2728,27 +3146,30 @@
       }
 
       function saveWeek() {
-        const entry1 = picksForEntry(1).map(item => item.team.name);
-        const entry2 = picksForEntry(2).map(item => item.team.name);
-        if (entry1.length !== 7 || entry2.length !== 7) {
-          return setStatus('Nothing to save yet', 'Build both entries to 7 picks first.', 'error');
+        const lineups = entryIds().map(entry => picksForEntry(entry).map(item => item.team.name));
+        if (!lineups.every(list => list.length === state.picks)) {
+          return setStatus('Nothing to save yet', 'Build ' + everyEntry() + ' to ' + state.picks + ' picks first.', 'error');
         }
         const last = latestTrackedWeek();
-        if (last && JSON.stringify(last.entry1) === JSON.stringify(entry1) && JSON.stringify(last.entry2) === JSON.stringify(entry2)) {
+        if (last && JSON.stringify(last.lineups) === JSON.stringify(lineups)) {
           return setStatus('Already saved', 'This exact build is already your most recent saved week.', 'error');
         }
         const tiers = {};
-        state.teams.forEach(team => { if (entry1.includes(team.name) || entry2.includes(team.name)) tiers[team.name] = team.tier; });
+        const used = new Set(lineups.flat());
+        state.teams.forEach(team => { if (used.has(team.name)) tiers[team.name] = team.tier; });
         const now = new Date().toISOString();
         state.history = mergeHistory(state.history, [{
           id: uid(),
           savedAt: now,
           updatedAt: now,
           overlap: state.overlap,
-          entry1: entry1,
-          entry2: entry2,
+          picks: state.picks,
+          lineups: lineups,
+          entry1: lineups[0],
+          entry2: lineups[1],
           results: {},
-          tiers: tiers
+          tiers: tiers,
+          manual: null
         }]);
         save();
         renderHistory();
@@ -2757,18 +3178,16 @@
 
       async function copyHistoryEntry(id) {
         const entry = state.history.find(item => item.id === id);
-        if (!entry) return;
-        const text = 'Splash Entry 1 (' + formatSavedAt(entry.savedAt) + ')\n' +
-          entry.entry1.map((name, i) => (i + 1) + '. ' + name + (entry.results[name] ? ' (' + GRADE_LABEL[entry.results[name]] + ')' : '')).join('\n') +
-          '\n\nSplash Entry 2 (' + formatSavedAt(entry.savedAt) + ')\n' +
-          entry.entry2.map((name, i) => (i + 1) + '. ' + name + (entry.results[name] ? ' (' + GRADE_LABEL[entry.results[name]] + ')' : '')).join('\n');
+        if (!entry || entry.manual) return;
+        const text = entry.lineups.map((names, i) => 'Splash Entry ' + (i + 1) + ' (' + formatSavedAt(entry.savedAt) + ')\n' +
+          names.map((name, j) => (j + 1) + '. ' + name + (entry.results[name] ? ' (' + GRADE_LABEL[entry.results[name]] + ')' : '')).join('\n')).join('\n\n');
         try {
           await navigator.clipboard.writeText(text);
         } catch (_) {
           const temp = document.createElement('textarea');
           temp.value = text; document.body.appendChild(temp); temp.select(); document.execCommand('copy'); temp.remove();
         }
-        setStatus('Saved week copied', 'Both entries from that week are on your clipboard.', 'success');
+        setStatus('Saved week copied', (entry.lineups.length === 2 ? 'Both entries' : 'All ' + entry.lineups.length + ' entries') + ' from that week are on your clipboard.', 'success');
       }
 
       function deleteHistoryEntry(id) {
@@ -2779,15 +3198,111 @@
         setStatus('Saved week deleted', state.history.length + ' saved week' + (state.history.length === 1 ? '' : 's') + ' remaining.');
       }
 
+      // --- Pools ---
+      function renderPoolBar() {
+        els.poolTabs.innerHTML = store.pools.map(p =>
+          '<button type="button" class="pool-tab' + (p === state ? ' active' : '') + '" data-pool-id="' + escapeHtml(p.id) + '" aria-pressed="' + (p === state) + '" title="' + escapeHtml(p.name + ': ' + p.picks + ' picks, ' + p.entries + ' entries') + '">' +
+          escapeHtml(p.name) + ' <small>' + p.picks + ' \u00d7 ' + p.entries + '</small></button>').join('');
+        if (document.activeElement !== els.poolName) els.poolName.value = state.name;
+        els.poolName.placeholder = 'Pick ' + state.picks;
+        els.printPoolName.textContent = state.name;
+        els.deletePool.classList.toggle('hidden', store.pools.length < 2);
+        const others = store.pools.filter(p => p !== state);
+        els.copyFromRow.classList.toggle('hidden', !others.length);
+        const chosen = els.copyFromSelect.value;
+        els.copyFromSelect.innerHTML = others.map(p => '<option value="' + escapeHtml(p.id) + '">' + escapeHtml(p.name) + ' (' + p.teams.length + ' teams)</option>').join('');
+        if (others.some(p => p.id === chosen)) els.copyFromSelect.value = chosen;
+        document.getElementById('historyTitle').textContent = 'Saved weeks \u00b7 ' + state.name;
+      }
+
+      function switchPool(id) {
+        const pool = store.pools.find(p => p.id === id);
+        if (!pool || pool === state) return;
+        state = pool;
+        try { localStorage.setItem(ACTIVE_KEY, pool.id); } catch (_) {}
+        resetUndoBaseline();
+        expandedRows.clear();
+        lineInfo = new Map();
+        linesCheckedAt = 0;
+        slateFinished = false;
+        pastEditingId = null;
+        els.pastForm.classList.add('hidden');
+        renderAll();
+        setStatus(pool.name, pool.teams.length ? pool.picks + ' picks \u00d7 ' + pool.entries + ' entries.' : 'No teams in this pool yet. Paste them above, or copy them from another pool.');
+        if (pool.teams.length) checkLines(true);
+      }
+
+      function addPool() {
+        const names = new Set(store.pools.map(p => p.name));
+        let n = store.pools.length + 1;
+        while (names.has('Pool ' + n)) n++;
+        const pool = newPool({ id: 'pool-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 6), name: 'Pool ' + n, picks: 7, entries: 2, spread: 1, overlap: 3 });
+        store.pools.push(pool);
+        setSetupCollapsed(false);
+        switchPool(pool.id);
+        save();
+        renderAll();
+        setStatus('New pool added', 'Name it and set its picks and entries in step 2, then add its teams in step 1 (or copy them from another pool).', 'success');
+        els.poolName.focus();
+        els.poolName.select();
+      }
+
+      function deletePool() {
+        if (store.pools.length < 2) return;
+        if (!confirm('Delete \u201c' + state.name + '\u201d? This removes its teams, build, saved weeks, and records on every device. This cannot be undone.')) return;
+        const gone = state;
+        store.deleted[gone.id] = new Date().toISOString();
+        store.pools = store.pools.filter(p => p !== gone);
+        state = store.pools[0];
+        try { localStorage.setItem(ACTIVE_KEY, state.id); } catch (_) {}
+        resetUndoBaseline();
+        expandedRows.clear();
+        lineInfo = new Map();
+        linesCheckedAt = 0;
+        slateFinished = false;
+        els.pastForm.classList.add('hidden');
+        save();
+        renderAll();
+        setStatus('Pool deleted', '\u201c' + gone.name + '\u201d was removed. You\u2019re now in \u201c' + state.name + '\u201d.', 'success');
+      }
+
+      function renamePool(value) {
+        const name = value.trim().slice(0, 40) || 'Pick ' + state.picks;
+        if (name === state.name) return;
+        state.name = name;
+        save();
+        renderPoolBar();
+        renderSetupSummary();
+      }
+
+      // Brings another pool's teams, order and tiers into this one, for weeks when both pools use the same
+      // games and lines. A team already here keeps its own Min / Max / placement. The build is cleared.
+      function copyTeamsFrom(sourceId) {
+        const source = store.pools.find(p => p.id === sourceId);
+        if (!source || source === state) return;
+        if (!source.teams.length) return setStatus('Nothing to copy', '\u201c' + source.name + '\u201d has no teams yet.', 'error');
+        if (state.teams.length && !confirm('Replace the teams and tiers in \u201c' + state.name + '\u201d with the ones from \u201c' + source.name + '\u201d? Your Min / Max and placements for teams in both are kept, and the current build is cleared.')) return;
+        const mine = new Map(state.teams.map(team => [team.name.toLowerCase(), team]));
+        state.teams = source.teams.map(team => {
+          const old = mine.get(team.name.toLowerCase());
+          return old ? { ...old, name: team.name, tier: team.tier } : { id: uid(), name: team.name, min: 0, max: state.entries, fixedMask: 0, tier: team.tier };
+        });
+        state.result = null;
+        save();
+        renderAll();
+        setStatus('Teams copied', source.teams.length + ' teams and their tiers came from \u201c' + source.name + '\u201d. Set this pool\u2019s own placements, then build.', 'success');
+        if (state.teams.length) checkLines(true);
+      }
+
       function renderAll() {
         els.input.value = state.teams.map(team => team.name).join('\n');
-        els.overlap.value = String(state.overlap);
         updateInputCount();
         updateOverlapUI();
         renderCandidates();
         renderEntries();
         renderButtons();
         renderHistory();
+        renderPoolBar();
       }
 
       // Tier (Lock/Strong/Lean/Meh) is the hard priority signal: teams in a higher tier always
@@ -2806,57 +3321,99 @@
         return byTier.flatMap(group => shuffled(group));
       }
 
-      function confidenceGreedyAssign() {
-        let need1 = 7, need2 = 7, needShared = state.overlap;
+      // Can teams that each go in a given number of entries ("degrees") fill entries that still need these
+      // many picks, with no team in the same entry twice? (Gale-Ryser: the biggest k degrees can never
+      // outrun what k teams can actually supply.)
+      function degreesFit(degrees, needs) {
+        if (degrees.reduce((a, b) => a + b, 0) !== needs.reduce((a, b) => a + b, 0)) return false;
+        const sorted = degrees.slice().sort((a, b) => b - a);
+        let prefix = 0;
+        for (let k = 1; k <= sorted.length; k++) {
+          prefix += sorted[k - 1];
+          let supply = 0;
+          needs.forEach(n => { supply += Math.min(n, k); });
+          if (prefix > supply) return false;
+        }
+        return true;
+      }
+
+      // The tier-driven build. Locked placements go in first. The shared group (teams in every entry) comes
+      // from the highest tiers, then the other teams get as many entries each as the pool's limit allows,
+      // best tier first, until the entries are full, so lower tiers are left out first. Which entries a
+      // team lands in is random, so "Another valid build" really is different. Returns null when a lock or
+      // exposure limit makes that impossible; the exhaustive search below is then used instead.
+      function structuralAssign() {
+        const N = state.entries, K = state.picks, full = fullMask();
+        const needs = new Array(N).fill(K);
+        let coreLeft = state.overlap;
         const assigned = [];
         const free = [];
         for (const team of tierShuffledOrder()) {
           if (team.fixedMask) {
             assigned.push({ id: team.id, mask: team.fixedMask });
-            if (includesEntry(team.fixedMask, 1)) need1--;
-            if (includesEntry(team.fixedMask, 2)) need2--;
-            if (team.fixedMask === 3) needShared--;
+            entryIds().forEach(entry => { if (includesEntry(team.fixedMask, entry)) needs[entry - 1]--; });
+            if (team.fixedMask === full) coreLeft--;
           } else {
             free.push(team);
           }
         }
-        if (need1 < 0 || need2 < 0 || needShared < 0) return null;
+        if (needs.some(n => n < 0) || coreLeft < 0) return null;
 
-        const singleOrder = Math.random() < 0.5 ? [2, 1] : [1, 2];
-        const priority = [3, singleOrder[0], singleOrder[1], 0];
+        const info = free.map(team => {
+          const exposures = Array.from(new Set(allowedMasks(team).map(popcount)));
+          const others = exposures.filter(e => e < N);
+          return { team, canCore: exposures.includes(N), lo: others.length ? Math.min(...others) : 0, hi: others.length ? Math.max(...others) : -1, noOther: !others.length };
+        });
+        const forced = info.filter(i => i.noOther);
+        if (forced.some(i => !i.canCore) || forced.length > coreLeft) return null;
+        const volunteers = info.filter(i => !i.noOther && i.canCore).slice(0, coreLeft - forced.length);
+        if (forced.length + volunteers.length < coreLeft) return null;
+        const core = new Set(forced.concat(volunteers).map(i => i.team.id));
+        needs.forEach((n, i) => { needs[i] = n - coreLeft; });
+        if (needs.some(n => n < 0)) return null;
 
-        for (let i = 0; i < free.length; i++) {
-          const team = free[i];
-          const remaining = free.length - i - 1;
-          let chosen = null;
-          for (const mask of priority) {
-            const exposure = popcount(mask);
-            if (exposure < team.min || exposure > team.max) continue;
-            const n1 = need1 - (includesEntry(mask, 1) ? 1 : 0);
-            const n2 = need2 - (includesEntry(mask, 2) ? 1 : 0);
-            const ns = needShared - (mask === 3 ? 1 : 0);
-            if (n1 < 0 || n2 < 0 || ns < 0) continue;
-            if (n1 > remaining || n2 > remaining || ns > remaining) continue;
-            if (ns > Math.min(n1, n2)) continue;
-            if ((n1 + n2 - ns) > remaining) continue;
-            chosen = mask; need1 = n1; need2 = n2; needShared = ns;
-            break;
+        const rest = info.filter(i => !core.has(i.team.id));
+        const open = needs.filter(n => n > 0).length;
+        const lo = rest.map(i => i.lo), hi = rest.map(i => Math.min(i.hi, open));
+        if (hi.some((h, i) => h < lo[i])) return null;
+        const sufLo = new Array(rest.length + 1).fill(0), sufHi = new Array(rest.length + 1).fill(0);
+        for (let i = rest.length - 1; i >= 0; i--) { sufLo[i] = sufLo[i + 1] + lo[i]; sufHi[i] = sufHi[i + 1] + hi[i]; }
+        let left = needs.reduce((a, b) => a + b, 0);
+        const degrees = [];
+        for (let i = 0; i < rest.length; i++) {
+          let pick = null;
+          for (let d = hi[i]; d >= lo[i]; d--) {
+            const remaining = left - d;
+            if (remaining >= sufLo[i + 1] && remaining <= sufHi[i + 1]) { pick = d; break; }
           }
-          if (chosen === null) return null;
-          assigned.push({ id: team.id, mask: chosen });
+          if (pick === null) return null;
+          degrees.push(pick);
+          left -= pick;
         }
-        return (need1 === 0 && need2 === 0 && needShared === 0) ? assigned : null;
+        if (left !== 0 || !degreesFit(degrees, needs)) return null;
+
+        const masks = new Map();
+        core.forEach(id => masks.set(id, full));
+        const order = rest.map((item, i) => ({ id: item.team.id, d: degrees[i], r: Math.random() })).sort((a, b) => b.d - a.d || a.r - b.r);
+        const remaining = needs.slice();
+        for (const item of order) {
+          if (item.d === 0) { masks.set(item.id, 0); continue; }
+          const targets = entryIds().map(e => ({ e, need: remaining[e - 1], r: Math.random() })).sort((a, b) => b.need - a.need || a.r - b.r).slice(0, item.d);
+          if (targets.some(t => t.need <= 0)) return null;
+          let mask = 0;
+          targets.forEach(t => { mask |= entryBit(t.e); remaining[t.e - 1]--; });
+          masks.set(item.id, mask);
+        }
+        if (remaining.some(n => n !== 0)) return null;
+        info.forEach(i => assigned.push({ id: i.team.id, mask: masks.get(i.team.id) || 0 }));
+        return assigned;
       }
 
-      function solve(preferredResult = null, randomize = false) {
-        const validation = validate();
-        if (!validation.ok) return null;
-
-        if (randomize) {
-          const greedy = confidenceGreedyAssign();
-          if (greedy) return greedy;
-        }
-
+      // Exhaustive search over every team's allowed set of entries. With `preferredResult` it tries each
+      // team's current placement first, so a small edit keeps the rest of your build in place.
+      // Returns the assignment, null if none exists, or undefined if it gave up (very large searches).
+      function exhaustiveAssign(preferredResult, randomize) {
+        const N = state.entries, K = state.picks, C = state.overlap, full = fullMask();
         const prepared = state.teams.map((team, originalIndex) => {
           const previousMask = maskFromResult(team.id, preferredResult);
           let masks = allowedMasks(team).slice();
@@ -2866,51 +3423,75 @@
         });
         prepared.sort((a, b) => a.masks.length - b.masks.length || (randomize ? Math.random() - .5 : a.originalIndex - b.originalIndex));
         const memo = new Set();
+        let nodes = 0, gaveUp = false;
 
-        function walk(index, count1, count2, shared) {
-          if (count1 > 7 || count2 > 7 || shared > state.overlap) return null;
-          if (index === prepared.length) return count1 === 7 && count2 === 7 && shared === state.overlap ? [] : null;
+        function walk(index, counts, shared) {
+          if (++nodes > 250000) { gaveUp = true; return null; }
+          if (shared > C || counts.some(count => count > K)) return null;
+          if (index === prepared.length) return counts.every(count => count === K) && shared === C ? [] : null;
           const remaining = prepared.length - index;
-          if (count1 + remaining < 7 || count2 + remaining < 7 || shared + remaining < state.overlap) return null;
-          const key = index + '|' + count1 + '|' + count2 + '|' + shared;
+          if (shared + remaining < C || counts.some(count => count + remaining < K)) return null;
+          const key = index + '|' + counts.join(',') + '|' + shared;
           if (memo.has(key)) return null;
 
           const item = prepared[index];
           for (const mask of item.masks) {
-            const next1 = count1 + (includesEntry(mask, 1) ? 1 : 0);
-            const next2 = count2 + (includesEntry(mask, 2) ? 1 : 0);
-            const nextShared = shared + (mask === 3 ? 1 : 0);
-            const tail = walk(index + 1, next1, next2, nextShared);
+            const next = counts.map((count, i) => count + (mask & (1 << i) ? 1 : 0));
+            const tail = walk(index + 1, next, shared + (mask === full ? 1 : 0));
             if (tail) return [{ id: item.team.id, mask }, ...tail];
+            if (gaveUp) return null;
           }
           memo.add(key);
           return null;
         }
 
-        return walk(0, 0, 0, 0);
+        const found = walk(0, new Array(N).fill(0), 0);
+        return found || (gaveUp ? undefined : null);
+      }
+
+      function solve(preferredResult = null, randomize = false) {
+        const validation = validate();
+        if (!validation.ok) return null;
+
+        if (randomize) {
+          for (let attempt = 0; attempt < 4; attempt++) {
+            const built = structuralAssign();
+            if (built) return built;
+          }
+        }
+        const found = exhaustiveAssign(preferredResult, randomize);
+        if (found) return found;
+        // The exhaustive search can give up on a big pool; any valid build beats none.
+        if (found === undefined && !randomize) return structuralAssign();
+        return null;
       }
 
       function solutionToResult(solved) {
         const maskById = new Map(solved.map(item => [item.id, item.mask]));
-        const result = { 1: [], 2: [] };
+        const result = {};
+        entryIds().forEach(entry => { result[entry] = []; });
         solved.forEach(({ id, mask }) => {
-          if (includesEntry(mask, 1)) result[1].push(id);
-          if (includesEntry(mask, 2)) result[2].push(id);
+          entryIds().forEach(entry => { if (includesEntry(mask, entry)) result[entry].push(id); });
         });
-        // Shared (both-entries) picks lead each list, then the rest in confidence order — this is
-        // the one place that decides pick order, so the entry views, Copy entry text, print output,
-        // and saved-week history all agree on shared-first without each having to re-sort.
-        [1, 2].forEach(entry => {
+        // Picks in the most entries lead each list (shared with every entry first), then the rest in
+        // confidence order — this is the one place that decides pick order, so the entry views, Copy
+        // entry text, print output, and saved-week history all agree without each having to re-sort.
+        entryIds().forEach(entry => {
           result[entry].sort((a, b) => {
-            const aShared = maskById.get(a) === 3 ? 0 : 1;
-            const bShared = maskById.get(b) === 3 ? 0 : 1;
-            if (aShared !== bShared) return aShared - bShared;
+            const aCount = popcount(maskById.get(a)), bCount = popcount(maskById.get(b));
+            if (aCount !== bCount) return bCount - aCount;
             const teamA = state.teams.find(t => t.id === a), teamB = state.teams.find(t => t.id === b);
             if (teamA.tier !== teamB.tier) return teamA.tier - teamB.tier;
             return state.teams.indexOf(teamA) - state.teams.indexOf(teamB);
           });
         });
         return result;
+      }
+
+      function buildSummary() {
+        return state.entries === 2
+          ? 'Both entries have ' + state.picks + ' picks and share exactly ' + state.overlap + '.'
+          : 'All ' + state.entries + ' entries have ' + state.picks + ' picks, and exactly ' + state.overlap + ' teams are in every entry.';
       }
 
       function commitSolution(solved, detail) {
@@ -2920,7 +3501,7 @@
         renderEntries();
         renderButtons();
         els.another.disabled = false;
-        setStatus('Entries updated', detail || ('Both entries have 7 picks and share exactly ' + state.overlap + '.'), 'success');
+        setStatus('Entries updated', detail || buildSummary(), 'success');
       }
 
       function applyMutation(change, detail) {
@@ -2934,7 +3515,7 @@
         // introduces a *different* problem is rolled back.
         const newProblem = !validation.ok && (wasValid.ok || wasValid.title !== validation.title);
         if (newProblem) {
-          state = before;
+          setState(before);
           renderAll();
           setStatus(validation.title, validation.detail, 'error');
           return false;
@@ -2942,7 +3523,7 @@
         if (preferred) {
           const solved = solve(preferred, false);
           if (!solved) {
-            state = before;
+            setState(before);
             renderAll();
             setStatus('Change could not be applied', 'That move conflicts with the overlap or exposure rules, so the previous entries were kept.', 'error');
             return false;
@@ -2963,7 +3544,8 @@
         const team = state.teams.find(item => item.id === teamId);
         if (!team) return;
         const nextMask = toggleIfSame && team.fixedMask === mask ? 0 : mask;
-        const action = nextMask === 3 ? team.name + ' is now locked in both entries.' : nextMask ? team.name + ' moved and fixed in Splash ' + nextMask + '.' : team.name + ' is no longer fixed to an entry.';
+        const placedIn = entryIds().filter(entry => includesEntry(nextMask, entry));
+        const action = nextMask && nextMask === fullMask() ? team.name + ' is now locked in ' + everyEntry() + '.' : placedIn.length === 1 ? team.name + ' moved and fixed in Splash ' + placedIn[0] + '.' : nextMask ? team.name + ' is now fixed in Splash entries ' + placedIn.join(' + ') + '.' : team.name + ' is no longer fixed to an entry.';
         applyMutation(() => {
           team.fixedMask = nextMask;
           if (nextMask) {
@@ -2980,18 +3562,18 @@
       function removeFromBuild(teamId) {
         const team = state.teams.find(item => item.id === teamId);
         if (!team) return;
-        const before = state.result ? { 1: state.result[1].slice(), 2: state.result[2].slice() } : null;
+        const before = state.result ? Object.fromEntries(entryIds().map(entry => [entry, (state.result[entry] || []).slice()])) : null;
         const ok = applyMutation(() => {
           team.fixedMask = 0;
           team.min = 0;
           team.max = 0;
         }, team.name + ' removed from this build.');
         if (!ok) {
-          setStatus('Couldn\u2019t remove ' + team.name, 'Without it there\u2019s no valid build: you need enough other teams (and exposure) to fill both entries. Add a team or raise a Max, then try again.', 'error');
+          setStatus('Couldn\u2019t remove ' + team.name, 'Without it there\u2019s no valid build: you need enough other teams (and exposure) to fill ' + everyEntry() + '. Add a team or raise a Max, then try again.', 'error');
           return;
         }
         if (!before || !state.result) return;
-        const added = [1, 2].map(entry => state.result[entry].filter(id => !before[entry].includes(id))).flat();
+        const added = entryIds().map(entry => state.result[entry].filter(id => !before[entry].includes(id))).flat();
         const names = Array.from(new Set(added)).map(id => (state.teams.find(t => t.id === id) || {}).name).filter(Boolean);
         setStatus(team.name + ' removed', (names.length ? names.join(' and ') + (names.length === 1 ? ' took' : ' took') + ' its place. ' : '') + 'It\u2019s on the Benched list. Tap it there to put it back, or tap Undo.', 'success');
       }
@@ -2999,8 +3581,8 @@
       function restoreToPool(teamId) {
         const team = state.teams.find(item => item.id === teamId);
         if (!team) return;
-        const ok = applyMutation(() => { team.max = 2; }, team.name + ' can be picked again.');
-        if (ok) setStatus(team.name + ' is back in play', 'Its Max is back to 2. Your entries didn\u2019t change; tap Build 2 entries or Another valid build to pick from it again.', 'success');
+        const ok = applyMutation(() => { team.max = state.entries; }, team.name + ' can be picked again.');
+        if (ok) setStatus(team.name + ' is back in play', 'Its Max is back to ' + state.entries + '. Your entries didn\u2019t change; tap Build ' + state.entries + ' entries or Another valid build to pick from it again.', 'success');
       }
 
       function setExposure(teamId, field, value) {
@@ -3016,7 +3598,7 @@
       function build(randomize = true) {
         const solved = solve(null, randomize);
         if (!solved) return setStatus('No valid build found', 'The overlap, placements, and exposure limits conflict. Adjust a Min/Max button or unlock a team.', 'error');
-        commitSolution(solved, 'Both entries have 7 picks and share exactly ' + state.overlap + '.');
+        commitSolution(solved, buildSummary());
       }
 
       async function copyEntry(entry) {
@@ -3029,11 +3611,45 @@
           const temp = document.createElement('textarea');
           temp.value = text; document.body.appendChild(temp); temp.select(); document.execCommand('copy'); temp.remove();
         }
-        setStatus('Entry ' + entry + ' copied', 'The seven picks are on your clipboard.', 'success');
+        setStatus('Entry ' + entry + ' copied', 'The ' + (NUMBER_WORDS[state.picks] || state.picks) + ' picks are on your clipboard.', 'success');
       }
 
       els.input.addEventListener('input', updateInputCount);
       els.load.addEventListener('click', loadTeams);
+
+      // Changing the pool's shape (picks per entry, number of entries, how far non-shared teams spread)
+      // makes the current build meaningless, so it's cleared; teams, tiers and settings are kept, with
+      // Min/Max and placements fitted to the new number of entries. Undo reverses it.
+      function changePoolShape(next) {
+        const oldN = state.entries, oldFull = fullMask();
+        const picks = clampInt(next.picks, 1, MAX_PICKS, state.picks);
+        const entries = clampInt(next.entries, 2, MAX_ENTRIES, state.entries);
+        const spread = next.spread !== undefined ? clampInt(next.spread, 1, entries - 1, entries - 1)
+          : (entries === oldN ? state.spread : entries - 1);
+        if (picks === state.picks && entries === state.entries && spread === state.spread) return;
+        const newFull = (1 << entries) - 1;
+        state.teams.forEach(team => {
+          if (entries !== oldN) {
+            team.fixedMask = team.fixedMask === oldFull ? newFull : team.fixedMask & newFull;
+            team.max = team.max === oldN ? entries : Math.min(team.max, entries);
+            team.min = Math.min(team.min, entries);
+          }
+          const exposure = popcount(team.fixedMask);
+          if (team.fixedMask) { team.min = Math.min(team.min, exposure); team.max = Math.max(team.max, exposure); }
+          if (team.min > team.max) team.min = team.max;
+        });
+        state.picks = picks;
+        state.entries = entries;
+        state.spread = spread;
+        state.overlap = Math.min(state.overlap, picks);
+        state.result = null;
+        save();
+        renderAll();
+        if (validate().ok || !state.teams.length) setStatus('Pool updated', picks + ' picks \u00d7 ' + entries + ' entries. Your teams and settings were kept; build again to fill the entries. Tap Undo to go back.', 'success');
+      }
+      els.picksSelect.addEventListener('change', () => changePoolShape({ picks: els.picksSelect.value }));
+      els.entriesSelect.addEventListener('change', () => changePoolShape({ entries: els.entriesSelect.value }));
+      els.spreadSelect.addEventListener('change', () => changePoolShape({ spread: els.spreadSelect.value }));
       els.overlap.addEventListener('change', () => {
         const next = Number(els.overlap.value);
         const beforeOverlap = state.overlap;
@@ -3120,45 +3736,51 @@
       document.addEventListener('dragend', event => {
         event.target.closest('[data-team-id]')?.classList.remove('dragging');
         dragData = { teamId: null, sourceEntry: 0, tier: null };
-        Object.values(els.zones).forEach(zone => zone.classList.remove('over'));
+        document.querySelectorAll('.dropzone.over').forEach(zone => zone.classList.remove('over'));
         clearReorderIndicators();
       });
 
-      Object.values(els.zones).forEach(zone => {
-        zone.addEventListener('dragover', event => { event.preventDefault(); zone.classList.add('over'); event.dataTransfer.dropEffect = 'move'; });
-        zone.addEventListener('dragleave', event => { if (!zone.contains(event.relatedTarget)) zone.classList.remove('over'); });
-        zone.addEventListener('drop', event => {
-          event.preventDefault();
-          zone.classList.remove('over');
-          const teamId = event.dataTransfer.getData('text/plain') || dragData.teamId;
-          const targetEntry = Number(zone.dataset.entry);
-          if (!teamId || dragData.sourceEntry === targetEntry) return;
-          setPlacement(teamId, targetEntry, false);
-        });
-        zone.addEventListener('click', event => {
-          const button = event.target.closest('.pick-action-btn, .pick-remove');
-          if (!button) return;
+      els.entriesHost.addEventListener('dragover', event => {
+        const zone = event.target.closest('.dropzone');
+        if (!zone) return;
+        event.preventDefault();
+        zone.classList.add('over');
+        event.dataTransfer.dropEffect = 'move';
+      });
+      els.entriesHost.addEventListener('dragleave', event => {
+        const zone = event.target.closest('.dropzone');
+        if (zone && !zone.contains(event.relatedTarget)) zone.classList.remove('over');
+      });
+      els.entriesHost.addEventListener('drop', event => {
+        const zone = event.target.closest('.dropzone');
+        if (!zone) return;
+        event.preventDefault();
+        zone.classList.remove('over');
+        const teamId = event.dataTransfer.getData('text/plain') || dragData.teamId;
+        const targetEntry = Number(zone.dataset.entry);
+        if (!teamId || dragData.sourceEntry === targetEntry) return;
+        setPlacement(teamId, entryBit(targetEntry), false);
+      });
+      els.entriesHost.addEventListener('click', event => {
+        const button = event.target.closest('.pick-action-btn, .pick-remove');
+        if (button) {
           if (button.dataset.action === 'remove') removeFromBuild(button.dataset.teamId);
-          else if (button.dataset.action === 'move') setPlacement(button.dataset.teamId, Number(button.dataset.targetEntry), false);
+          else if (button.dataset.action === 'move') setPlacement(button.dataset.teamId, entryBit(Number(button.dataset.targetEntry)), false);
           else if (button.dataset.action === 'unlock') setPlacement(button.dataset.teamId, 0);
-        });
+          return;
+        }
+        const foot = event.target.closest('[data-act]');
+        if (!foot || foot.disabled) return;
+        const entry = Number(foot.dataset.entry);
+        if (foot.dataset.act === 'copy') return copyEntry(entry);
+        applyMutation(() => {
+          state.teams.forEach(team => { if (includesEntry(team.fixedMask, entry)) team.fixedMask &= ~entryBit(entry); });
+        }, 'Fixed placements cleared from Splash ' + entry + '.');
       });
 
       els.benchedList.addEventListener('click', event => {
         const chip = event.target.closest('[data-restore]');
         if (chip) restoreToPool(chip.dataset.restore);
-      });
-
-      [1, 2].forEach(entry => {
-        els.clear[entry].addEventListener('click', () => {
-          applyMutation(() => {
-            state.teams.forEach(team => {
-              if (team.fixedMask === entry) team.fixedMask = 0;
-              else if (team.fixedMask === 3) team.fixedMask = entry === 1 ? 2 : 1;
-            });
-          }, 'Fixed placements cleared from Splash ' + entry + '.');
-        });
-        els.copy[entry].addEventListener('click', () => copyEntry(entry));
       });
 
       els.build.addEventListener('click', () => build(true));
@@ -3167,15 +3789,14 @@
       // Clears this week's teams, tiers, exposure, locks and build so you can paste next week's
       // slate. Keeps your overlap setting (usually the same week to week) and saved-weeks history.
       els.reset.addEventListener('click', () => {
-        const entry1 = picksForEntry(1).map(item => item.team.name);
-        const entry2 = picksForEntry(2).map(item => item.team.name);
+        const lineups = entryIds().map(entry => picksForEntry(entry).map(item => item.team.name));
         const last = latestTrackedWeek();
-        const unsaved = entry1.length === 7 && entry2.length === 7 &&
-          !(last && JSON.stringify(last.entry1) === JSON.stringify(entry1) && JSON.stringify(last.entry2) === JSON.stringify(entry2));
+        const unsaved = lineups.every(list => list.length === state.picks) &&
+          !(last && JSON.stringify(last.lineups) === JSON.stringify(lineups));
         const message = 'Start a new week? This clears your teams, tiers, exposure, locks, and current build on both devices. Your overlap setting and saved weeks are kept.' +
           (unsaved ? '\n\nHeads up: your current build hasn\u2019t been saved to Saved weeks yet. Cancel and tap "Save this week" first if you want a record of it.' : '');
         if (!confirm(message)) return;
-        state = { teams: [], overlap: state.overlap, result: null, history: state.history };
+        setState(Object.assign({}, state, { teams: [], result: null }));
         els.input.value = '';
         save();
         renderAll();
@@ -3183,8 +3804,18 @@
         els.input.focus();
       });
 
+      els.poolTabs.addEventListener('click', event => {
+        const tab = event.target.closest('.pool-tab');
+        if (tab) switchPool(tab.dataset.poolId);
+      });
+      els.addPool.addEventListener('click', addPool);
+      els.deletePool.addEventListener('click', deletePool);
+      els.poolName.addEventListener('change', () => renamePool(els.poolName.value));
+      els.poolName.addEventListener('keydown', event => { if (event.key === 'Enter') { event.preventDefault(); els.poolName.blur(); } });
+      els.copyFrom.addEventListener('click', () => copyTeamsFrom(els.copyFromSelect.value));
+
       els.transferBtn.addEventListener('click', () => {
-        els.transferOut.value = JSON.stringify(state);
+        els.transferOut.value = JSON.stringify(fullSyncPayload());
         els.transferIn.value = '';
         openOverlay(els.transferOverlay);
       });
