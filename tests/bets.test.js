@@ -362,3 +362,24 @@ test('phone cards: each bet starts collapsed, Details opens it for editing, and 
   app.$('#btAddBtn').click();
   assert.ok(app.$$('#btBody tr').some(r => r.classList.contains('open')));
 });
+
+test('Today P/L card adds up graded bets dated today, ignores other days, and counts open ones separately', async t => {
+  const { openApp, wait } = require('./helpers');
+  const mk = (id, date, result, win, risk) => ({ id, date, bet: 'Team ' + id, odds: -110, risk, win, book: '', result, notes: '', updatedAt: 1 });
+  const app = openApp({ now: '2026-11-06T18:00:00', bets: { bets: [mk('a', '2026-11-06', 'W', 100, 110), mk('b', '2026-11-06', 'L', 100, 110), mk('c', '2026-11-06', 'W', 50, 55), mk('d', '2026-11-06', '', 100, 110), mk('e', '2026-11-05', 'W', 900, 1000)], deleted: {}, settings: { unit: 55 } } });
+  t.after(app.close);
+  await wait(30);
+  assert.match(app.$('#btToday').textContent, /40\.00/);
+  assert.ok(app.$('#btToday').classList.contains('pos'));
+  assert.equal(app.$('#btTodaySub').textContent, '3 of 4 graded');
+  assert.match(app.$('#btNet').textContent, /940\.00/);
+});
+
+test('Today P/L card shows a zero and "no bets today" when nothing is dated today', async t => {
+  const { openApp, wait } = require('./helpers');
+  const app = openApp({ now: '2026-11-06T18:00:00', bets: { bets: [{ id: 'e', date: '2026-11-05', bet: 'X', odds: -110, risk: 110, win: 100, book: '', result: 'W', notes: '', updatedAt: 1 }], deleted: {}, settings: { unit: 55 } } });
+  t.after(app.close);
+  await wait(30);
+  assert.match(app.$('#btToday').textContent, /0\.00/);
+  assert.equal(app.$('#btTodaySub').textContent, 'no bets today');
+});

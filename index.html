@@ -862,7 +862,7 @@
     body.on-bets .subtitle-pool { display: none; }
     body.on-bets .subtitle-bets { display: block; }
 
-    .bt-stats { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 12px; margin-bottom: 16px; }
+    .bt-stats { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 12px; margin-bottom: 16px; }
     .bt-stat { min-width: 0; padding: 13px 15px; border: 1px solid var(--line); border-left: 4px solid var(--green); border-radius: 14px; background: var(--panel); box-shadow: var(--shadow); }
     .bt-stat.pending { border-left-color: var(--amber); }
     .bt-stat span { display: block; color: var(--muted); font-size: .68rem; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; }
@@ -958,6 +958,8 @@
       .bt-settings { width: 100%; }
       .bt-settings summary { display: list-item; cursor: pointer; color: var(--muted); font-size: .82rem; font-weight: 800; }
       .bt-settings-inner { padding-top: 10px; }
+      /* Collapsed by default on a phone: the filters, sync status and backup note open with Settings. */
+      .bt-settings:not([open]) ~ .bt-filters, .bt-settings:not([open]) ~ .bt-foot { display: none; }
       .bt-spacer { display: none; }
       .bt-filters { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); width: 100%; }
       .bt-filters select { width: 100%; min-width: 0; }
@@ -1217,6 +1219,7 @@
 
     <section id="betsPage" class="bets-page" role="tabpanel" aria-labelledby="tabBets" hidden>
       <div class="bt-stats">
+        <div class="bt-stat today"><span>Today P/L</span><strong id="btToday">$0.00</strong><em id="btTodaySub">no bets today</em></div>
         <div class="bt-stat"><span>Record</span><strong id="btRec">0-0-0</strong><em>W-L-Push</em></div>
         <div class="bt-stat"><span>Profit</span><strong id="btNet">$0.00</strong><em>graded bets</em></div>
         <div class="bt-stat"><span>Units</span><strong id="btUnits">+0.00u</strong><em>at your unit size</em></div>
@@ -1228,7 +1231,7 @@
 
       <div class="card bt-toolbar">
         <details class="bt-settings" id="btSettings">
-          <summary>Settings</summary>
+          <summary>Settings &amp; filters</summary>
           <div class="bt-settings-inner">
             <label><span class="field-label">Unit size ($)</span><input type="number" id="btUnit" min="1" step="1" inputmode="decimal" class="bt-unit"></label>
             <label><span class="field-label">League</span>
@@ -4318,6 +4321,12 @@
         $('btClv').textContent = decided ? Math.round(beat / decided * 100) + '%' : '\u2014';
         tone($('btClv'), decided ? beat / decided - 0.5 : 0);
         $('btClvSub').textContent = clvs.length ? (pts.length ? 'avg ' + fmtClv({ value: Math.round(pts.reduce((s, c) => s + c.value, 0) / pts.length * 10) / 10, unit: 'pts' }) + ' pts \u00b7 ' : '') + clvs.length + ' bet' + (clvs.length === 1 ? '' : 's') : 'no closing lines yet';
+        // Today = bets dated today (your local date). Open bets count as pending, not as $0.
+        const d = new Date(), todayStr = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+        const todays = S.bets.filter(b => b.bet && b.date === todayStr);
+        const tDone = todays.filter(b => b.result), tNet = tDone.reduce((sum, b) => sum + (profit(b) || 0), 0);
+        $('btToday').textContent = money(tNet); tone($('btToday'), tNet);
+        $('btTodaySub').textContent = !todays.length ? 'no bets today' : tDone.length + ' of ' + todays.length + ' graded';
         const pending = S.bets.filter(b => b.bet && !b.result);
         $('btPending').textContent = pending.length;
         $('btPendingRisk').textContent = pending.length ? money(pending.reduce((s, b) => s + (b.risk || 0), 0)) + ' at risk' : 'none open';
