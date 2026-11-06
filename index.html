@@ -920,6 +920,7 @@
     .bt-pl { padding-right: 10px !important; font-weight: 800; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
     .bt-fin { min-width: 150px; padding: 0 8px !important; color: var(--muted); font-size: .76rem; white-space: nowrap; }
     .bt-fin.bad { color: #9a3412; }
+    .bt-sum, .bt-more { display: none; }
     .bt-del { min-width: 34px; min-height: 34px; border: 0; border-radius: 8px; background: none; color: var(--muted); font-size: 1rem; }
     .bt-del:hover { background: rgba(200, 61, 54, .08); color: var(--red); }
 
@@ -967,7 +968,17 @@
       .bt-table { display: block; min-width: 0; }
       .bt-table thead { display: none; }
       .bt-table tbody { display: block; }
-      .bt-table tbody tr { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-areas: "bet bet bet res" "date date book book" "odds risk win units" "pl clv fin fin" "notes notes notes x"; gap: 7px; margin-bottom: 10px; padding: 11px; border: 1px solid var(--line); border-left: 5px solid var(--line); border-radius: 14px; background: var(--panel); box-shadow: var(--shadow); }
+      .bt-table tbody tr { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "bet bet bet res" "sum sum pl more"; gap: 6px 8px; align-items: center; margin-bottom: 8px; padding: 9px 10px; border: 1px solid var(--line); border-left: 5px solid var(--line); border-radius: 14px; background: var(--panel); box-shadow: var(--shadow); }
+      .bt-table tbody tr.open { grid-template-areas: "bet bet bet res" "date date book book" "odds risk win units" "pl clv fin fin" "notes notes more x"; gap: 7px; }
+      .bt-table tbody tr:not(.open) .bt-date, .bt-table tbody tr:not(.open) .bt-book, .bt-table tbody tr:not(.open) .bt-odds, .bt-table tbody tr:not(.open) .bt-risk,
+      .bt-table tbody tr:not(.open) .bt-win, .bt-table tbody tr:not(.open) .bt-units, .bt-table tbody tr:not(.open) .bt-clv, .bt-table tbody tr:not(.open) .bt-fin,
+      .bt-table tbody tr:not(.open) .bt-notes, .bt-table tbody tr:not(.open) .bt-x, .bt-table tbody tr.open .bt-sum { display: none; }
+      .bt-table tbody tr:not(.open) .bt-pl::before, .bt-table tbody tr:not(.open) .bt-res::before { display: none; }
+      .bt-sum { grid-area: sum; color: var(--muted); font-size: .8rem; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .bt-more { grid-area: more; text-align: right; }
+      .bt-morebtn { min-height: 34px; padding: 0 12px; border: 1px solid var(--control-line); border-radius: 9px; background: var(--panel-2); color: var(--text); font-size: .8rem; font-weight: 800; }
+      .bt-table tbody tr:not(.open) .bt-res select { min-height: 36px; }
+      .bt-table tbody tr:not(.open) .bt-bet input { min-height: 36px; }
       .bt-table tbody tr.W { border-left-color: var(--green); }
       .bt-table tbody tr.L { border-left-color: var(--red); }
       .bt-table tbody tr.P { border-left-color: #6b7280; }
@@ -1362,6 +1373,7 @@
           <li><strong>Set up.</strong> Open <strong>Settings</strong> and set your unit size and league (College football or NFL).</li>
           <li><strong>Add a bet.</strong> Tap <strong>+ Add bet</strong>. A new bet copies the last bet's date and book, uses -110 odds, and wins exactly 1 unit. Change any of it.</li>
           <li><strong>Type the bet.</strong> Use <em>Team +3.5</em> for a spread, <em>Team ML</em> for a moneyline, or <em>Team Over 55.5</em> for a total (either team in the game).</li>
+          <li><strong>On a phone,</strong> each bet is a compact card with the bet, its result, and profit or loss. Tap <strong>Details</strong> to edit the date, odds, amounts, book, and notes (or delete the bet), then <strong>Done</strong>.</li>
           <li><strong>Grade.</strong> After the games, tap <strong>Auto-grade</strong>. Results come from final scores. You can also pick the Result yourself.</li>
           <li><strong>Review.</strong> The stats at the top and the summary below your bets show your record, profit, units, ROI, a profit chart, and records by week, book, and bet type.</li>
           <li><strong>Bring bets in or out.</strong> Under <strong>Data</strong>: Import pastes rows from Google Sheets or loads a CSV or backup file, Export CSV opens in Sheets or Excel, and the full backup saves everything.</li>
@@ -4159,6 +4171,7 @@
 
       // ---------- rows ----------
       const body = $('btBody');
+      const openRows = new Set(); // bets whose phone card is expanded for editing
       const rowEl = id => body.querySelector('tr[data-id="' + id + '"]');
       function rowHTML(b, i) {
         const cell = (cls, label, inner) => '<td class="' + cls + '"' + (label ? ' data-label="' + label + '"' : '') + '>' + inner + '</td>';
@@ -4176,6 +4189,8 @@
           cell('bt-clv', 'Close \u00b7 CLV', '') +
           cell('bt-fin', 'Final score', '') +
           cell('bt-notes', 'Notes', '<input class="notes" data-f="notes" aria-label="Notes" value="' + esc(b.notes) + '" autocomplete="off">') +
+          cell('bt-sum', '', '') +
+          cell('bt-more', '', '<button type="button" class="bt-morebtn" data-more aria-expanded="false">Details</button>') +
           cell('bt-x', '', '<button type="button" class="bt-del" data-del aria-label="Delete bet ' + esc(b.bet || '') + '">\u2715</button>') +
           '</tr>';
       }
@@ -4188,7 +4203,11 @@
         setVal(tr, 'win', fmt2(b.win));
         setVal(tr, 'units', b.risk > 0 && unit > 0 ? (b.risk / unit).toFixed(2) : '');
         setVal(tr, 'result', b.result || '');
-        tr.className = b.result || '';
+        const isOpen = openRows.has(b.id);
+        tr.className = (b.result || '') + (isOpen ? ' open' : '');
+        const moreBtn = tr.querySelector('[data-more]');
+        moreBtn.textContent = isOpen ? 'Done' : 'Details';
+        moreBtn.setAttribute('aria-expanded', String(isOpen));
         const p = profit(b), pl = tr.querySelector('.bt-pl');
         pl.textContent = p == null ? '' : money(p);
         pl.className = 'bt-pl' + (p > 0 ? ' pos' : p < 0 ? ' neg' : '');
@@ -4202,6 +4221,12 @@
         const fin = tr.querySelector('.bt-fin');
         fin.textContent = b.final || '';
         fin.className = 'bt-fin' + ((b.final || '').startsWith('!') ? ' bad' : '');
+        // One line for the collapsed phone card: date \u00b7 odds \u00b7 risk to win \u00b7 book
+        const bits = [];
+        if (b.date) { const d = new Date(b.date + 'T12:00:00'); bits.push(isNaN(d) ? b.date : d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })); }
+        if (b.odds != null && isOdds(b.odds)) bits.push(fmtOdds(b.odds));
+        if (b.risk > 0) bits.push('$' + fmt2(b.risk));
+        tr.querySelector('.bt-sum').textContent = bits.join(' \u00b7 ');
       }
       function renderAll() {
         reindex();
@@ -4566,6 +4591,13 @@
       // ---------- wiring ----------
       body.addEventListener('change', onChange);
       body.addEventListener('click', e => {
+        const more = e.target.closest('[data-more]');
+        if (more) {
+          const tr = more.closest('tr'), b = IDX.get(tr.dataset.id);
+          if (openRows.has(tr.dataset.id)) openRows.delete(tr.dataset.id); else openRows.add(tr.dataset.id);
+          if (b) refreshRow(tr, b);
+          return;
+        }
         const del = e.target.closest('[data-del]');
         if (!del) return;
         const tr = del.closest('tr'), i = S.bets.findIndex(x => x.id === tr.dataset.id);
@@ -4587,6 +4619,7 @@
         S.bets.push(b); IDX.set(b.id, b);
         $('btEmpty').hidden = true;
         body.insertAdjacentHTML($('btSort').value === 'new' ? 'afterbegin' : 'beforeend', rowHTML(b, S.bets.length - 1));
+        openRows.add(b.id);
         const tr = rowEl(b.id);
         refreshRow(tr, b);
         if ($('btFilterResult').value && $('btFilterResult').value !== 'pending') $('btFilterResult').value = '';

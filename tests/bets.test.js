@@ -345,3 +345,20 @@ test('a hand-graded bet still picks up its closing line', async t => {
   assert.equal(clvText(app, 'Temple +6.5'), '+4.5 +2.0');
   assert.match(app.$('#btMsgText').textContent, /Nothing to grade/);
 });
+
+test('phone cards: each bet starts collapsed, Details opens it for editing, and a new bet starts open', async t => {
+  const { openApp, wait } = require('./helpers');
+  const app = openApp({ bets: { bets: [{ id: 'b1', date: '2026-10-10', bet: 'Alabama -6.5', odds: -110, risk: 110, win: 100, book: '', result: '', notes: '', updatedAt: 1 }], deleted: {}, settings: { unit: 55 } } });
+  t.after(app.close);
+  await wait(30);
+  const tr = () => app.$('#btBody tr');
+  assert.ok(!tr().classList.contains('open'));
+  assert.equal(tr().querySelector('.bt-sum').textContent, 'Oct 10 · -110 · $110.00');
+  tr().querySelector('[data-more]').click();
+  assert.ok(tr().classList.contains('open'));
+  assert.equal(tr().querySelector('[data-more]').textContent, 'Done');
+  tr().querySelector('[data-more]').click();
+  assert.ok(!tr().classList.contains('open'));
+  app.$('#btAddBtn').click();
+  assert.ok(app.$$('#btBody tr').some(r => r.classList.contains('open')));
+});
