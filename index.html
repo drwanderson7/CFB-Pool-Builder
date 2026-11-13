@@ -921,6 +921,30 @@
     .bt-fin { min-width: 150px; padding: 0 8px !important; color: var(--muted); font-size: .76rem; white-space: nowrap; }
     .bt-fin.bad { color: #9a3412; }
     .bt-sum, .bt-more { display: none; }
+    .bt-legs-btn { display: inline-flex; align-items: center; gap: 6px; margin: 3px 0 2px 8px; padding: 2px 9px; border: 1px solid var(--control-line); border-radius: 999px; background: var(--panel-2); color: var(--text); font-size: .72rem; font-weight: 800; white-space: nowrap; cursor: pointer; }
+    .bt-legs-btn:hover { background: var(--panel-3); }
+    .bt-legdots { display: inline-flex; gap: 3px; }
+    .bt-legdots i { width: 8px; height: 8px; border-radius: 50%; background: #d1d5db; }
+    .bt-legdots i.W { background: var(--green); } .bt-legdots i.L { background: var(--red); } .bt-legdots i.P { background: #6b7280; }
+    .bt-legs-card { max-width: 680px; }
+    .bt-legs-settings { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 6px 0 12px; }
+    .bt-legs-settings label { display: flex; flex-direction: column; }
+    .bt-legs-settings select, .bt-legs-settings input { width: 100%; }
+    .bt-legs-list { display: grid; gap: 8px; }
+    .bt-leg { display: grid; grid-template-columns: 22px minmax(0, 1fr) 88px 34px; grid-template-areas: "n bet res x" "sub sub sub sub"; gap: 6px; align-items: center; padding: 8px; border: 1px solid var(--line); border-left: 4px solid var(--line); border-radius: 10px; background: var(--panel); }
+    .bt-leg.W { border-left-color: var(--green); } .bt-leg.L { border-left-color: var(--red); } .bt-leg.P { border-left-color: #6b7280; }
+    .bt-leg-n { color: var(--muted); font-size: .78rem; font-weight: 800; text-align: center; }
+    .bt-leg.has-odds { grid-template-columns: 22px minmax(0, 1fr) 84px 88px 34px; grid-template-areas: "n bet odds res x" "sub sub sub sub sub"; }
+    .bt-leg-n { grid-area: n; } .bt-leg [data-lf="bet"] { grid-area: bet; } .bt-leg [data-lf="odds"] { grid-area: odds; } .bt-leg [data-lf="result"] { grid-area: res; } .bt-leg [data-lrm] { grid-area: x; }
+    .bt-leg input, .bt-leg select { width: 100%; min-width: 0; min-height: 38px; padding: 6px 10px; border: 1px solid var(--control-line); border-radius: 8px; background: #ffffff; color: var(--text); font: inherit; }
+    .bt-leg input.num { text-align: right; }
+    .bt-leg-sub { grid-area: sub; padding-left: 28px; display: flex; flex-wrap: wrap; gap: 4px 12px; color: var(--muted); font-size: .76rem; }
+    .bt-leg-sub:empty { display: none; }
+    .bt-leg-sub .bad { color: #9a3412; }
+    .bt-legs-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 10px; }
+    .bt-legs-foot .helper { flex: 1; min-width: 180px; margin: 0; }
+    .bt-legs-paid { display: flex; flex-direction: column; max-width: 220px; margin-top: 10px; }
+    .bt-legs-paid[hidden], #btLegsPtsWrap[hidden], #btLegsUsePrice[hidden] { display: none; }
     .bt-del { min-width: 34px; min-height: 34px; border: 0; border-radius: 8px; background: none; color: var(--muted); font-size: 1rem; }
     .bt-del:hover { background: rgba(200, 61, 54, .08); color: var(--red); }
 
@@ -963,7 +987,11 @@
       .bt-spacer { display: none; }
       .bt-filters { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); width: 100%; }
       .bt-filters select { width: 100%; min-width: 0; }
-      .bt-actions { display: grid; grid-template-columns: 1fr 1fr 1fr; width: 100%; }
+      .bt-actions { display: grid; grid-template-columns: 1fr 1fr; width: 100%; }
+      .bt-legs-btn { margin-left: 0; }
+      .bt-leg { grid-template-columns: 22px minmax(0, 1fr) 80px 34px; }
+      .bt-leg.has-odds { grid-template-columns: 22px minmax(0, 1fr) 80px 34px; grid-template-areas: "n bet bet bet" ". odds res x" "sub sub sub sub"; }
+      .bt-leg input, .bt-leg select { font-size: 16px; }
       .bt-actions .btn, .bt-menu .btn { width: 100%; padding: 0 6px; font-size: .9rem; white-space: nowrap; }
       .bt-menu-pop { left: auto; right: 0; }
       .bt-tablecard { max-height: none; overflow: visible; border: 0; background: transparent; box-shadow: none; }
@@ -1043,6 +1071,17 @@
     .line-move.worse { border: 1px solid var(--amber-line); background: var(--amber-soft); color: #7a4d00; }
     .line-move.better { border: 1px solid rgba(19, 122, 69, .35); background: var(--green-soft); color: var(--green-2); }
     .team-name-wrap .line-move { margin-left: 2px; }
+    .line-move.even { border: 1px solid var(--line); background: var(--panel-2); color: var(--muted); }
+    .line-move.key.better { box-shadow: 0 0 0 2px rgba(19, 122, 69, .18); }
+    .line-extras { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin-top: 3px; }
+    .line-ctx { color: var(--muted); font-size: .74rem; font-weight: 600; }
+    .same-game { display: inline-flex; padding: 1px 7px; border: 1px solid rgba(220, 38, 38, .35); border-radius: 999px; background: rgba(220, 38, 38, .07); color: #b91c1c; font-size: .68rem; font-weight: 800; white-space: nowrap; }
+    .pick-sub .same-game { margin-left: 4px; }
+    .same-game.soft { border-color: var(--line); background: var(--panel-2); color: var(--muted); font-weight: 700; }
+    .tier-hint { min-height: 24px; padding: 0 9px; border: 1px dashed var(--control-line); border-radius: 999px; background: var(--panel); color: var(--text); font-size: .7rem; font-weight: 800; cursor: pointer; }
+    .tier-hint:hover { border-style: solid; background: var(--panel-2); }
+    .team-record { flex: none; align-self: center; margin-left: 6px; padding: 1px 7px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel-2); color: var(--muted); font-size: .68rem; font-weight: 800; white-space: nowrap; }
+    .type-chip { display: inline-flex; padding: 3px 9px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel-2); font-size: .78rem; font-weight: 700; }
 
     /* ---------- Slimmer header ---------- */
     .topbar { align-items: center; gap: 16px; margin-bottom: 14px; }
@@ -1154,6 +1193,13 @@
             <span class="field-label">Entries</span>
             <select id="entriesSelect" aria-label="Number of entries"></select>
           </label>
+          <label>
+            <span class="field-label">Lines</span>
+            <select id="linesSelect" aria-label="Where this pool's lines come from">
+              <option value="pool">Pool posts its own</option>
+              <option value="market">Market (update to current)</option>
+            </select>
+          </label>
           <label class="spread-field hidden" id="spreadField">
             <span class="field-label">Most entries for a non-shared team</span>
             <select id="spreadSelect" aria-label="Most entries a team that is not in every entry can be in"></select>
@@ -1189,7 +1235,7 @@
             <p class="helper">Set each team's tier (Lock, Strong, Lean, Meh) to control who gets the shared slots first. Tap S1, S2, or the lock to place a team. Full details are in Help at the top.</p>
             <button type="button" class="expand-all" id="expandAllBtn">Expand all</button>
           </div>
-          <div class="candidate-tools"><button class="btn line-check-btn" id="checkLinesBtn" type="button" disabled title="Compare your spreads with the current lines">Check lines</button><span class="badge" id="candidateBadge">0 teams</span></div>
+          <div class="candidate-tools"><button class="btn line-check-btn hidden" id="sortEdgeBtn" type="button" title="Put the biggest edge first within each tier">Sort by edge</button><button class="btn line-check-btn" id="checkLinesBtn" type="button" disabled title="Compare your spreads with the current lines">Check lines</button><span class="badge" id="candidateBadge">0 teams</span></div>
         </div>
         <div class="candidate-columns" id="candidateColumns" aria-hidden="true"><span>Team</span><span>Min</span><span>Max</span><span>Place</span><span>Tier</span></div>
         <div class="candidate-list" id="candidateList"></div>
@@ -1242,13 +1288,14 @@
         <div class="bt-spacer"></div>
         <div class="bt-filters">
           <label><span class="field-label">Show</span>
-            <select id="btFilterResult"><option value="">All bets</option><option value="pending">Pending</option><option value="W">Wins</option><option value="L">Losses</option><option value="P">Pushes</option></select></label>
+            <select id="btFilterResult"><option value="">All bets</option><option value="pending">Pending</option><option value="W">Wins</option><option value="L">Losses</option><option value="P">Pushes</option><option value="multi">Parlays &amp; teasers</option></select></label>
           <label><span class="field-label">Book</span><select id="btFilterBook"><option value="">All books</option></select></label>
           <label><span class="field-label">Sort</span>
             <select id="btSort"><option value="new">Newest</option><option value="old">Oldest</option><option value="entry">Entry order</option></select></label>
         </div>
         <div class="bt-actions">
           <button class="btn primary" id="btAddBtn" type="button">+ Add bet</button>
+          <button class="btn" id="btAddMultiBtn" type="button">+ Parlay / teaser</button>
           <button class="btn" id="btGradeBtn" type="button">Auto-grade</button>
           <div class="bt-menu">
             <button class="btn" id="btDataBtn" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="btDataMenu">Data &#9662;</button>
@@ -1290,6 +1337,33 @@
       </div>
     </section>
 
+    <div class="modal-overlay hidden" id="btLegsOverlay" role="dialog" aria-modal="true" aria-labelledby="btLegsTitle">
+      <div class="card modal-card bt-legs-card">
+        <div class="modal-head">
+          <h2 id="btLegsTitle">Legs</h2>
+          <button class="btn" id="btLegsClose" type="button" aria-label="Close">✕</button>
+        </div>
+        <div class="bt-legs-settings">
+          <label><span class="field-label">Type</span>
+            <select id="btLegsKind"><option value="parlay">Parlay</option><option value="teaser">Teaser</option></select></label>
+          <label id="btLegsPtsWrap"><span class="field-label">Teaser points</span>
+            <input type="number" id="btLegsPts" min="0.5" max="20" step="0.5" inputmode="decimal"></label>
+          <label><span class="field-label">If a leg pushes</span>
+            <select id="btLegsPush"><option value="drop">Leg drops, rest stands</option><option value="lose">Bet loses</option></select></label>
+        </div>
+        <div id="btLegsList" class="bt-legs-list"></div>
+        <div class="bt-legs-foot">
+          <button class="btn" id="btLegsAdd" type="button">+ Add leg</button>
+          <span id="btLegsPrice" class="helper"></span>
+          <button class="btn" id="btLegsUsePrice" type="button">Use this price</button>
+        </div>
+        <label id="btLegsPaidWrap" class="bt-legs-paid"><span class="field-label">Paid ($) after the push</span>
+          <input type="text" id="btLegsPaid" inputmode="decimal" autocomplete="off"></label>
+        <p class="helper" id="btLegsNote"></p>
+        <div class="modal-actions"><button class="btn primary" id="btLegsDone" type="button">Done</button></div>
+      </div>
+    </div>
+
     <div class="modal-overlay hidden" id="btImportOverlay" role="dialog" aria-modal="true" aria-labelledby="btImportTitle">
       <div class="card modal-card">
         <div class="modal-head">
@@ -1324,7 +1398,8 @@
           <li><strong>Optional: fine-tune.</strong> Use Min and Max to limit how many entries a team can be in. Use S1, S2, or the lock to force a team into Entry 1, Entry 2, or both. On a phone these settings are tucked behind each team's <strong>Edit</strong> button.</li>
           <li><strong>Build.</strong> Tap <strong>Build 2 entries</strong>. Tap <strong>Another valid build</strong> for a different arrangement.</li>
           <li><strong>Adjust.</strong> On any pick, <strong>Move to</strong> sends it to the other entry and <strong>Unlock</strong> releases a locked pick. <strong>Undo</strong> reverses your last change.</li>
-          <li><strong>Submit and record.</strong> Tap <strong>Check lines</strong> (top of section 3) to see whether any spread has moved since you entered it, then tap <strong>Copy entry</strong> under each entry to copy its list, then tap <strong>Save this week</strong>.</li>
+          <li><strong>Find the value.</strong> Tap <strong>Check lines</strong> (top of section 3). For a pool that posts its own lines, each team shows its edge: how many points better or worse the pool's number is than the market. Tap <strong>Sort by edge</strong> to put the best numbers first in each tier, and tap a <strong>Try Strong</strong> / <strong>Try Meh</strong> hint if you agree with it.</li>
+          <li><strong>Submit and record.</strong> Tap <strong>Copy entry</strong> under each entry to copy its list, then tap <strong>Save this week</strong>.</li>
           <li><strong>Grade it.</strong> After the games, open <strong>Saved weeks</strong> and tap <strong>Auto-grade from scores</strong>. It fills in W, L, or Push for every pick with a spread. You can also tap the dash beside a pick to grade it yourself. For weeks you didn't save here, tap <strong>Add a past week</strong> and enter the records by hand.</li>
           <li><strong>Next week.</strong> Tap <strong>Start new week</strong> in section 1. Your overlap setting and saved weeks are kept.</li>
         </ol>
@@ -1335,7 +1410,7 @@
           <li>Each pick shows its spread as a chip: dark for favorites, light for underdogs. Each entry header shows the mix, like "5 dogs · 2 favs".</li>
           <li>A <strong>Benched</strong> list under the entries with every team left out of both, color-coded by tier.</li>
           <li><strong>Copy entry</strong> gives a numbered list in on-screen order, using your original team names.</li>
-          <li><strong>Saved weeks</strong> keeps each build you save, with your record per entry, your season record, and your record by tier.</li>
+          <li><strong>Saved weeks</strong> keeps each build you save, with your record per entry, your season record, your record by tier, and your record by pick type (favorites, underdogs, and spread size).</li>
         </ul>
 
         <h3 class="help-h">Key features</h3>
@@ -1356,8 +1431,18 @@
           <dd>Each pool is separate: its own picks per entry, number of entries, teams, tiers, build, saved weeks, and season record. Switching pools never mixes them. The pools you add, rename, or delete follow you to your other device. Delete pool removes a pool and its records everywhere, after you confirm.</dd>
           <dt>Remove a pick (&#10005;)</dt>
           <dd>The &#10005; on the right of a pick card takes that team out of this build. Its slot is refilled from your other teams, and your other picks stay put wherever the rules allow. The team stays in your list with Max set to 0 and shows on the Benched list as "Max 0 &middot; put back"; tap it there to make it pickable again, or tap Undo.</dd>
-          <dt>Line check</dt>
-          <dd>Check lines compares each team's spread with the line ESPN lists now (games in the next 7 days). A moved line gets a badge on the team and its pick: green &#9650; means the number is better for your side now, amber &#9660; means worse. Use current lines in the message updates the spreads and keeps everything else; Undo reverses it. It also runs quietly when teams load.</dd>
+          <dt>Lines (step 2)</dt>
+          <dd>Tells the tool where this pool's numbers come from. <strong>Pool posts its own</strong> (the default): the spreads you paste are fixed, and Check lines shows your edge against the market. <strong>Market</strong>: Check lines flags spreads that moved and offers to update them. Each pool keeps its own setting.</dd>
+          <dt>Edge vs market</dt>
+          <dd>Pool number minus the market's, from your team's side. Pool Texas +7 with the market at +4.5 is a +2.5 edge (green &#9650;); pool USC -9.5 with the market at -8 is -1.5 (amber &#9660;). "Gets 3" or "gets 7" means the edge covers a key number, the margins games land on most, so it's worth more than its size; "loses 3" means the pool's number gives one up. Check lines uses ESPN's line for games in the next 7 days and runs quietly when teams load; the message lists every edge, best first.</dd>
+          <dt>Sort by edge and tier hints</dt>
+          <dd><strong>Sort by edge</strong> reorders teams within each tier, best edge first (teams without a line keep their order after them). A team with a big edge (2.5 points or more, counting each key number as a point) in Lean or Meh shows <strong>Try Strong</strong>; one with a big negative edge in Lean or higher shows <strong>Try Meh</strong>. Hints never change anything until you tap one, and Undo reverses it.</dd>
+          <dt>Game, same-game guard, and your record</dt>
+          <dd>Once lines are checked, each team shows its opponent and kickoff ("@" means away). If both sides of a game are on your list, each shows "Other side". Builds keep both sides of one game out of the same entry, since at most one can cover; if your locks or Min/Max force it, the build message and the pick cards warn you. "You 2-1" next to a team is your graded record on that team in this pool's saved weeks.</dd>
+          <dt>Market-line pools</dt>
+          <dd>With Lines set to Market, a moved line gets a badge on the team and its pick: green &#9650; means the number is better for your side now, amber &#9660; means worse. Use current lines in the message updates the spreads and keeps everything else; Undo reverses it.</dd>
+          <dt>Keyboard (laptop)</dt>
+          <dd>Ctrl/Cmd+Enter builds the entries (or makes another valid build). Ctrl/Cmd+S saves this week. Ctrl/Cmd+Z undoes.</dd>
           <dt>Hide setup</dt>
           <dd>Once your teams are loaded, Hide setup (top right of section 1) folds sections 1 and 2 into one line next to the page tabs. Tap Edit teams &amp; overlap to open them again. It reopens on its own when you start a new week.</dd>
           <dt>Undo</dt>
@@ -1376,6 +1461,7 @@
           <li><strong>Set up.</strong> Open <strong>Settings</strong> and set your unit size and league (College football or NFL).</li>
           <li><strong>Add a bet.</strong> Tap <strong>+ Add bet</strong>. A new bet copies the last bet's date and book, uses -110 odds, and wins exactly 1 unit. Change any of it.</li>
           <li><strong>Type the bet.</strong> Use <em>Team +3.5</em> for a spread, <em>Team ML</em> for a moneyline, or <em>Team Over 55.5</em> for a total (either team in the game).</li>
+          <li><strong>Parlay or teaser?</strong> Tap <strong>+ Parlay / teaser</strong>. Pick the type (for a teaser, its points; 6 to start), what happens if a leg pushes, and type each leg the same way as a single bet. Enter the price in the Odds column; for a parlay, <strong>Use this price</strong> fills it in from the legs' odds. Tap the bet's legs chip (for example "Parlay &middot; 3 legs") to open them again.</li>
           <li><strong>On a phone,</strong> each bet is a compact card with the bet, its result, and profit or loss. Tap <strong>Details</strong> to edit the date, odds, amounts, book, and notes (or delete the bet), then <strong>Done</strong>.</li>
           <li><strong>Grade.</strong> After the games, tap <strong>Auto-grade</strong>. Results come from final scores. You can also pick the Result yourself.</li>
           <li><strong>Review.</strong> The stats at the top and the summary below your bets show your record, profit, units, ROI, a profit chart, and records by week, book, and bet type.</li>
@@ -1392,6 +1478,8 @@
           <dd>Green is a win, red a loss, gray a push. No bar means it's still pending.</dd>
           <dt>Close and CLV</dt>
           <dd>Close is the last line the tracker saw before kickoff; until kickoff it shows the current line as <em>now</em>. CLV (closing line value) is how much better your number was: betting +6.5 when it closed +4.5 is +2.0. Totals work the same way, and moneylines show the difference in win chance. Beating the close regularly is a strong sign of good betting, even over a small sample. Open the tracker on game day for the most accurate close.</dd>
+          <dt>Parlays and teasers</dt>
+          <dd>Auto-grade grades each leg from its final score; a teaser grades each leg at the teased number (Texas -3 in a 6-pt teaser is graded as Texas +3; totals move 6 points your way). Any losing leg loses the bet right away. When a leg pushes: <strong>Leg drops</strong> pays on the remaining legs (a parlay at those legs' odds, a teaser left with one leg as a straight bet at -110; a bigger teaser asks you to enter what you were paid, since books price it differently), and <strong>Bet loses</strong> grades it a loss. The dots on the chip show each leg: green won, red lost, gray pushed. Parlays and teasers get their own rows in the by-type summary, and Show &rarr; Parlays &amp; teasers lists just them. A result you set on the row by hand is kept.</dd>
           <dt>Sync and backups</dt>
           <dd>Bets save in this browser and sync between your devices automatically. The line under the buttons shows sync status (tap it to sync now). A full backup is still a good idea now and then.</dd>
         </dl>
@@ -1682,7 +1770,11 @@
         if (!hits.length) return { p, err: 'game not found' };
         return { p, games: hits.map(found => {
           const status = (found.ev.status && found.ev.status.type) || {};
-          return { state: status.state || (status.completed ? 'post' : 'pre'), kickoff: found.ev.date || '', market: marketFor(found) };
+          const oppTeam = (found.opp && found.opp.team) || {};
+          const names = [found.me.team || {}, oppTeam].map(t => t.abbreviation || t.shortDisplayName || t.location || '').sort().join('|');
+          return { state: status.state || (status.completed ? 'post' : 'pre'), kickoff: found.ev.date || '', market: marketFor(found),
+            gameKey: String(found.ev.id || ((found.ev.date || '') + '|' + names)),
+            opp: oppTeam.shortDisplayName || oppTeam.location || oppTeam.displayName || '', home: found.me.homeAway === 'home' };
         }) };
       }
 
@@ -1757,14 +1849,14 @@
         pastCheck: $('#pastCheck'), pastError: $('#pastError'), pastHelp: $('#pastHelp'), pastSave: $('#pastSaveBtn'), pastCancel: $('#pastCancelBtn'),
         autoGrade: $('#autoGradeBtn'), autoGradeNote: $('#autoGradeNote'),
         setupSection: $('#setupSection'), setupSummary: $('#setupSummary'), setupSummaryText: $('#setupSummaryText'),
-        setupHide: $('#setupHideBtn'), setupShow: $('#setupShowBtn'), checkLines: $('#checkLinesBtn')
+        setupHide: $('#setupHideBtn'), setupShow: $('#setupShowBtn'), checkLines: $('#checkLinesBtn'), sortEdge: $('#sortEdgeBtn'), linesSelect: $('#linesSelect')
       };
 
       // The pool being worked on. picks = picks per entry, entries = how many entries, overlap = how many
       // teams are in EVERY entry, spread = the most entries a team outside that shared group can be in.
       const MAX_PICKS = 15, MAX_ENTRIES = 6;
       function newPool(over) {
-        return Object.assign({ id: 'main', name: 'Pick 7', picks: 7, entries: 2, spread: 1, overlap: 3, teams: [], result: null, history: [] }, over || {});
+        return Object.assign({ id: 'main', name: 'Pick 7', picks: 7, entries: 2, spread: 1, lines: 'pool', overlap: 3, teams: [], result: null, history: [] }, over || {});
       }
       // Every pool lives in store.pools; `state` is always one of them (the pool on screen), so all the
       // builder code works on "the current pool" without knowing there are others.
@@ -1818,7 +1910,7 @@
       let applyingUndo = false;
 
       function setupSnapshot() {
-        return JSON.stringify({ teams: state.teams, overlap: state.overlap, result: state.result, picks: state.picks, entries: state.entries, spread: state.spread });
+        return JSON.stringify({ teams: state.teams, overlap: state.overlap, result: state.result, picks: state.picks, entries: state.entries, spread: state.spread, lines: state.lines });
       }
       function resetUndoBaseline() {
         lastSetupJSON = setupSnapshot();
@@ -1838,6 +1930,7 @@
         state.picks = snap.picks || 7;
         state.entries = snap.entries || 2;
         state.spread = snap.spread || (state.entries - 1);
+        state.lines = snap.lines === 'market' ? 'market' : 'pool';
         applyingUndo = true;
         save();
         applyingUndo = false;
@@ -1915,8 +2008,8 @@
         pushTimer = setTimeout(pushToServer, 600);
       }
 
-      const setupOf = (p) => ({ name: p.name, picks: p.picks, entries: p.entries, spread: p.spread, teams: p.teams, overlap: p.overlap, result: p.result });
-      const poolPayload = (p) => ({ id: p.id, name: p.name, picks: p.picks, entries: p.entries, spread: p.spread, overlap: p.overlap, teams: p.teams, result: p.result, history: p.history });
+      const setupOf = (p) => ({ name: p.name, picks: p.picks, entries: p.entries, spread: p.spread, lines: p.lines, teams: p.teams, overlap: p.overlap, result: p.result });
+      const poolPayload = (p) => ({ id: p.id, name: p.name, picks: p.picks, entries: p.entries, spread: p.spread, lines: p.lines, overlap: p.overlap, teams: p.teams, result: p.result, history: p.history });
       // What is stored and synced: every pool, plus (at the top level, in the old single-pool shape) the
       // first pool, so a device still on an older version keeps working and the sync route's check passes.
       function storePayload(pools, deleted) {
@@ -2117,7 +2210,8 @@
         const result = r && typeof r === 'object' && Array.from({ length: entries }, (_, i) => Array.isArray(r[i + 1])).every(Boolean) && r[entries + 1] === undefined ? r : null;
         const name = typeof saved.name === 'string' && saved.name.trim() ? saved.name.trim().slice(0, 40) : 'Pick ' + picks;
         const history = sanitizeHistory(saved.history);
-        return { id: String(saved.id || 'main'), name, picks, entries, spread, teams, overlap, result, history };
+        const lines = saved.lines === 'market' ? 'market' : 'pool';
+        return { id: String(saved.id || 'main'), name, picks, entries, spread, lines, teams, overlap, result, history };
       }
 
       // Copies a sanitized pool's setup (not its saved weeks) onto a pool (the one on screen by default).
@@ -2127,6 +2221,7 @@
         pool.picks = sanitized.picks;
         pool.entries = sanitized.entries;
         pool.spread = sanitized.spread;
+        pool.lines = sanitized.lines;
         pool.teams = sanitized.teams;
         pool.overlap = sanitized.overlap;
         pool.result = sanitized.result;
@@ -2293,6 +2388,7 @@
         fillSelect(els.entriesSelect, Array.from({ length: MAX_ENTRIES - 1 }, (_, i) => ({ value: i + 2, label: String(i + 2) })), N);
         fillSelect(els.overlap, Array.from({ length: K + 1 }, (_, i) => ({ value: i, label: i + (i === 1 ? ' pick' : ' picks') })), state.overlap);
         els.spreadField.classList.toggle('hidden', N < 3);
+        els.linesSelect.value = state.lines === 'market' ? 'market' : 'pool';
         fillSelect(els.spreadSelect, Array.from({ length: N - 1 }, (_, i) => ({ value: i + 1, label: i + 1 + (i === 0 ? ' entry' : ' entries') })), spreadCap());
         els.overlapValue.textContent = state.overlap;
         els.overlapUnit.textContent = N === 2 ? 'shared picks' : 'in every entry';
@@ -2461,7 +2557,29 @@
         return parts.join(' \u00b7 ');
       }
 
+      // Your graded record on each team in this pool's saved builds, by team name (spread ignored).
+      function teamRecords() {
+        const map = new Map();
+        state.history.forEach(week => {
+          if (week.manual || !week.lineups) return;
+          Array.from(new Set(week.lineups.flat())).forEach(name => {
+            const g = week.results && week.results[name];
+            if (!g) return;
+            const key = splitSpread(name).team.trim().toLowerCase();
+            if (!map.has(key)) map.set(key, newTally());
+            map.get(key)[g]++;
+          });
+        });
+        return map;
+      }
+      function recordChip(records, name) {
+        const t = records.get(splitSpread(name).team.trim().toLowerCase());
+        if (!t || !tallyTotal(t)) return '';
+        return '<span class="team-record" title="Your graded picks on ' + escapeHtml(splitSpread(name).team) + ' in this pool\u2019s saved weeks (W-L' + (t.P ? '-Push' : '') + ')">You ' + recordText(t) + '</span>';
+      }
+
       function renderCandidates() {
+        const records = teamRecords();
         els.candidateEmpty.classList.toggle('hidden', state.teams.length > 0);
         els.candidateBadge.textContent = state.teams.length + (state.teams.length === 1 ? ' team' : ' teams');
         // Grouped by tier with a divider between groups, so the list reads the same way the
@@ -2480,7 +2598,7 @@
               '<div class="team-row' + (expanded ? ' expanded' : '') + '" draggable="true" data-team-id="' + escapeHtml(team.id) + '" data-source-entry="0" data-tier="' + team.tier + '">' +
                 '<div class="team-name-wrap">' +
                   '<div class="team-top-row">' +
-                    '<div class="team-name" title="' + escapeHtml(team.name) + '">' + nameHtml(team.name) + '</div>' +
+                    '<div class="team-name" title="' + escapeHtml(team.name) + '">' + nameHtml(team.name) + '</div>' + recordChip(records, team.name) +
                     '<div class="rank-arrows">' +
                       '<button type="button" class="rank-btn" data-dir="up" data-team-id="' + escapeHtml(team.id) + '"' + (i === 0 ? ' disabled' : '') + ' aria-label="Move ' + escapeHtml(team.name) + ' earlier within its tier" title="Move up within tier">▲</button>' +
                       '<button type="button" class="rank-btn" data-dir="down" data-team-id="' + escapeHtml(team.id) + '"' + (i === group.length - 1 ? ' disabled' : '') + ' aria-label="Move ' + escapeHtml(team.name) + ' later within its tier" title="Move down within tier">▼</button>' +
@@ -2754,6 +2872,7 @@
         const levelTotals = new Map();
         const all = newTally();
         const byTier = [0, 1, 2, 3].map(newTally);
+        const byType = { Favorites: newTally(), Underdogs: newTally(), 'Spread 3 or less': newTally(), 'Spread 3.5\u20137': newTally(), 'Spread 7.5\u201314': newTally(), 'Spread 14.5+': newTally() };
         let weeks = 0, handEntered = 0;
         state.history.forEach(week => {
           const stats = weekStats(week);
@@ -2770,11 +2889,19 @@
           Array.from(new Set(week.lineups.flat())).forEach(name => {
             const g = week.results[name];
             if (g && week.tiers && week.tiers[name] !== undefined) byTier[week.tiers[name]][g]++;
+            const sp = splitSpread(name);
+            if (g && sp.line && sp.kind !== 'pk') {
+              const n = Math.abs(parseFloat(sp.line));
+              byType[sp.kind === 'fav' ? 'Favorites' : 'Underdogs'][g]++;
+              byType[n <= 3 ? 'Spread 3 or less' : n <= 7 ? 'Spread 3.5\u20137' : n <= 14 ? 'Spread 7.5\u201314' : 'Spread 14.5+'][g]++;
+            }
           });
         });
         if (!weeks) { els.historySummary.innerHTML = ''; return; }
         const tierChips = byTier.map((t, i) => tallyTotal(t)
           ? '<span class="tier-chip tier-' + i + '">' + TIER_LABELS[i] + ' ' + recordText(t) + ' \u00b7 ' + winPct(t) + '</span>' : '').join('');
+        const typeChips = Object.keys(byType).map(label => tallyTotal(byType[label])
+          ? '<span class="type-chip">' + label + ' ' + recordText(byType[label]) + ' \u00b7 ' + winPct(byType[label]) + '</span>' : '').join('');
         const cell = (label, t) => '<div><span>' + label + '</span><strong>' + recordText(t) + '</strong><em>' + winPct(t) + '</em></div>';
         const levels = Array.from(levelTotals.values()).sort((a, b) => a.n - b.n || b.k - a.k);
         els.historySummary.innerHTML =
@@ -2785,6 +2912,7 @@
               '<div><span>Weeks</span><strong>' + weeks + '</strong></div>' +
             '</div>' +
             (tierChips ? '<div class="summary-tiers"><span>By tier' + (handEntered ? ' (saved builds only)' : '') + '</span>' + tierChips + '</div>' : '') +
+            (typeChips ? '<div class="summary-tiers summary-types"><span>By pick type</span>' + typeChips + '</div>' : '') +
           '</div>';
       }
 
@@ -3037,17 +3165,150 @@
       const fmtLine = n => n === 0 ? 'PK' : (n > 0 ? '+' : '') + n;
       function movedLines() {
         const moved = [];
-        if (slateFinished) return moved;
+        if (slateFinished || state.lines !== 'market') return moved;
         lineInfo.forEach((r, name) => {
           if (!r.far && r.state === 'pre' && r.market && r.market.spread != null && r.market.spread !== r.saved) moved.push({ name, saved: r.saved, now: r.market.spread, team: r.p.team });
         });
         return moved;
       }
+      // --- Edge vs market (pools that post their own lines) ---
+      // Edge = the pool's number minus the market's, from the team's side: pool +7 vs market +4.5
+      // is +2.5 (you get 2.5 extra points). Keys are the margins games land on most (3 and 7);
+      // an edge that takes in one is worth more than its size.
+      const KEY_MARGINS = [-7, -3, 3, 7];
+      function edgeOf(r) {
+        if (!r || r.err || r.far || r.state !== 'pre' || !r.market || r.market.spread == null || r.saved == null) return null;
+        const pool = r.saved, market = r.market.spread;
+        const edge = Math.round((pool - market) * 10) / 10;
+        // The pool covers margins above -pool, the market above -market. Key margins in between
+        // are the extra results the edge wins (or the ones it gives up).
+        const lo = Math.min(-pool, -market), hi = Math.max(-pool, -market);
+        const keys = KEY_MARGINS.filter(k => k > lo && k <= hi).map(Math.abs);
+        return { edge, pool, market, keys: Array.from(new Set(keys)), score: edge + (edge > 0 ? 1 : edge < 0 ? -1 : 0) * keys.length };
+      }
+      // A suggested tier from the edge. Only a hint: nothing changes until you tap it.
+      function tierHint(team, e) {
+        if (!e || state.lines !== 'pool') return null;
+        if (e.score >= 2.5 && team.tier >= 2) return 1;  // Strong
+        if (e.score <= -2 && team.tier <= 2) return 3;   // Meh
+        return null;
+      }
+      const fmtEdge = n => (n > 0 ? '+' : '') + n;
+      function edgeTitle(e) {
+        return 'Pool ' + fmtLine(e.pool) + ', market ' + fmtLine(e.market) + ': ' +
+          (e.edge === 0 ? 'the same number.' : Math.abs(e.edge) + ' point' + (Math.abs(e.edge) === 1 ? '' : 's') + (e.edge > 0 ? ' better than the market.' : ' worse than the market.')) +
+          (e.keys.length ? ' ' + (e.edge > 0 ? 'Gains' : 'Gives up') + ' the key number' + (e.keys.length > 1 ? 's ' : ' ') + e.keys.join(' and ') + '.' : '');
+      }
+      function edgeBadge(e) {
+        if (!e) return '';
+        const cls = e.edge > 0 ? 'better' : e.edge < 0 ? 'worse' : 'even';
+        return '<span class="line-move edge ' + cls + (e.keys.length ? ' key' : '') + '" title="' + escapeHtml(edgeTitle(e)) + '">' +
+          (e.edge === 0 ? '= market' : (e.edge > 0 ? '\u25b2 ' : '\u25bc ') + fmtEdge(e.edge) + ' vs ' + fmtLine(e.market)) +
+          (e.keys.length ? ' \u00b7 ' + (e.edge > 0 ? 'gets ' : 'loses ') + e.keys.join(', ') : '') + '</span>';
+      }
+      // Teams on the list (or in one entry) that matched the same game: one of the two can't win.
+      function sameGamePairs(names) {
+        const byGame = new Map();
+        names.forEach(name => {
+          const r = lineInfo.get(name);
+          if (!r || r.err || !r.gameKey) return;
+          if (!byGame.has(r.gameKey)) byGame.set(r.gameKey, []);
+          byGame.get(r.gameKey).push(name);
+        });
+        const partner = new Map();
+        byGame.forEach(list => { if (list.length > 1) list.forEach(name => partner.set(name, list.filter(x => x !== name))); });
+        return partner;
+      }
+      // "Entry 1: Temple +6.5 / Navy -3" for every entry holding both sides of a game.
+      function entryConflicts() {
+        if (!state.result) return [];
+        const out = [];
+        entryIds().forEach(entry => {
+          const pairs = sameGamePairs(picksForEntry(entry).map(item => item.team.name));
+          const seen = new Set();
+          pairs.forEach((others, name) => {
+            const key = [name].concat(others).sort().join(' / ');
+            if (seen.has(key)) return;
+            seen.add(key);
+            out.push('Entry ' + entry + ': ' + key);
+          });
+        });
+        return out;
+      }
+      function gameContext(r) {
+        if (!r || r.err || !r.opp) return '';
+        let when = '';
+        if (r.state === 'pre' && r.kickoff) {
+          const d = new Date(r.kickoff);
+          if (!isNaN(d)) when = d.toLocaleDateString(undefined, { weekday: 'short' }) + ' ' + d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+        } else if (r.state === 'in') when = 'in progress';
+        else if (r.state === 'post') when = 'final';
+        return (r.home ? 'vs ' : '@ ') + r.opp + (when ? ' \u00b7 ' + when : '');
+      }
+      function sortByEdge() {
+        const edges = new Map(state.teams.map(team => [team.id, edgeOf(lineInfo.get(team.name))]));
+        if (!Array.from(edges.values()).some(Boolean)) return setStatus('No edges yet', 'Tap Check lines first to compare the pool\u2019s numbers with the market.', 'error');
+        applyMutation(() => {
+          // Each tier keeps the slots it had in the list; only the order inside a tier changes.
+          const order = new Map(state.teams.map((team, i) => [team.id, i]));
+          const byScore = (a, b) => {
+            const ea = edges.get(a.id), eb = edges.get(b.id);
+            if (ea && eb && ea.score !== eb.score) return eb.score - ea.score;
+            if (ea && !eb) return -1;
+            if (eb && !ea) return 1;
+            return order.get(a.id) - order.get(b.id);
+          };
+          const sortedByTier = [0, 1, 2, 3].map(t => state.teams.filter(team => team.tier === t).sort(byScore));
+          const next = [0, 0, 0, 0];
+          state.teams = state.teams.map(team => sortedByTier[team.tier][next[team.tier]++]);
+        }, 'Sorted by edge within each tier. Tap Undo to go back.');
+      }
+
       function decorateLines() {
         if (!document) return; // page already closed (only happens in the tests)
         if (els.checkLines) els.checkLines.disabled = linesChecking || !state.teams.some(team => window.ScoreGrader && window.ScoreGrader.parseBet(team.name));
-        document.querySelectorAll('.line-move').forEach(el => el.remove());
+        document.querySelectorAll('.line-move, .line-extra').forEach(el => el.remove());
+        const poolLines = state.lines !== 'market';
+        if (els.sortEdge) els.sortEdge.classList.toggle('hidden', !(poolLines && lineInfo.size && !slateFinished && state.teams.some(team => edgeOf(lineInfo.get(team.name)))));
         if (!lineInfo.size) return;
+        const partners = sameGamePairs(state.teams.map(team => team.name));
+        const teamByName = new Map(state.teams.map(team => [team.name, team]));
+        document.querySelectorAll('.team-row').forEach(row => {
+          const nameEl = row.querySelector('.team-name'), wrap = row.querySelector('.team-name-wrap');
+          if (!nameEl || !wrap) return;
+          const name = nameEl.title, r = lineInfo.get(name), team = teamByName.get(name);
+          const ctx = gameContext(r);
+          let extra = poolLines && !slateFinished ? edgeBadge(edgeOf(r)) : '';
+          if (ctx) extra += '<span class="line-extra line-ctx">' + escapeHtml(ctx) + '</span>';
+          const others = partners.get(name);
+          if (others) extra += '<span class="line-extra same-game soft" title="The other side of this game is also on your list. Fine to have both as candidates; the tool warns if both land in one entry.">Other side: ' + escapeHtml(others.join(', ')) + '</span>';
+          if (poolLines && !slateFinished && team) {
+            const hint = tierHint(team, edgeOf(r));
+            if (hint !== null) extra += '<button type="button" class="line-extra tier-hint" data-team-id="' + escapeHtml(team.id) + '" data-tier="' + hint + '" title="Suggested from the edge vs market. Tap to set the tier.">Try ' + TIER_LABELS[hint] + '</button>';
+          }
+          if (extra) wrap.insertAdjacentHTML('beforeend', '<div class="line-extra line-extras">' + extra + '</div>');
+        });
+        // Both sides of a game in the same entry
+        document.querySelectorAll('.entry-zone, [id^="entry"][id$="Zone"]').forEach(zone => {
+          const cards = Array.from(zone.querySelectorAll('.pick-card'));
+          const names = cards.map(card => card.querySelector('.pick-name') && card.querySelector('.pick-name').title).filter(Boolean);
+          const inEntry = sameGamePairs(names);
+          cards.forEach(card => {
+            const nameEl = card.querySelector('.pick-name'), sub = card.querySelector('.pick-sub');
+            const others = nameEl && inEntry.get(nameEl.title);
+            if (others && sub && !sub.querySelector('.same-game')) sub.insertAdjacentHTML('beforeend', '<span class="line-extra same-game" title="Both sides of one game are in this entry: at most one can cover.">\u26a0 Same game as ' + escapeHtml(others.join(', ')) + '</span>');
+          });
+        });
+        if (poolLines) {
+          if (slateFinished) return;
+          const html = name => edgeBadge(edgeOf(lineInfo.get(name)));
+          document.querySelectorAll('.pick-card').forEach(card => {
+            const name = card.querySelector('.pick-name'), sub = card.querySelector('.pick-sub');
+            const b = name && html(name.title);
+            if (b && sub) sub.insertAdjacentHTML('beforeend', b);
+          });
+          return;
+        }
         const byName = new Map(movedLines().map(m => [m.name, m]));
         const badge = name => {
           const m = byName.get(name);
@@ -3108,6 +3369,7 @@
         }
         const moved = movedLines();
         const notListed = [], started = [], far = [];
+        const poolLines = state.lines !== 'market';
         info.forEach((r, name) => {
           if (r.err || (r.state === 'pre' && (!r.market || r.market.spread == null))) notListed.push(name);
           else if (r.state !== 'pre') started.push(name);
@@ -3116,12 +3378,27 @@
         const extra = (started.length ? ' Already started: ' + started.join(', ') + '.' : '') +
           (far.length ? ' Check by hand (more than ' + FAR + ' points apart, may be a different game): ' + far.join(', ') + '.' : '') +
           (notListed.length ? ' No line found for ' + notListed.length + ' team' + (notListed.length === 1 ? '' : 's') + '.' : '');
+        const conflicts = entryConflicts();
+        const pairs = { size: conflicts.length };
+        const pairText = conflicts.length ? ' Both sides of one game in the same entry: ' + conflicts.join('; ') + '.' : '';
+        if (poolLines) {
+          const edges = state.teams.map(team => ({ team, e: edgeOf(info.get(team.name)) })).filter(x => x.e);
+          const plus = edges.filter(x => x.e.edge > 0).sort((a, b) => b.e.score - a.e.score);
+          const minus = edges.filter(x => x.e.edge < 0).sort((a, b) => a.e.score - b.e.score);
+          const label = x => splitSpread(x.team.name).team + ' ' + fmtEdge(x.e.edge) + (x.e.keys.length ? ' (gets ' + x.e.keys.join(', ') + ')' : '');
+          const labelMinus = x => splitSpread(x.team.name).team + ' ' + fmtEdge(x.e.edge) + (x.e.keys.length ? ' (loses ' + x.e.keys.join(', ') + ')' : '');
+          setStatus(edges.length ? 'Edge vs market' : 'Lines checked',
+            (plus.length ? 'Better than market: ' + plus.map(label).join(', ') + '.' : (edges.length ? 'No team has a better number than the market.' : 'No market lines to compare yet.')) +
+            (minus.length ? ' Worse than market: ' + minus.map(labelMinus).join(', ') + '.' : '') + pairText + extra,
+            plus.length || !edges.length ? 'success' : 'error');
+          return;
+        }
         if (moved.length) {
           setStatus(moved.length + ' line' + (moved.length === 1 ? ' has' : 's have') + ' moved',
-            moved.map(m => m.team + ' ' + fmtLine(m.saved) + ' \u2192 ' + fmtLine(m.now)).join(', ') + '.' + extra, 'error',
+            moved.map(m => m.team + ' ' + fmtLine(m.saved) + ' \u2192 ' + fmtLine(m.now)).join(', ') + '.' + pairText + extra, 'error',
             { fix: 'lines', value: '', label: 'Use current lines' });
         } else {
-          setStatus('Lines checked', (far.length ? 'No lines moved within ' + FAR + ' points.' : 'Every spread matches ESPN\u2019s current line.') + extra, far.length ? 'error' : 'success');
+          setStatus('Lines checked', (far.length ? 'No lines moved within ' + FAR + ' points.' : 'Every spread matches ESPN\u2019s current line.') + pairText + extra, far.length || pairs.size ? 'error' : 'success');
         }
       }
       // Which of a team's games this pick means: the one whose line is nearest your number,
@@ -3610,10 +3887,29 @@
         }, 'Exposure settings updated for ' + team.name + '.');
       }
 
+      // Entries that hold both sides of one game (known once Check lines has matched the games).
+      function sameGameCount(result) {
+        let n = 0;
+        entryIds().forEach(entry => {
+          const names = (result[entry] || []).map(id => { const team = state.teams.find(t => t.id === id); return team ? team.name : null; }).filter(Boolean);
+          n += sameGamePairs(names).size;
+        });
+        return n;
+      }
       function build(randomize = true) {
-        const solved = solve(null, randomize);
+        let solved = solve(null, randomize);
         if (!solved) return setStatus('No valid build found', 'The overlap, placements, and exposure limits conflict. Adjust a Min/Max button or unlock a team.', 'error');
+        // Builds are shuffled within tiers, so try a few more for one that keeps both sides of a
+        // game out of the same entry. Locks and Min/Max can make that impossible; then it says so.
+        let clash = lineInfo.size ? sameGameCount(solutionToResult(solved)) : 0;
+        for (let tries = 0; clash && randomize && tries < 60; tries++) {
+          const next = solve(null, true);
+          if (!next) break;
+          const c = sameGameCount(solutionToResult(next));
+          if (c < clash) { solved = next; clash = c; }
+        }
         commitSolution(solved, buildSummary());
+        if (clash) setStatus('Entries updated', buildSummary() + ' Heads up: ' + entryConflicts().join('; ') + ' \u2014 both sides of one game, so at most one can cover. Your locks and Min/Max leave no way around it.', 'error');
       }
 
       async function copyEntry(entry) {
@@ -3665,6 +3961,16 @@
       els.picksSelect.addEventListener('change', () => changePoolShape({ picks: els.picksSelect.value }));
       els.entriesSelect.addEventListener('change', () => changePoolShape({ entries: els.entriesSelect.value }));
       els.spreadSelect.addEventListener('change', () => changePoolShape({ spread: els.spreadSelect.value }));
+      els.linesSelect.addEventListener('change', () => {
+        state.lines = els.linesSelect.value === 'market' ? 'market' : 'pool';
+        save();
+        decorateLines();
+        setStatus('Lines: ' + (state.lines === 'pool' ? 'the pool posts its own' : 'market'),
+          state.lines === 'pool'
+            ? 'Check lines now shows each team\u2019s edge: how many points better (or worse) the pool\u2019s number is than the current market line.'
+            : 'Check lines now flags lines that moved and offers to update your spreads to the current ones.', 'success');
+      });
+      els.sortEdge.addEventListener('click', sortByEdge);
       els.overlap.addEventListener('change', () => {
         const next = Number(els.overlap.value);
         const beforeOverlap = state.overlap;
@@ -3691,6 +3997,8 @@
         if (placement) return setPlacement(placement.dataset.teamId, Number(placement.dataset.mask));
         const rank = event.target.closest('.rank-btn');
         if (rank && !rank.disabled) return moveRank(rank.dataset.teamId, rank.dataset.dir);
+        const hint = event.target.closest('.tier-hint');
+        if (hint) return setTier(hint.dataset.teamId, Number(hint.dataset.tier));
         const toggle = event.target.closest('.row-toggle');
         if (toggle) {
           const row = toggle.closest('.team-row');
@@ -3953,6 +4261,13 @@
 
       els.undo.addEventListener('click', undo);
       document.addEventListener('keydown', event => {
+        if ((event.ctrlKey || event.metaKey) && !event.shiftKey && !event.altKey && (event.key === 'Enter' || event.key.toLowerCase() === 's') && !document.body.classList.contains('on-bets') && !document.querySelector('.modal-overlay:not(.hidden)')) {
+          if (event.key === 'Enter' && event.target.closest('textarea')) return; // leave text boxes alone
+          event.preventDefault();
+          if (event.key === 'Enter') { if (!els.build.disabled) build(true); }
+          else if (!els.saveWeek.disabled) saveWeek();
+          return;
+        }
         if (!(event.ctrlKey || event.metaKey) || event.shiftKey || event.key.toLowerCase() !== 'z') return;
         if (event.target.closest('input, textarea, select')) return; // leave text-field undo alone
         if (document.body.classList.contains('on-bets')) return; // Bet Tracker page: nothing here to undo
@@ -4011,7 +4326,12 @@
       const fmtOdds = o => o == null ? '' : (o > 0 ? '+' : '') + Math.round(o);
       const fmt2 = n => n == null ? '' : Number(n).toFixed(2);
       const money = n => (n < 0 ? '-' : '') + '$' + Math.abs(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-      function profit(b) { if (b.result === 'W') return b.win || 0; if (b.result === 'L') return -(b.risk || 0); if (b.result === 'P') return 0; return null; }
+      // A parlay or teaser that won after a pushed leg dropped pays less than its full price: `paid`.
+      function profit(b) { if (b.result === 'W') return b.legs && b.paid != null ? b.paid : (b.win || 0); if (b.result === 'L') return -(b.risk || 0); if (b.result === 'P') return 0; return null; }
+      const decimalOdds = o => o > 0 ? 1 + o / 100 : 1 + 100 / -o;
+      const americanFromDecimal = d => d >= 2 ? Math.round((d - 1) * 100) : -Math.round(100 / (d - 1));
+      const isMulti = b => Array.isArray(b.legs);
+      const LEG_DEFAULT_ODDS = -110;
 
       // ---------- storage ----------
       // Every bet and the settings go through these, so localStorage, sync, and imports all hold
@@ -4019,7 +4339,7 @@
       function cleanBet(x) {
         if (!x || typeof x !== 'object') return null;
         const num = v => (v === null || v === undefined || v === '' || !isFinite(Number(v))) ? null : Number(v);
-        return {
+        const out = {
           id: String(x.id || uid()),
           date: /^\d{4}-\d{2}-\d{2}$/.test(x.date || '') ? x.date : '',
           bet: String(x.bet || '').slice(0, 200),
@@ -4034,6 +4354,23 @@
           closeLocked: Boolean(x.closeLocked),
           updatedAt: Number(x.updatedAt) || 0
         };
+        // Parlays and teasers: the legs, plus how the bet is settled. Single bets carry none of these
+        // fields, so their stored shape is unchanged.
+        if (Array.isArray(x.legs)) {
+          out.kind = x.kind === 'teaser' ? 'teaser' : 'parlay';
+          const pts = Number(x.teaser);
+          out.teaser = out.kind === 'teaser' ? (pts > 0 && pts <= 20 ? Math.round(pts * 2) / 2 : 6) : 0;
+          out.push = x.push === 'lose' ? 'lose' : 'drop';
+          out.paid = num(x.paid);
+          out.legs = x.legs.slice(0, 12).map(l => (l && typeof l === 'object') ? {
+            bet: String(l.bet || '').slice(0, 120),
+            odds: isOdds(num(l.odds)) ? num(l.odds) : null,
+            result: ['W', 'L', 'P'].includes(l.result) ? l.result : '',
+            auto: Boolean(l.auto),
+            final: String(l.final || '').slice(0, 140)
+          } : null).filter(Boolean);
+        }
+        return out;
       }
       function cleanMarket(m) {
         if (!m || typeof m !== 'object') return null;
@@ -4049,7 +4386,7 @@
       const fmtLine = n => n === 0 ? 'PK' : (n > 0 ? '+' : '') + n;
       const implied = o => o > 0 ? 100 / (o + 100) : -o / (-o + 100);
       function clvOf(b) {
-        if (!b.close) return null;
+        if (!b.close || isMulti(b)) return null;
         const p = SG.parseBet(b.bet);
         if (!p) return null;
         if (p.kind === 'Spread' && b.close.spread != null) return { value: Math.round((p.line - b.close.spread) * 10) / 10, unit: 'pts', close: fmtLine(b.close.spread) };
@@ -4181,7 +4518,8 @@
         return '<tr data-id="' + esc(b.id) + '">' +
           cell('bt-n', '', String(i + 1)) +
           cell('bt-date', 'Date', '<input type="date" data-f="date" aria-label="Date" value="' + esc(b.date) + '">') +
-          cell('bt-bet', '', '<input class="bet" data-f="bet" aria-label="Bet" value="' + esc(b.bet) + '" placeholder="Team +3.5 / Team ML / Team Over 55.5" autocomplete="off">') +
+          cell('bt-bet', '', '<input class="bet" data-f="bet" aria-label="Bet" value="' + esc(b.bet) + '" placeholder="Team +3.5 / Team ML / Team Over 55.5" autocomplete="off">' +
+            (isMulti(b) ? '<button type="button" class="bt-legs-btn" data-legs aria-label="Edit legs of ' + esc(b.bet) + '"></button>' : '')) +
           cell('bt-odds', 'Odds', '<input class="num" data-f="odds" aria-label="Odds (American)" autocomplete="off">') +
           cell('bt-risk', 'Risk $', '<input class="num" data-f="risk" aria-label="Risk in dollars" inputmode="decimal" autocomplete="off">') +
           cell('bt-win', 'Win $', '<input class="num" data-f="win" aria-label="Win in dollars" inputmode="decimal" autocomplete="off">') +
@@ -4221,6 +4559,12 @@
           cl.title = (b.closeLocked ? 'Closing line ' : 'Current line (not closed yet) ') + c.close + '. ' +
             (c.value === 0 ? 'Same as your number.' : 'Your number was ' + Math.abs(c.value).toFixed(1) + (c.unit === '%' ? ' percentage points of win chance ' : ' points ') + (c.value > 0 ? 'better.' : 'worse.'));
         } else { cl.textContent = ''; cl.className = 'bt-clv'; cl.title = ''; }
+        const legsBtn = tr.querySelector('[data-legs]');
+        if (legsBtn) {
+          const legs = b.legs.filter(l => l.bet), won = legs.filter(l => l.result === 'W').length, count = legs.length || b.legs.length;
+          legsBtn.innerHTML = (b.kind === 'teaser' ? 'Teaser ' + b.teaser + '-pt' : 'Parlay') + ' \u00b7 ' + count + ' leg' + (count === 1 ? '' : 's') +
+            '<span class="bt-legdots">' + legs.map(l => '<i class="' + (l.result || 'open') + '"></i>').join('') + '</span>' + (legs.length && !b.result && won ? ' ' + won + '/' + legs.length : '');
+        }
         const fin = tr.querySelector('.bt-fin');
         fin.textContent = b.final || '';
         fin.className = 'bt-fin' + ((b.final || '').startsWith('!') ? ' bad' : '');
@@ -4237,6 +4581,7 @@
         body.querySelectorAll('tr').forEach(tr => refreshRow(tr, IDX.get(tr.dataset.id)));
         $('btEmpty').hidden = S.bets.length > 0;
         updateBooks(); sortRows(); stats(); applyFilters(); backupNote(); renderSummary();
+        if (legsOpenId) { if (IDX.get(legsOpenId)) renderLegs(); else closeLegs(); }
       }
       // A sync can redraw the list while you're in a field. Remember where the cursor was, put it
       // back afterwards, and keep anything you'd typed but not finished (it saves when you leave).
@@ -4277,8 +4622,13 @@
         if (!b) return;
         const v = el.value, unit = S.settings.unit;
         switch (f) {
-          case 'date': b.date = v; clearAuto(b); break;
-          case 'bet': b.bet = v.trim(); clearAuto(b); break;
+          case 'date':
+            b.date = v; clearAuto(b);
+            if (isMulti(b)) { b.paid = null; b.legs.forEach(l => { if (l.auto) { l.result = ''; l.auto = false; } l.final = ''; }); applySettle(b); }
+            break;
+          case 'bet':
+            if (isMulti(b)) { b.bet = v.trim() || multiLabel(b); el.value = b.bet; break; } // just the label; the legs decide the result
+            b.bet = v.trim(); clearAuto(b); break;
           case 'book': b.book = v.trim(); updateBooks(); break;
           case 'notes': b.notes = v; break;
           case 'odds': b.odds = parseNum(v); if (isOdds(b.odds) && b.risk > 0) b.win = winFromOdds(b.risk, b.odds); break;
@@ -4349,7 +4699,7 @@
         body.querySelectorAll('tr').forEach(tr => {
           const b = IDX.get(tr.dataset.id);
           if (!b) return;
-          let show = fr === 'pending' ? !b.result : fr ? b.result === fr : true;
+          let show = fr === 'pending' ? !b.result : fr === 'multi' ? isMulti(b) : fr ? b.result === fr : true;
           if (show && fb) show = b.book === fb;
           tr.hidden = !show;
         });
@@ -4408,8 +4758,77 @@
         if ($('betsPage').hidden) return; // drawn when the page is shown
         groupTable('btByWeek', b => weekKey(b.date), { head: 'Week', newestFirst: true, label: weekLabel });
         groupTable('btByBook', b => b.book, { head: 'Book' });
-        groupTable('btByType', b => SG.betType(b.bet), { head: 'Type' });
+        groupTable('btByType', b => isMulti(b) ? (b.kind === 'teaser' ? 'Teaser' : 'Parlay') : SG.betType(b.bet), { head: 'Type' });
         chart();
+      }
+
+      // ---------- parlays & teasers ----------
+      // A teaser moves every spread leg toward you by its points (Texas -3 in a 6-pt teaser is
+      // graded as Texas +3), totals down for an over and up for an under. Moneylines can't be teased.
+      function teased(text, pts) {
+        const p = SG.parseBet(text);
+        if (!p || !pts) return text;
+        const n = x => Math.round(x * 10) / 10;
+        if (p.kind === 'Spread') { const v = n(p.line + pts); return p.team + ' ' + (v === 0 ? 'PK' : (v > 0 ? '+' : '') + v); }
+        if (p.kind === 'Total') return (p.team ? p.team + ' ' : '') + (p.side === 'over' ? 'Over ' + n(p.line - pts) : 'Under ' + n(p.line + pts));
+        return text;
+      }
+      const legText = (b, leg) => b.kind === 'teaser' ? teased(leg.bet, b.teaser) : leg.bet;
+      function legsPrice(legs) {
+        const list = legs.filter(l => l.bet);
+        if (list.length < 2) return null;
+        return americanFromDecimal(list.reduce((d, l) => d * decimalOdds(isOdds(l.odds) ? l.odds : LEG_DEFAULT_ODDS), 1));
+      }
+      function multiLabel(b) {
+        const n = b.legs.length;
+        return n + '-leg ' + (b.kind === 'teaser' ? b.teaser + '-pt teaser' : 'parlay');
+      }
+      const isAutoLabel = text => !text || /^\d+-leg (parlay|[\d.]+-pt teaser)$/i.test(text);
+      // The bet's result from its legs. Any losing leg loses it, even with other legs still to play.
+      // A pushed leg either drops out (the bet pays on the rest) or loses the bet, as set per bet.
+      function settle(b) {
+        const legs = b.legs.filter(l => l.bet);
+        if (!legs.length) return { result: '', paid: null, note: '' };
+        const lost = legs.find(l => l.result === 'L');
+        if (lost) return { result: 'L', paid: null, note: 'Lost: ' + legText(b, lost) + (lost.final ? ' (' + lost.final + ')' : '') };
+        const open = legs.filter(l => !l.result);
+        if (open.length) return { result: '', paid: null, note: (legs.length - open.length) + ' of ' + legs.length + ' legs won so far' };
+        const pushed = legs.filter(l => l.result === 'P'), won = legs.filter(l => l.result === 'W');
+        if (!pushed.length) return { result: 'W', paid: null, note: 'All ' + legs.length + ' legs won' };
+        if (b.push === 'lose') return { result: 'L', paid: null, note: pushed.length + ' leg' + (pushed.length === 1 ? '' : 's') + ' pushed (counts as a loss on this bet)' };
+        if (!won.length) return { result: 'P', paid: null, note: 'Every leg pushed' };
+        const pushNote = pushed.length + ' leg' + (pushed.length === 1 ? '' : 's') + ' pushed and dropped';
+        if (b.kind === 'parlay' || won.length === 1) {
+          // Pays on the winning legs at their own prices (-110 when a leg has no price; a teaser
+          // left with one leg pays as a straight bet at -110).
+          const dec = won.reduce((d, l) => d * decimalOdds(b.kind === 'parlay' && isOdds(l.odds) ? l.odds : LEG_DEFAULT_ODDS), 1);
+          return { result: 'W', paid: round2((b.risk || 0) * (dec - 1)), note: pushNote + '; paid on ' + won.length + ' leg' + (won.length === 1 ? '' : 's') };
+        }
+        return { result: 'W', paid: null, note: '! ' + pushNote + '. Books price the smaller teaser differently: enter what you were paid under Legs' };
+      }
+      // Writes the legs' outcome onto the bet unless you set the bet's result by hand.
+      function applySettle(b) {
+        const r = settle(b);
+        if (b.result && !b.auto) return false;
+        const before = JSON.stringify([b.result, b.auto, b.final, b.paid]);
+        const keepPaid = b.paid != null && r.result === 'W' && r.paid == null; // a payout you typed in
+        b.result = r.result; b.auto = Boolean(r.result); b.final = r.note;
+        if (!keepPaid) b.paid = r.paid;
+        return JSON.stringify([b.result, b.auto, b.final, b.paid]) !== before;
+      }
+      async function gradeMulti(b, league) {
+        let changed = false, waiting = 0, bad = 0;
+        for (const leg of b.legs) {
+          if (!leg.bet || (leg.result && !leg.auto) || leg.result) continue;
+          const r = await SG.grade(legText(b, leg), { league, date: b.date, endDate: SG.addDays(b.date, 4) });
+          const live = IDX.get(b.id);
+          if (!live || !live.legs.includes(leg)) return { gone: true };
+          if (r.result) { leg.result = r.result; leg.auto = true; leg.final = r.final; changed = true; }
+          else if (r.skip) { waiting++; if (leg.final !== r.final) { leg.final = r.final; changed = true; } }
+          else { bad++; const f = '! ' + r.err.charAt(0).toUpperCase() + r.err.slice(1); if (leg.final !== f) { leg.final = f; changed = true; } }
+        }
+        if (applySettle(b)) changed = true;
+        return { changed, waiting, bad };
       }
 
       // ---------- grading ----------
@@ -4427,6 +4846,18 @@
         await Promise.all(Array.from(new Set(rows.filter(b => b.date && b.date <= horizon).map(b => b.date))).map(d => SG.prefetch(league, d, SG.addDays(d, 1))));
         let done = 0, waiting = 0, bad = 0, netErr = false, changed = false;
         for (const b of rows) {
+          if (isMulti(b)) {
+            if (b.result || !b.date) continue;
+            let m;
+            try { m = await gradeMulti(b, league); } catch (_) { netErr = true; break; }
+            if (m.gone) continue;
+            if (m.changed) { touch(b); changed = true; }
+            if (b.result) done++; else if (m.bad) bad++; else waiting++;
+            const tr = rowEl(b.id);
+            if (tr) refreshRow(tr, b);
+            if (legsOpenId === b.id) renderLegs();
+            continue;
+          }
           let r;
           try { r = await SG.grade(b.bet, { league, date: b.date }); } catch (_) { netErr = true; break; }
           const live = IDX.get(b.id);
@@ -4545,7 +4976,8 @@
         S.bets.forEach(b => {
           const p = profit(b);
           const c = b.closeLocked ? clvOf(b) : null;
-          out += [q(b.date), q(b.bet), q(fmtOdds(b.odds)), fmt2(b.risk), fmt2(b.win), b.risk > 0 ? (b.risk / unit).toFixed(2) : '', q(b.book), q(b.result), p == null ? '' : p.toFixed(2), q(c ? c.close : ''), q(c ? fmtClv(c) : ''), q(b.notes)].join(',') + '\n';
+          const betText = isMulti(b) ? b.bet + ': ' + b.legs.filter(l => l.bet).map(l => legText(b, l) + (l.result ? ' (' + l.result + ')' : '')).join(' | ') : b.bet;
+          out += [q(b.date), q(betText), q(fmtOdds(b.odds)), fmt2(b.risk), fmt2(b.win), b.risk > 0 ? (b.risk / unit).toFixed(2) : '', q(b.book), q(b.result), p == null ? '' : p.toFixed(2), q(c ? c.close : ''), q(c ? fmtClv(c) : ''), q(b.notes)].join(',') + '\n';
         });
         download('bets_' + today() + '.csv', out, 'text/csv');
       }
@@ -4600,6 +5032,8 @@
       // ---------- wiring ----------
       body.addEventListener('change', onChange);
       body.addEventListener('click', e => {
+        const legsBtn = e.target.closest('[data-legs]');
+        if (legsBtn) return openLegs(legsBtn.closest('tr').dataset.id);
         const more = e.target.closest('[data-more]');
         if (more) {
           const tr = more.closest('tr'), b = IDX.get(tr.dataset.id);
@@ -4612,6 +5046,7 @@
         const tr = del.closest('tr'), i = S.bets.findIndex(x => x.id === tr.dataset.id);
         if (i < 0) return;
         const [gone] = S.bets.splice(i, 1);
+        if (legsOpenId === gone.id) closeLegs();
         IDX.delete(gone.id);
         S.deleted[gone.id] = Date.now();
         tr.remove();
@@ -4636,6 +5071,147 @@
         if (tr.scrollIntoView) tr.scrollIntoView({ block: 'center' });
         tr.querySelector('[data-f="bet"]').focus({ preventScroll: true });
       });
+      $('btAddMultiBtn').addEventListener('click', () => {
+        const last = S.bets[S.bets.length - 1], u = S.settings.unit;
+        const b = cleanBet({ id: uid(), date: last && last.date ? last.date : today(), bet: '2-leg parlay', odds: legsPrice([{ bet: 'a' }, { bet: 'b' }]), risk: u, book: last ? last.book : '',
+          kind: 'parlay', teaser: 0, push: 'drop', paid: null, legs: [{ bet: '' }, { bet: '' }], updatedAt: Date.now() });
+        b.win = winFromOdds(b.risk, b.odds);
+        S.bets.push(b); IDX.set(b.id, b);
+        $('btEmpty').hidden = true;
+        body.insertAdjacentHTML($('btSort').value === 'new' ? 'afterbegin' : 'beforeend', rowHTML(b, S.bets.length - 1));
+        refreshRow(rowEl(b.id), b);
+        if ($('btFilterResult').value && !['pending', 'multi'].includes($('btFilterResult').value)) $('btFilterResult').value = '';
+        applyFilters(); stats(); save();
+        openLegs(b.id);
+      });
+
+      // ---------- legs editor ----------
+      let legsOpenId = null;
+      function openLegs(id) {
+        legsOpenId = id;
+        renderLegs();
+        UI.openOverlay($('btLegsOverlay'));
+        const first = $('btLegsList').querySelector('input[data-lf="bet"]');
+        if (first && !first.value) first.focus();
+      }
+      function closeLegs() {
+        const b = IDX.get(legsOpenId);
+        // Blank legs left in the editor are dropped (keeping at least one row).
+        if (b && b.legs.some(l => !l.bet) && b.legs.some(l => l.bet)) {
+          b.legs = b.legs.filter(l => l.bet);
+          if (isAutoLabel(b.bet)) b.bet = multiLabel(b);
+          touch(b);
+          const tr = rowEl(b.id);
+          if (tr) { setVal(tr, 'bet', b.bet); refreshRow(tr, b); }
+          save();
+        }
+        legsOpenId = null;
+        UI.closeOverlay($('btLegsOverlay'));
+        if (b) { const tr = rowEl(b.id); if (tr) { const btn = tr.querySelector('[data-legs]'); if (btn) btn.focus(); } }
+      }
+      function renderLegs() {
+        const b = IDX.get(legsOpenId);
+        if (!b) return;
+        const teaser = b.kind === 'teaser';
+        $('btLegsTitle').textContent = b.bet || multiLabel(b);
+        $('btLegsKind').value = b.kind;
+        $('btLegsPts').value = b.teaser || 6;
+        $('btLegsPtsWrap').hidden = !teaser;
+        $('btLegsPush').value = b.push;
+        $('btLegsList').innerHTML = b.legs.map((l, i) =>
+          '<div class="bt-leg ' + (l.result || '') + (teaser ? '' : ' has-odds') + '" data-i="' + i + '">' +
+            '<span class="bt-leg-n">' + (i + 1) + '</span>' +
+            '<input data-lf="bet" aria-label="Leg ' + (i + 1) + '" value="' + esc(l.bet) + '" placeholder="Team -3 / Team Over 45.5 / Team ML" autocomplete="off">' +
+            (teaser ? '' : '<input data-lf="odds" class="num" aria-label="Leg ' + (i + 1) + ' odds" value="' + esc(fmtOdds(l.odds)) + '" placeholder="-110" autocomplete="off">') +
+            '<select data-lf="result" aria-label="Leg ' + (i + 1) + ' result"><option value="">\u2014</option><option value="W"' + (l.result === 'W' ? ' selected' : '') + '>W</option><option value="L"' + (l.result === 'L' ? ' selected' : '') + '>L</option><option value="P"' + (l.result === 'P' ? ' selected' : '') + '>Push</option></select>' +
+            '<button type="button" class="bt-del" data-lrm aria-label="Remove leg ' + (i + 1) + '"' + (b.legs.length <= 1 ? ' disabled' : '') + '>\u2715</button>' +
+            '<div class="bt-leg-sub">' + (teaser && l.bet && teased(l.bet, b.teaser) !== l.bet ? 'Graded as <strong>' + esc(teased(l.bet, b.teaser)) + '</strong>' : '') +
+              (l.final ? '<span class="' + (l.final.startsWith('!') ? 'bad' : '') + '">' + esc(l.final) + '</span>' : '') + '</div>' +
+          '</div>').join('');
+        const price = legsPrice(b.legs);
+        $('btLegsPrice').textContent = teaser ? 'Enter the teaser\u2019s price in the Odds column (your book sets it).' : price == null ? 'Add at least two legs to price the parlay.' : 'Price from the legs: ' + fmtOdds(price) + (b.legs.some(l => l.bet && !isOdds(l.odds)) ? ' (blank odds count as -110)' : '');
+        $('btLegsUsePrice').hidden = teaser || price == null || price === b.odds;
+        const pushedWin = b.result === 'W' && b.legs.some(l => l.result === 'P');
+        $('btLegsPaidWrap').hidden = !pushedWin;
+        if (document.activeElement !== $('btLegsPaid')) $('btLegsPaid').value = b.paid == null ? '' : fmt2(b.paid);
+        $('btLegsNote').textContent = (b.result ? 'Result: ' + ({ W: 'Win', L: 'Loss', P: 'Push' })[b.result] + (b.auto ? ' (from the legs)' : ' (set by hand)') + '. ' : '') + (b.final || '');
+      }
+      function legsChanged(b, opts) {
+        if (isAutoLabel(b.bet)) b.bet = multiLabel(b);
+        if (!(opts && opts.keepResult)) { if (b.result && b.auto) b.result = ''; applySettle(b); }
+        touch(b);
+        const tr = rowEl(b.id);
+        if (tr) { setVal(tr, 'bet', b.bet); refreshRow(tr, b); }
+        stats(); applyFilters(); save(); renderSummary();
+        renderLegs();
+      }
+      $('btLegsList').addEventListener('change', e => {
+        const b = IDX.get(legsOpenId), row = e.target.closest('.bt-leg');
+        if (!b || !row) return;
+        const leg = b.legs[Number(row.dataset.i)], f = e.target.dataset.lf;
+        if (!leg || !f) return;
+        if (f === 'bet') { leg.bet = e.target.value.trim(); leg.result = ''; leg.auto = false; leg.final = ''; }
+        else if (f === 'odds') { const o = parseNum(e.target.value); leg.odds = isOdds(o) ? o : null; }
+        else if (f === 'result') { leg.result = e.target.value; leg.auto = false; }
+        legsChanged(b);
+      });
+      $('btLegsList').addEventListener('click', e => {
+        const rm = e.target.closest('[data-lrm]');
+        const b = IDX.get(legsOpenId);
+        if (!rm || !b || b.legs.length <= 1) return;
+        b.legs.splice(Number(rm.closest('.bt-leg').dataset.i), 1);
+        legsChanged(b);
+      });
+      $('btLegsAdd').addEventListener('click', () => {
+        const b = IDX.get(legsOpenId);
+        if (!b || b.legs.length >= 12) return;
+        b.legs.push({ bet: '', odds: null, result: '', auto: false, final: '' });
+        legsChanged(b, { keepResult: true });
+        const inputs = $('btLegsList').querySelectorAll('input[data-lf="bet"]');
+        inputs[inputs.length - 1].focus();
+      });
+      $('btLegsKind').addEventListener('change', e => {
+        const b = IDX.get(legsOpenId);
+        if (!b) return;
+        b.kind = e.target.value === 'teaser' ? 'teaser' : 'parlay';
+        b.teaser = b.kind === 'teaser' ? (b.teaser || 6) : 0;
+        b.legs.forEach(l => { if (l.auto) { l.result = ''; l.auto = false; l.final = ''; } }); // graded at different numbers now
+        legsChanged(b);
+      });
+      $('btLegsPts').addEventListener('change', e => {
+        const b = IDX.get(legsOpenId), v = parseNum(e.target.value);
+        if (!b || !(v > 0 && v <= 20)) { renderLegs(); return; }
+        b.teaser = Math.round(v * 2) / 2;
+        b.legs.forEach(l => { if (l.auto) { l.result = ''; l.auto = false; l.final = ''; } });
+        legsChanged(b);
+      });
+      $('btLegsPush').addEventListener('change', e => {
+        const b = IDX.get(legsOpenId);
+        if (!b) return;
+        b.push = e.target.value === 'lose' ? 'lose' : 'drop';
+        if (b.auto) b.paid = null;
+        legsChanged(b);
+      });
+      $('btLegsUsePrice').addEventListener('click', () => {
+        const b = IDX.get(legsOpenId), price = b && legsPrice(b.legs);
+        if (price == null) return;
+        b.odds = price;
+        if (b.risk > 0) b.win = winFromOdds(b.risk, b.odds);
+        legsChanged(b, { keepResult: true });
+      });
+      $('btLegsPaid').addEventListener('change', e => {
+        const b = IDX.get(legsOpenId);
+        if (!b) return;
+        const v = parseNum(e.target.value);
+        b.paid = v != null && v >= 0 ? round2(v) : null;
+        if (b.final && b.final.startsWith('!')) b.final = b.final.replace(/^! /, '').replace(/\. Books price.*$/, '; payout entered by hand');
+        legsChanged(b, { keepResult: true });
+      });
+      $('btLegsDone').addEventListener('click', closeLegs);
+      $('btLegsClose').addEventListener('click', closeLegs);
+      $('btLegsOverlay').addEventListener('click', e => { if (e.target === $('btLegsOverlay')) closeLegs(); });
+      document.addEventListener('keydown', e => { if (e.key === 'Escape' && legsOpenId) closeLegs(); });
+
       $('btGradeBtn').addEventListener('click', () => gradeAll(false));
       const menu = $('btDataMenu');
       $('btDataBtn').addEventListener('click', e => {

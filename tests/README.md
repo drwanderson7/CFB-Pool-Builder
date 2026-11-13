@@ -37,6 +37,8 @@ shows `fail 0`. Any failure prints which check broke and why.
 | `entries-n.test.js` | Pools with other shapes: 3–6 entries, picks 1–15, spread, tiers, placements, Min/Max, shape changes + Undo, legacy storage opens as Pick 7 |
 | `records-n.test.js` | Saved weeks, grading, season tiles and hand-entered weeks for 3+ entries (k/N levels, add-up check), mixed shapes, old 2-entry weeks |
 | `pools.test.js` | Pool tabs: add/rename/delete, isolation of teams/builds/records, copy teams & tiers, remembered pool, two-device sync and deletes, setup codes |
+| `edge.test.js` | Pools that post their own lines: edge vs market, key numbers 3/7, tier hints, Sort by edge, game context, same-game guard in builds, your record per team, records by pick type, keyboard shortcuts |
+| `parlays.test.js` | Bet Tracker parlays and teasers: legs editor, per-leg auto-grading, teased numbers, push rules and payouts, hand results, by-type summary and filter, storage, sync, CSV |
 | `api-bets.test.js` | `/api/bets` GET/POST, separate Redis key, validation and size limit, missing-Redis error |
 
 ## Notes

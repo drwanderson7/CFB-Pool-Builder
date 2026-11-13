@@ -1,4 +1,4 @@
-// Pool Builder > Check lines: compare saved spreads with ESPN's current lines.
+// Pool Builder > Check lines for a market-line pool: compare saved spreads with ESPN's current lines.
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const { openApp, espnFeed, wait } = require('./helpers');
@@ -18,9 +18,18 @@ async function open(t, espn = { feed: espnFeed(games), calls: [] }) {
   const app = openApp({ espn });
   t.after(app.close);
   await wait(20);
+  // these tests cover market-line pools (pools that post their own lines are in edge.test.js)
+  const lines = app.$('#linesSelect');
+  lines.value = 'market';
+  lines.dispatchEvent(new app.window.Event('change'));
   app.loadTeams(TEAMS);
   await wait(250); // quiet check after loading
   return app;
+}
+function marketMode(app) {
+  const lines = app.$('#linesSelect');
+  lines.value = 'market';
+  lines.dispatchEvent(new app.window.Event('change'));
 }
 const badge = (app, name) => { const el = app.row(name).querySelector('.line-move'); return el ? el.className.replace('line-move ', '') + ' ' + el.textContent : ''; };
 
@@ -121,6 +130,7 @@ test('with last week\u2019s game also in view, an upcoming pick matches this wee
   const app = openApp({ espn: { feed: espnFeed(lastWeek.concat(thisWeek)), calls: [] } });
   t.after(app.close);
   await wait(20);
+  marketMode(app);
   app.loadTeams(['Temple +6.5', 'USC -9.5', 'Purdue +14.5', 'Iowa -3', 'Utah -1', 'Rice +2', 'Army -3']);
   await wait(250);
   assert.equal(badge(app, 'Temple +6.5'), 'worse \u25bc now +5.5', 'compared with this week, not last week\u2019s +6.5 close');
@@ -131,6 +141,7 @@ test('a line more than 7 points off is flagged to check by hand, not badged', as
   const app = openApp({ espn: { feed: espnFeed([upcoming(['Temple', 'TEM'], ['Navy', 'NAVY'], 'TEM -4.5'), upcoming(['USC', 'USC'], ['Michigan State', 'MSU'], 'USC -8.5')]), calls: [] } });
   t.after(app.close);
   await wait(20);
+  marketMode(app);
   app.loadTeams(['Temple +6.5', 'USC -9.5', 'Purdue +14.5', 'Iowa -3', 'Utah -1', 'Rice +2', 'Army -3']);
   await wait(250);
   assert.equal(badge(app, 'Temple +6.5'), '');
